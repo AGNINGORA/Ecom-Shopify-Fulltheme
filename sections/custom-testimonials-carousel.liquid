@@ -1,0 +1,327 @@
+{% comment %}
+  custom-testimonials-carousel.liquid
+  Carrousel d'avis clients — autoplay, flèches, dots, scroll-snap
+  Dawn 15.x · Vanilla JS · CSS scroll-snap (pas de librairie)
+  CSS : assets/custom-testimonials-carousel.css
+  JS  : assets/custom-testimonials-carousel.js
+{% endcomment %}
+
+{{ 'custom-testimonials-carousel.css' | asset_url | stylesheet_tag }}
+
+{%- assign testimonial_blocks = section.blocks | where: 'type', 'testimonial' -%}
+{%- assign slides_desktop = section.settings.slides_desktop | default: 2 -%}
+
+<section
+  class="ctc"
+  data-section-id="{{ section.id }}"
+  style="
+    --ctc-accent:    {{ section.settings.accent_color }};
+    --ctc-star:      {{ section.settings.star_color }};
+    --ctc-card-bg:   {{ section.settings.card_bg }};
+    --ctc-slides-desktop: {{ slides_desktop }};
+  "
+>
+  <div class="ctc__inner page-width">
+
+    {%- comment %} En-tête ─────────────────────────────────── {% endcomment %}
+    <div class="ctc__header">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="ctc__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.title != blank -%}
+        <h2 class="ctc__title">{{ section.settings.title | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtitle != blank -%}
+        <p class="ctc__subtitle">{{ section.settings.subtitle | escape }}</p>
+      {%- endif -%}
+    </div>
+
+  </div>
+
+  {%- comment %} Carrousel ───────────────────────────────────────── {% endcomment %}
+  {%- if testimonial_blocks.size > 0 -%}
+    <div
+      class="ctc__carousel"
+      data-ctc-carousel
+      data-autoplay="{{ section.settings.autoplay }}"
+      data-speed="{{ section.settings.autoplay_speed | times: 1000 }}"
+      data-slides-desktop="{{ slides_desktop }}"
+    >
+      {%- comment %} Track (scroll-snap) {% endcomment %}
+      <div class="ctc__track" data-ctc-track aria-live="polite" aria-atomic="false">
+
+        {%- for block in testimonial_blocks -%}
+          {%- liquid
+            assign rating = block.settings.rating | plus: 0
+          -%}
+          <article
+            class="ctc__slide"
+            data-ctc-slide
+            aria-label="Avis de {{ block.settings.name | default: 'client' | escape }}, {{ forloop.index }} sur {{ testimonial_blocks.size }}"
+            role="group"
+            {{ block.shopify_attributes }}
+          >
+            <div class="ctc__card">
+
+              {%- comment %} Note étoiles {% endcomment %}
+              {%- if rating > 0 -%}
+                <div class="ctc__stars" aria-label="{{ rating }} étoiles sur 5">
+                  {%- for i in (1..5) -%}
+                    <span class="ctc__star {% if i <= rating %}ctc__star--filled{% else %}ctc__star--empty{% endif %}" aria-hidden="true">
+                      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        {%- if i <= rating -%}
+                          <path d="M8 1L10 6H15L11 9.5L12.5 14.5L8 11.5L3.5 14.5L5 9.5L1 6H6L8 1Z" fill="currentColor"/>
+                        {%- else -%}
+                          <path d="M8 1L10 6H15L11 9.5L12.5 14.5L8 11.5L3.5 14.5L5 9.5L1 6H6L8 1Z" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                        {%- endif -%}
+                      </svg>
+                    </span>
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
+
+              {%- comment %} Citation {% endcomment %}
+              {%- if block.settings.text != blank -%}
+                <blockquote class="ctc__quote">
+                  <p>{{ block.settings.text | escape }}</p>
+                </blockquote>
+              {%- endif -%}
+
+              {%- comment %} Auteur {% endcomment %}
+              <div class="ctc__author">
+                {%- if block.settings.photo != blank -%}
+                  <div class="ctc__author-avatar">
+                    <img
+                      src="{{ block.settings.photo | image_url: width: 120, format: 'webp' }}"
+                      alt="{{ block.settings.name | default: '' | escape }}"
+                      width="60"
+                      height="60"
+                      loading="lazy"
+                    >
+                  </div>
+                {%- else -%}
+                  <div class="ctc__author-initials" aria-hidden="true">
+                    {{ block.settings.name | slice: 0, 1 | upcase }}
+                  </div>
+                {%- endif -%}
+                <div class="ctc__author-info">
+                  {%- if block.settings.name != blank -%}
+                    <p class="ctc__author-name">{{ block.settings.name | escape }}</p>
+                  {%- endif -%}
+                  {%- if block.settings.location != blank -%}
+                    <p class="ctc__author-location">{{ block.settings.location | escape }}</p>
+                  {%- endif -%}
+                  {%- if block.settings.verified -%}
+                    <p class="ctc__verified">
+                      <svg viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                        <path d="M7 1L8.5 3.5H11.5L10 6L11.5 8.5H8.5L7 11L5.5 8.5H2.5L4 6L2.5 3.5H5.5L7 1Z" fill="currentColor"/>
+                        <path d="M5 6.5L6.5 8L9 5" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      Achat vérifié
+                    </p>
+                  {%- endif -%}
+                </div>
+              </div>
+
+            </div>
+          </article>
+        {%- endfor -%}
+
+      </div>
+      {%- comment %} fin track {% endcomment %}
+
+      {%- comment %} Flèches navigation {% endcomment %}
+      {%- if testimonial_blocks.size > 1 -%}
+        <button class="ctc__arrow ctc__arrow--prev" data-ctc-prev type="button" aria-label="Avis précédent">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="ctc__arrow ctc__arrow--next" data-ctc-next type="button" aria-label="Avis suivant">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      {%- endif -%}
+
+      {%- comment %} Indicateurs (dots) {% endcomment %}
+      {%- if testimonial_blocks.size > 1 -%}
+        <div class="ctc__dots" data-ctc-dots role="tablist" aria-label="Sélectionner un avis">
+          {%- for block in testimonial_blocks -%}
+            <button
+              class="ctc__dot{% if forloop.first %} is-active{% endif %}"
+              data-ctc-dot="{{ forloop.index0 }}"
+              type="button"
+              role="tab"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              aria-label="Avis {{ forloop.index }}"
+            ></button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+    </div>
+  {%- endif -%}
+
+</section>
+
+<script src="{{ 'custom-testimonials-carousel.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Témoignages carrousel",
+  "tag": "section",
+  "class": "section-custom-testimonials-carousel",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Accroche",
+      "placeholder": "ex : Ce que disent nos clientes"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Elles adorent nos produits"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Sous-titre",
+      "placeholder": "ex : Plus de 2 400 avis vérifiés"
+    },
+    {
+      "type": "header",
+      "content": "Carrousel"
+    },
+    {
+      "type": "select",
+      "id": "slides_desktop",
+      "label": "Avis visibles sur desktop",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Défilement automatique",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Délai entre les avis (secondes)",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent (flèches, dots)",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Couleur des étoiles",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Fond des cartes",
+      "default": "#faf8f5"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0, "max": 100, "step": 4, "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0, "max": 100, "step": 4, "unit": "px",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Témoignage",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "photo",
+          "label": "Photo du client (optionnelle)"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Prénom et nom",
+          "default": "Marie D."
+        },
+        {
+          "type": "text",
+          "id": "location",
+          "label": "Ville / localisation (optionnelle)",
+          "placeholder": "ex : Paris"
+        },
+        {
+          "type": "select",
+          "id": "rating",
+          "label": "Note",
+          "options": [
+            { "value": "5", "label": "5 étoiles" },
+            { "value": "4", "label": "4 étoiles" },
+            { "value": "3", "label": "3 étoiles" },
+            { "value": "2", "label": "2 étoiles" },
+            { "value": "1", "label": "1 étoile" }
+          ],
+          "default": "5"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Témoignage",
+          "default": "Résultats visibles dès la première semaine. Ma peau est transformée, plus lumineuse et hydratée. Je recommande les yeux fermés !"
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Afficher le badge \"Achat vérifié\"",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Témoignages carrousel",
+      "blocks": [
+        { "type": "testimonial", "settings": { "name": "Sophie L.", "location": "Lyon", "rating": "5", "text": "Ma peau n'a jamais été aussi belle. Le sérum est devenu indispensable dans ma routine.", "verified": true } },
+        { "type": "testimonial", "settings": { "name": "Camille R.", "location": "Paris", "rating": "5", "text": "Je suis bluffée par les résultats en seulement 4 semaines. Tellement naturel et efficace.", "verified": true } },
+        { "type": "testimonial", "settings": { "name": "Julie M.", "location": "Bordeaux", "rating": "5", "text": "Enfin des produits qui tiennent leurs promesses ! Ma peau est rayonnante et hydratée.", "verified": true } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,320 @@
+{% comment %}
+  custom-collection-product-card.liquid
+  Card produit pour la grille de collection — 2 styles
+  Accepte :
+    - product        : {Object}  (required)
+    - card_style     : {String}  'classic' | 'showcase'
+    - show_vendor    : {Boolean}
+    - show_price     : {Boolean}
+    - show_rating    : {Boolean}
+    - show_tags      : {Boolean}
+    - tag_prefix     : {String}  ex: 'feat:'
+    - show_badges    : {Boolean}
+    - show_hover_img : {Boolean}
+    - show_swatches  : {Boolean}
+    - show_atc       : {Boolean}
+    - atc_label      : {String}
+    - image_ratio    : {String}  'square' | 'portrait' | 'landscape' | 'auto'
+    - card_bg        : {String}  couleur hex
+    - card_radius    : {Number}  px
+    - accent         : {String}  couleur hex
+{% endcomment %}
+
+{%- liquid
+  assign card_style    = card_style | default: 'showcase'
+  assign show_vendor   = show_vendor | default: false
+  assign show_price    = show_price | default: true
+  assign show_rating   = show_rating | default: true
+  assign show_tags     = show_tags | default: true
+  assign tag_prefix    = tag_prefix | default: 'feat:'
+  assign show_badges   = show_badges | default: true
+  assign show_hover_img = show_hover_img | default: true
+  assign show_swatches = show_swatches | default: true
+  assign show_atc      = show_atc | default: true
+  assign atc_label     = atc_label | default: 'Acheter'
+  assign image_ratio   = image_ratio | default: 'square'
+  assign card_bg       = card_bg | default: '#f9f9f9'
+  assign card_radius   = card_radius | default: 12
+  assign accent        = accent | default: '#C9A96E'
+
+  assign card_img = product.featured_media
+  assign price    = product.price
+  assign compare  = product.compare_at_price
+  assign on_sale  = false
+  if compare > price
+    assign on_sale = true
+  endif
+  assign sold_out = false
+  unless product.available
+    assign sold_out = true
+  endunless
+  assign pct = 0
+  if on_sale and compare > 0
+    assign pct = compare | minus: price | times: 100 | divided_by: compare
+  endif
+
+  assign feature_tags = ''
+  if show_tags
+    for tag in product.tags
+      assign tag_down = tag | downcase
+      assign prefix_down = tag_prefix | downcase
+      if tag_down contains prefix_down
+        assign clean_tag = tag | split: ':' | last | strip
+        if feature_tags == ''
+          assign feature_tags = clean_tag
+        else
+          assign feature_tags = feature_tags | append: '|||' | append: clean_tag
+        endif
+      endif
+    endfor
+  endif
+-%}
+
+<article
+  class="ccf__card ccf__card--{{ card_style }}{% if sold_out %} ccf__card--sold-out{% endif %}"
+  data-product-id="{{ product.id }}"
+  style="
+    --card-bg: {{ card_bg }};
+    --card-radius: {{ card_radius }}px;
+    --card-accent: {{ accent }};
+  "
+>
+
+  {%- if card_style == 'showcase' -%}
+    {%- comment %} ═══════════════════════════════════════════
+        STYLE VITRINE (Momcozy-like)
+    ═══════════════════════════════════════════ {% endcomment %}
+
+    {%- comment %} ── Header : titre + rating ──────────────── {% endcomment %}
+    <div class="ccf__card-header">
+      <h3 class="ccf__card-title">
+        <a class="ccf__card-title-link" href="{{ product.url }}">{{ product.title | escape }}</a>
+      </h3>
+
+      {%- if show_rating -%}
+        <div class="ccf__card-rating" aria-label="Note du produit">
+          <div class="ccf__stars">
+            {%- for i in (1..5) -%}
+              <svg class="ccf__star" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path d="M8 0l2.47 4.84L16 5.72l-4 3.76.94 5.32L8 12.36 3.06 14.8 4 9.48 0 5.72l5.53-.88Z"/>
+              </svg>
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment %} ── Image ──────────────────────────────── {% endcomment %}
+    <a class="ccf__card-img-wrap ccf__card-img-wrap--{{ image_ratio }}" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+      {%- if card_img -%}
+        <img
+          class="ccf__card-img ccf__card-img--primary"
+          src="{{ card_img | image_url: width: 540 }}"
+          srcset="
+            {{ card_img | image_url: width: 300 }} 300w,
+            {{ card_img | image_url: width: 540 }} 540w,
+            {{ card_img | image_url: width: 800 }} 800w
+          "
+          sizes="(min-width: 990px) calc((100vw - 13rem) / 4), (min-width: 750px) calc((100vw - 10rem) / 3), calc(50vw - 2.4rem)"
+          alt="{{ card_img.alt | escape | default: product.title | escape }}"
+          loading="lazy"
+          width="{{ card_img.width }}"
+          height="{{ card_img.height }}"
+        >
+        {%- if show_hover_img and product.media.size > 1 -%}
+          {%- assign hover_img = product.media[1] -%}
+          <img
+            class="ccf__card-img ccf__card-img--hover"
+            src="{{ hover_img | image_url: width: 540 }}"
+            alt="{{ hover_img.alt | escape | default: product.title | escape }}"
+            loading="lazy"
+            width="{{ hover_img.width }}"
+            height="{{ hover_img.height }}"
+            aria-hidden="true"
+          >
+        {%- endif -%}
+      {%- else -%}
+        <div class="ccf__card-img-placeholder"></div>
+      {%- endif -%}
+
+      {%- if show_badges -%}
+        <div class="ccf__card-badges">
+          {%- if sold_out -%}
+            <span class="ccf__badge ccf__badge--sold-out">Épuisé</span>
+          {%- elsif on_sale -%}
+            <span class="ccf__badge ccf__badge--sale">-{{ pct }}%</span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </a>
+
+    {%- render 'custom-wishlist-button', product: product -%}
+
+    {%- comment %} ── Footer : tags + prix + bouton ───────── {% endcomment %}
+    <div class="ccf__card-footer">
+
+      {%- if show_tags and feature_tags != '' -%}
+        <div class="ccf__card-tags">
+          {%- assign tags_arr = feature_tags | split: '|||' -%}
+          {%- for ft in tags_arr limit: 4 -%}
+            <span class="ccf__tag">{{ ft }}</span>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- if show_swatches -%}
+        {%- for option in product.options_with_values -%}
+          {%- assign opt_lower = option.name | downcase -%}
+          {%- if opt_lower contains 'couleur' or opt_lower contains 'color' or opt_lower contains 'teinte' -%}
+            {%- if option.values.size > 1 -%}
+              <div class="ccf__card-swatches" aria-label="Couleurs disponibles">
+                {%- for value in option.values limit: 6 -%}
+                  <span
+                    class="ccf__card-swatch"
+                    title="{{ value | escape }}"
+                    style="background-color: {{ value | downcase | replace: ' ', '' }};"
+                    aria-hidden="true"
+                  ></span>
+                {%- endfor -%}
+                {%- if option.values.size > 6 -%}
+                  <span class="ccf__card-swatch-more">+{{ option.values.size | minus: 6 }}</span>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+            {%- break -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+
+      {%- if show_price -%}
+        <div class="ccf__card-price">
+          {%- if on_sale -%}
+            <span class="ccf__price--sale">{{ price | money }}</span>
+            <s class="ccf__price--compare">{{ compare | money }}</s>
+          {%- else -%}
+            <span class="ccf__price--regular">{{ price | money }}</span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if show_atc and product.available -%}
+        <a class="ccf__card-buy" href="{{ product.url }}">
+          {{ atc_label }}
+        </a>
+      {%- elsif sold_out -%}
+        <span class="ccf__card-buy ccf__card-buy--disabled">Épuisé</span>
+      {%- endif -%}
+
+    </div>
+
+  {%- else -%}
+    {%- comment %} ═══════════════════════════════════════════
+        STYLE CLASSIQUE
+    ═══════════════════════════════════════════ {% endcomment %}
+
+    <a class="ccf__card-img-wrap ccf__card-img-wrap--{{ image_ratio }}" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+      {%- if card_img -%}
+        <img
+          class="ccf__card-img ccf__card-img--primary"
+          src="{{ card_img | image_url: width: 480 }}"
+          srcset="
+            {{ card_img | image_url: width: 240 }} 240w,
+            {{ card_img | image_url: width: 480 }} 480w,
+            {{ card_img | image_url: width: 720 }} 720w
+          "
+          sizes="(min-width: 990px) calc((100vw - 13rem) / 4), (min-width: 750px) calc((100vw - 10rem) / 3), calc(50vw - 2.4rem)"
+          alt="{{ card_img.alt | escape | default: product.title | escape }}"
+          loading="lazy"
+          width="{{ card_img.width }}"
+          height="{{ card_img.height }}"
+        >
+        {%- if show_hover_img and product.media.size > 1 -%}
+          {%- assign hover_img = product.media[1] -%}
+          <img
+            class="ccf__card-img ccf__card-img--hover"
+            src="{{ hover_img | image_url: width: 480 }}"
+            alt="{{ hover_img.alt | escape | default: product.title | escape }}"
+            loading="lazy"
+            width="{{ hover_img.width }}"
+            height="{{ hover_img.height }}"
+            aria-hidden="true"
+          >
+        {%- endif -%}
+      {%- else -%}
+        <div class="ccf__card-img-placeholder"></div>
+      {%- endif -%}
+
+      {%- if show_badges -%}
+        <div class="ccf__card-badges">
+          {%- if sold_out -%}
+            <span class="ccf__badge ccf__badge--sold-out">Épuisé</span>
+          {%- elsif on_sale -%}
+            <span class="ccf__badge ccf__badge--sale">-{{ pct }}%</span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </a>
+
+    {%- render 'custom-wishlist-button', product: product -%}
+
+    <div class="ccf__card-info">
+      {%- if show_vendor and product.vendor != blank -%}
+        <p class="ccf__card-vendor">{{ product.vendor | escape }}</p>
+      {%- endif -%}
+
+      <h3 class="ccf__card-title">
+        <a class="ccf__card-title-link" href="{{ product.url }}">{{ product.title | escape }}</a>
+      </h3>
+
+      {%- if show_price -%}
+        <div class="ccf__card-price">
+          {%- if on_sale -%}
+            <span class="ccf__price--sale">{{ price | money }}</span>
+            <s class="ccf__price--compare">{{ compare | money }}</s>
+          {%- else -%}
+            <span class="ccf__price--regular">{{ price | money }}</span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if show_swatches -%}
+        {%- for option in product.options_with_values -%}
+          {%- assign opt_lower = option.name | downcase -%}
+          {%- if opt_lower contains 'couleur' or opt_lower contains 'color' or opt_lower contains 'teinte' -%}
+            {%- if option.values.size > 1 -%}
+              <div class="ccf__card-swatches" aria-label="Couleurs disponibles">
+                {%- for value in option.values limit: 6 -%}
+                  <span
+                    class="ccf__card-swatch"
+                    title="{{ value | escape }}"
+                    style="background-color: {{ value | downcase | replace: ' ', '' }};"
+                    aria-hidden="true"
+                  ></span>
+                {%- endfor -%}
+                {%- if option.values.size > 6 -%}
+                  <span class="ccf__card-swatch-more">+{{ option.values.size | minus: 6 }}</span>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+            {%- break -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+    {%- if show_atc and product.variants.size == 1 and product.available -%}
+      <button
+        class="ccf__card-atc"
+        type="button"
+        data-ccf-quick-add="{{ product.variants.first.id }}"
+        aria-label="Ajouter {{ product.title | escape }} au panier"
+      >
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    {%- endif -%}
+
+  {%- endif -%}
+
+</article>

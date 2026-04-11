@@ -1,0 +1,218 @@
+{% comment %}
+  Custom A/B CTA Banner – Testable call-to-action banner
+  Dawn 15.x · Utilise le système custom-ab-testing.js
+  Permet de tester 2 variantes de titre, texte et CTA.
+{% endcomment %}
+
+{%- assign accent = section.settings.accent_color -%}
+
+<section
+  class="ab-cta-banner page-width"
+  style="
+    --ab-accent: {{ accent }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  {%- comment %} ── Variant A ── {% endcomment %}
+  <div
+    class="ab-cta-banner__card"
+    data-ab-test="{{ section.settings.test_name }}"
+    data-ab-variant="A"
+  >
+    {%- if section.settings.title_a != blank -%}
+      <h2 class="ab-cta-banner__title">{{ section.settings.title_a }}</h2>
+    {%- endif -%}
+    {%- if section.settings.text_a != blank -%}
+      <p class="ab-cta-banner__text">{{ section.settings.text_a }}</p>
+    {%- endif -%}
+    {%- if section.settings.cta_label_a != blank and section.settings.cta_url_a != blank -%}
+      <a href="{{ section.settings.cta_url_a }}" class="ab-cta-banner__btn" style="background:{{ section.settings.cta_color_a }};">
+        {{ section.settings.cta_label_a }}
+      </a>
+    {%- endif -%}
+  </div>
+
+  {%- comment %} ── Variant B ── {% endcomment %}
+  <div
+    class="ab-cta-banner__card"
+    data-ab-test="{{ section.settings.test_name }}"
+    data-ab-variant="B"
+  >
+    {%- if section.settings.title_b != blank -%}
+      <h2 class="ab-cta-banner__title">{{ section.settings.title_b }}</h2>
+    {%- endif -%}
+    {%- if section.settings.text_b != blank -%}
+      <p class="ab-cta-banner__text">{{ section.settings.text_b }}</p>
+    {%- endif -%}
+    {%- if section.settings.cta_label_b != blank and section.settings.cta_url_b != blank -%}
+      <a href="{{ section.settings.cta_url_b }}" class="ab-cta-banner__btn" style="background:{{ section.settings.cta_color_b }};">
+        {{ section.settings.cta_label_b }}
+      </a>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  .ab-cta-banner__card {
+    text-align: center;
+    padding: 40px 24px;
+    background: linear-gradient(135deg, #f8f6f3, #fff);
+    border-radius: 16px;
+    border: 1px solid #eee;
+  }
+
+  .ab-cta-banner__title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: rgb(var(--color-foreground));
+  }
+
+  .ab-cta-banner__text {
+    font-size: 1.05rem;
+    opacity: .7;
+    margin: 0 0 24px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .ab-cta-banner__btn {
+    display: inline-block;
+    padding: 14px 36px;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: opacity .2s, transform .2s;
+  }
+
+  .ab-cta-banner__btn:hover {
+    opacity: .9;
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 749px) {
+    .ab-cta-banner__title { font-size: 1.4rem; }
+    .ab-cta-banner__card { padding: 28px 16px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "A/B Test – CTA Banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "test_name",
+      "label": "Nom du test (unique)",
+      "default": "homepage_cta",
+      "info": "Identifiant unique pour le tracking analytics"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "header",
+      "content": "── Variante A ──"
+    },
+    {
+      "type": "text",
+      "id": "title_a",
+      "label": "Titre A",
+      "default": "Offre spéciale : -20% aujourd'hui"
+    },
+    {
+      "type": "text",
+      "id": "text_a",
+      "label": "Texte A",
+      "default": "Profitez de notre promotion exclusive sur toute la collection."
+    },
+    {
+      "type": "text",
+      "id": "cta_label_a",
+      "label": "Bouton A – Texte",
+      "default": "En profiter maintenant"
+    },
+    {
+      "type": "url",
+      "id": "cta_url_a",
+      "label": "Bouton A – Lien"
+    },
+    {
+      "type": "color",
+      "id": "cta_color_a",
+      "label": "Bouton A – Couleur",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "header",
+      "content": "── Variante B ──"
+    },
+    {
+      "type": "text",
+      "id": "title_b",
+      "label": "Titre B",
+      "default": "Livraison offerte dès 50€"
+    },
+    {
+      "type": "text",
+      "id": "text_b",
+      "label": "Texte B",
+      "default": "Découvrez notre collection et bénéficiez de la livraison gratuite."
+    },
+    {
+      "type": "text",
+      "id": "cta_label_b",
+      "label": "Bouton B – Texte",
+      "default": "Découvrir la collection"
+    },
+    {
+      "type": "url",
+      "id": "cta_url_b",
+      "label": "Bouton B – Lien"
+    },
+    {
+      "type": "color",
+      "id": "cta_color_b",
+      "label": "Bouton B – Couleur",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "A/B Test – CTA Banner"
+    }
+  ]
+}
+{% endschema %}

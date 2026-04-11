@@ -1,0 +1,290 @@
+{% comment %}
+  Custom Stories Block – Instagram-style stories
+  Dawn 15.x · CSS séparé · Vanilla JS · Mobile-first
+
+  Affiche des stories circulaires cliquables avec viewer modal,
+  progression automatique, navigation swipe et clavier.
+{% endcomment %}
+
+{{ 'custom-stories.css' | asset_url | stylesheet_tag }}
+
+<section
+  class="custom-stories page-width"
+  data-section-id="{{ section.id }}"
+  style="
+    --cst-accent: {{ section.settings.accent_color }};
+    --cst-ring:   {{ section.settings.ring_gradient }};
+    --cst-pt:     {{ section.settings.padding_top }}px;
+    --cst-pb:     {{ section.settings.padding_bottom }}px;
+  "
+>
+  {%- if section.settings.title != blank or section.settings.subtitle != blank -%}
+    <div class="cst-header">
+      {%- if section.settings.title != blank -%}
+        <h2 class="cst-header__title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtitle != blank -%}
+        <p class="cst-header__subtitle">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="cst-track-wrapper">
+    <div class="cst-track">
+      {%- for block in section.blocks -%}
+        <button
+          type="button"
+          class="cst-story"
+          data-story-id="{{ block.id }}"
+          data-story-type="{{ block.settings.content_type }}"
+          data-story-img="{{ block.settings.image | image_url: width: 800 }}"
+          data-story-video="{{ block.settings.video_url }}"
+          data-story-title="{{ block.settings.title | escape }}"
+          data-story-time="{{ block.settings.time_label | escape }}"
+          data-story-text="{{ block.settings.text_content | escape }}"
+          data-story-cta="{{ block.settings.cta_label | escape }}"
+          data-story-url="{{ block.settings.cta_url }}"
+          {{ block.shopify_attributes }}
+        >
+          <div class="cst-story__ring">
+            <div class="cst-story__avatar">
+              {%- if block.settings.thumbnail != blank -%}
+                <img
+                  src="{{ block.settings.thumbnail | image_url: width: 150, height: 150, crop: 'center' }}"
+                  alt="{{ block.settings.title | escape }}"
+                  width="66"
+                  height="66"
+                  loading="lazy"
+                >
+              {%- else -%}
+                <span class="cst-story__icon">{{ block.settings.icon }}</span>
+              {%- endif -%}
+            </div>
+            {%- if block.settings.show_badge -%}
+              <span class="cst-story__badge"></span>
+            {%- endif -%}
+          </div>
+          <span class="cst-story__label">{{ block.settings.title }}</span>
+          {%- if block.settings.time_label != blank -%}
+            <span class="cst-story__time">{{ block.settings.time_label }}</span>
+          {%- endif -%}
+        </button>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.blocks.size > 5 -%}
+      <button type="button" class="cst-nav cst-nav--prev" hidden aria-label="Précédent">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button type="button" class="cst-nav cst-nav--next" aria-label="Suivant">
+        <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    {%- endif -%}
+  </div>
+
+  {%- comment %} ── Viewer modal ── {% endcomment %}
+  <div class="cst-viewer" aria-hidden="true">
+    <div class="cst-viewer__card">
+      <div class="cst-viewer__progress"></div>
+
+      <div class="cst-viewer__header">
+        <div class="cst-viewer__thumb"><img src="" alt="" width="36" height="36"></div>
+        <div class="cst-viewer__meta">
+          <p class="cst-viewer__name"></p>
+          <span class="cst-viewer__when"></span>
+        </div>
+        <button type="button" class="cst-viewer__close" aria-label="Fermer">
+          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="cst-viewer__content"></div>
+
+      <button type="button" class="cst-viewer__tap cst-viewer__tap--prev" aria-label="Précédent"></button>
+      <button type="button" class="cst-viewer__tap cst-viewer__tap--next" aria-label="Suivant"></button>
+
+      <div class="cst-viewer__cta"></div>
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'custom-stories.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Stories",
+  "tag": "div",
+  "class": "custom-stories-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Nos Stories"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Sous-titre",
+      "default": "Nouveautés, promos & coulisses"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "text",
+      "id": "ring_gradient",
+      "label": "Dégradé de la bordure (CSS)",
+      "default": "linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "story",
+      "name": "Story",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titre",
+          "default": "Nouveauté"
+        },
+        {
+          "type": "image_picker",
+          "id": "thumbnail",
+          "label": "Miniature (cercle)"
+        },
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icône emoji (si pas de miniature)",
+          "default": "✨"
+        },
+        {
+          "type": "select",
+          "id": "content_type",
+          "label": "Type de contenu",
+          "options": [
+            { "value": "image", "label": "Image" },
+            { "value": "video", "label": "Vidéo" },
+            { "value": "text",  "label": "Texte" }
+          ],
+          "default": "image"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image plein écran"
+        },
+        {
+          "type": "url",
+          "id": "video_url",
+          "label": "URL vidéo (mp4)"
+        },
+        {
+          "type": "textarea",
+          "id": "text_content",
+          "label": "Contenu texte"
+        },
+        {
+          "type": "text",
+          "id": "time_label",
+          "label": "Label temps",
+          "default": "Nouveau"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_badge",
+          "label": "Afficher badge nouveau",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "cta_label",
+          "label": "Texte bouton CTA"
+        },
+        {
+          "type": "url",
+          "id": "cta_url",
+          "label": "Lien du CTA"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Stories",
+      "blocks": [
+        {
+          "type": "story",
+          "settings": {
+            "title": "Nouveauté",
+            "icon": "✨",
+            "content_type": "image",
+            "time_label": "Nouveau",
+            "show_badge": true
+          }
+        },
+        {
+          "type": "story",
+          "settings": {
+            "title": "Promo flash",
+            "icon": "🔥",
+            "content_type": "image",
+            "time_label": "2h",
+            "show_badge": true
+          }
+        },
+        {
+          "type": "story",
+          "settings": {
+            "title": "Coulisses",
+            "icon": "🎬",
+            "content_type": "image",
+            "time_label": "Hier",
+            "show_badge": false
+          }
+        },
+        {
+          "type": "story",
+          "settings": {
+            "title": "Avis client",
+            "icon": "⭐",
+            "content_type": "text",
+            "text_content": "Ce produit a transformé ma routine ! Je recommande à 100%.",
+            "time_label": "3h",
+            "show_badge": true
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

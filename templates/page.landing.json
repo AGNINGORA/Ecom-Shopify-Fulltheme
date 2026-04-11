@@ -1,0 +1,116 @@
+{
+  "sections": {
+    "hero": {
+      "type": "custom-hero-banner",
+      "settings": {
+        "content_type": "image",
+        "overlay_opacity": 35,
+        "height_desktop": 75,
+        "height_mobile": 60,
+        "text_alignment": "center",
+        "text_position": "middle",
+        "text_color": "#FFFFFF",
+        "eyebrow": "Offre exclusive",
+        "title": "Transformez votre routine beauté",
+        "title_size": "lg",
+        "subtitle": "Des formules clean, cliniquement testées — résultats visibles en 2 semaines.",
+        "cta_label": "Profiter de l'offre",
+        "cta_style": "filled",
+        "cta_bg": "#C9A96E",
+        "cta_text_color": "#FFFFFF",
+        "enable_parallax": false,
+        "show_scroll_arrow": true,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "benefits": {
+      "type": "custom-benefits-banner",
+      "blocks": {
+        "benefit-1": {
+          "type": "benefit",
+          "settings": {
+            "icon": "leaf",
+            "title": "100 % naturel",
+            "description": "Nos formules contiennent uniquement des ingrédients d'origine naturelle, certifiés et traçables."
+          }
+        },
+        "benefit-2": {
+          "type": "benefit",
+          "settings": {
+            "icon": "shield",
+            "title": "Sans parabène",
+            "description": "Aucun conservateur controversé. Efficace et sûr pour toute la famille, y compris les peaux sensibles."
+          }
+        },
+        "benefit-3": {
+          "type": "benefit",
+          "settings": {
+            "icon": "flask",
+            "title": "Cliniquement testé",
+            "description": "Développé avec des dermatologues et testé sous contrôle médical pour des résultats prouvés."
+          }
+        }
+      },
+      "block_order": ["benefit-1", "benefit-2", "benefit-3"],
+      "settings": {
+        "title": "Formulé pour votre peau, pas pour les marges",
+        "subtitle": "Des ingrédients sélectionnés avec soin, pour des résultats visibles dès les premières semaines.",
+        "section_bg": "#F7F5F2",
+        "card_bg": "#FFFFFF",
+        "icon_bg": "#F0EDE8",
+        "accent_color": "#C9A96E",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "featured-product": {
+      "type": "custom-featured-product",
+      "settings": {
+        "show_rating": true,
+        "show_description": true,
+        "desc_chars": 200,
+        "show_buy_now": true,
+        "show_size_guide": false,
+        "size_guide_label": "Guide de taille",
+        "accent_color": "#C9A96E",
+        "add_btn_bg": "#111111",
+        "add_btn_color": "#FFFFFF",
+        "buy_btn_bg": "#FFFFFF",
+        "buy_btn_color": "#111111",
+        "buy_btn_border": "#111111",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "before-after": {
+      "type": "custom-before-after",
+      "settings": {
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "reviews": {
+      "type": "custom-reviews",
+      "settings": {
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "faq": {
+      "type": "custom-product-faq",
+      "settings": {
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "benefits",
+    "featured-product",
+    "before-after",
+    "reviews",
+    "faq"
+  ]
+}

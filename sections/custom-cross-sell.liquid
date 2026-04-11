@@ -1,0 +1,211 @@
+{% comment %}
+  Custom Cross-Sell – Carrousel de produits recommandés
+  Dawn 15.x · CSS scroll-snap · Vanilla JS · Mobile-first
+
+  Priorité d'affichage :
+  1. Recommendations API (product_recommendations_url) via fetch JS
+  2. Fallback Liquid : produits de la même collection
+{% endcomment %}
+
+{{ 'custom-cross-sell.css' | asset_url | stylesheet_tag }}
+
+{%- assign limit = section.settings.products_count -%}
+
+{%- comment %} ── Fallback : produits de la même collection ─── {% endcomment %}
+{%- assign fallback_products = blank -%}
+{%- if product.collections.size > 0 -%}
+  {%- assign first_collection = product.collections.first -%}
+  {%- assign fallback_products = first_collection.products
+      | where: 'available', true -%}
+{%- endif -%}
+
+<section
+  class="custom-cross-sell"
+  data-section-id="{{ section.id }}"
+  data-product-id="{{ product.id }}"
+  data-limit="{{ limit }}"
+  data-recommendations-url="{{ routes.product_recommendations_url }}"
+  style="
+    --ccs-accent:    {{ section.settings.accent_color }};
+    --ccs-btn-bg:    {{ section.settings.button_bg }};
+    --ccs-btn-color: {{ section.settings.button_color }};
+    --ccs-star-color:{{ section.settings.star_color }};
+  "
+>
+  <div class="ccs__inner page-width">
+
+    {%- comment %} ── En-tête ──────────────────────────────────── {% endcomment %}
+    <div class="ccs__header">
+      {%- if section.settings.title != blank -%}
+        <h2 class="ccs__title">{{ section.settings.title | escape }}</h2>
+      {%- endif -%}
+    </div>
+
+    {%- comment %} ── Wrapper carrousel ─────────────────────────── {% endcomment %}
+    <div class="ccs__carousel-wrap">
+
+      {%- comment %} Flèches ──────────────────────────────────── {% endcomment %}
+      <button class="ccs__arrow ccs__arrow--prev" data-ccs-prev aria-label="Produits précédents" hidden>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M13 4L7 10L13 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      {%- comment %} Track scroll-snap ────────────────────────── {% endcomment %}
+      <div
+        class="ccs__track"
+        data-ccs-track
+        role="list"
+        aria-label="{{ section.settings.title | escape }}"
+      >
+        {%- comment %} ── État chargement (remplacé par JS) ───── {% endcomment %}
+        <div class="ccs__loading" data-ccs-loading aria-live="polite">
+          {%- for i in (1..limit) -%}
+            <div class="ccs__card ccs__card--skeleton" aria-hidden="true">
+              <div class="ccs__img-wrap ccs__img-wrap--skeleton"></div>
+              <div class="ccs__card-body ccs__card-body--skeleton">
+                <div class="ccs__skeleton-line ccs__skeleton-line--title"></div>
+                <div class="ccs__skeleton-line ccs__skeleton-line--price"></div>
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {%- comment %} ── Fallback Liquid (remplacé si API ok) ── {% endcomment %}
+        <div class="ccs__fallback" data-ccs-fallback hidden>
+          {%- for p in fallback_products limit: limit -%}
+            {%- unless p.id == product.id -%}
+              {%- render 'custom-cross-sell-card', product: p, section: section -%}
+            {%- endunless -%}
+          {%- endfor -%}
+        </div>
+
+        {%- comment %} ── Résultats API (injecté par JS) ─────── {% endcomment %}
+        <div class="ccs__results" data-ccs-results hidden></div>
+
+      </div>
+
+      <button class="ccs__arrow ccs__arrow--next" data-ccs-next aria-label="Produits suivants" hidden>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M7 4L13 10L7 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+    </div>
+    {%- comment %} fin carousel-wrap {% endcomment %}
+
+  </div>
+</section>
+
+{%- comment %} ── Template carte (utilisé par JS) ─────────────── {% endcomment %}
+<template id="ccs-card-tpl-{{ section.id }}">
+  <div class="ccs__card" role="listitem" data-ccs-card>
+    <div class="ccs__img-wrap">
+      <a class="ccs__img-link" data-ccs-link href="#">
+        <img class="ccs__img ccs__img--primary"   data-ccs-img-primary   src="" alt="" loading="lazy" width="400" height="400">
+        <img class="ccs__img ccs__img--secondary" data-ccs-img-secondary src="" alt="" loading="lazy" width="400" height="400" aria-hidden="true">
+      </a>
+    </div>
+    <div class="ccs__card-body">
+      <div class="ccs__stars" data-ccs-stars hidden aria-label="Note"></div>
+      <a class="ccs__product-name" data-ccs-name href="#"></a>
+      <div class="ccs__price-row">
+        <span class="ccs__price" data-ccs-price></span>
+        <s class="ccs__price-compare" data-ccs-compare hidden></s>
+      </div>
+      <button class="ccs__atc-btn" data-ccs-atc type="button">
+        <span class="ccs__atc-label">Ajouter</span>
+        <span class="ccs__atc-spinner" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5"
+              stroke-dasharray="28" stroke-dashoffset="10" stroke-linecap="round"/>
+          </svg>
+        </span>
+      </button>
+    </div>
+  </div>
+</template>
+
+<script src="{{ 'custom-cross-sell.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Produits recommandés",
+  "tag": "section",
+  "class": "section-custom-cross-sell",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Vous aimerez aussi"
+    },
+    {
+      "type": "range",
+      "id": "products_count",
+      "label": "Nombre de produits",
+      "min": 4,
+      "max": 8,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Couleur des étoiles",
+      "default": "#F4B942"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Fond bouton Ajouter",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Texte bouton Ajouter",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Produits recommandés"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,113 @@
+/* =============================================================
+   custom-free-shipping-bar.css
+   Barre de progression livraison gratuite — snippet
+   Dawn 15.x · Mobile-first
+   Préfixe : cfsb__
+   ============================================================= */
+
+/* ── Variables ─────────────────────────────────────────────── */
+:root {
+  --cfsb-fill:      #C9A96E;
+  --cfsb-fill-free: #22c55e;
+}
+
+/* ── Wrapper ────────────────────────────────────────────────── */
+.cfsb__wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+/* ── Ligne texte + icône ────────────────────────────────────── */
+.cfsb__row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+/* ── Icône camion ───────────────────────────────────────────── */
+.cfsb__icon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--cfsb-fill);
+  transition: color 0.4s ease;
+  width: 2rem;
+  height: 2rem;
+}
+
+.cfsb__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cfsb__wrap--free .cfsb__icon {
+  color: var(--cfsb-fill-free);
+}
+
+/* ── Message ────────────────────────────────────────────────── */
+.cfsb__msg {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #555;
+  line-height: 1.35;
+  flex: 1;
+}
+
+.cfsb__msg strong {
+  font-weight: 700;
+  color: #111;
+}
+
+.cfsb__msg--free {
+  font-weight: 600;
+}
+
+.cfsb__msg--free strong {
+  color: var(--cfsb-fill-free);
+}
+
+/* ── Track ──────────────────────────────────────────────────── */
+.cfsb__track {
+  width: 100%;
+  height: 0.45rem;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+/* ── Fill ───────────────────────────────────────────────────── */
+.cfsb__fill {
+  height: 100%;
+  background: var(--cfsb-fill);
+  border-radius: 99px;
+  transition: width 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.4s ease;
+  will-change: width;
+  min-width: 0;
+}
+
+.cfsb__fill[data-free] {
+  background: var(--cfsb-fill-free);
+}
+
+/* ── Animation célébration ──────────────────────────────────── */
+@keyframes cfsb-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-3px); }
+}
+
+.cfsb__wrap--free .cfsb__icon {
+  animation: cfsb-bounce 0.5s ease;
+}
+
+/* ── Réduction mouvement ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .cfsb__fill {
+    transition: none;
+  }
+
+  .cfsb__wrap--free .cfsb__icon {
+    animation: none;
+  }
+}

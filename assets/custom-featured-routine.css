@@ -1,0 +1,313 @@
+/* =============================================================
+   custom-featured-routine.css
+   Routine beauté étape par étape
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+.section-custom-featured-routine {
+  padding-top:    var(--cfr-padding-top, 6rem);
+  padding-bottom: var(--cfr-padding-bottom, 6rem);
+}
+
+.cfr__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+/* ── En-tête ────────────────────────────────────────────────── */
+.cfr__header {
+  text-align: center;
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+.cfr__eyebrow {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cfr-accent, #C9A96E);
+  margin: 0 0 1rem;
+}
+
+.cfr__title {
+  font-size: clamp(2.4rem, 3.5vw, 3.6rem);
+  font-weight: 800;
+  margin: 0 0 1rem;
+  line-height: 1.15;
+}
+
+.cfr__subtitle {
+  font-size: 1.6rem;
+  opacity: 0.65;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ÉTAPES — Layout mobile (vertical)
+   ══════════════════════════════════════════════════════════════ */
+
+.cfr__steps {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* ── Étape individuelle ─────────────────────────────────────── */
+.cfr__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.6rem;
+  width: 100%;
+  max-width: 28rem;
+  padding: 2.4rem 1.6rem;
+}
+
+/* ── Badge numéro ───────────────────────────────────────────── */
+.cfr__step-badge {
+  position: relative;
+  z-index: 1;
+}
+
+.cfr__step-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: var(--cfr-number-bg, #C9A96E);
+  color: var(--cfr-number-txt, #fff);
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 0 0 4px rgba(var(--cfr-number-bg, #C9A96E), 0.15);
+}
+
+/* ── Image produit ──────────────────────────────────────────── */
+.cfr__step-img-wrap {
+  width: 14rem;
+  height: 14rem;
+  border-radius: 1.2rem;
+  overflow: hidden;
+  background: #f5f5f5;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cfr__step-img-wrap:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+
+.cfr__step-img-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cfr__step-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.cfr__step-img-wrap:hover .cfr__step-img {
+  transform: scale(1.05);
+}
+
+.cfr__step-img-placeholder {
+  width: 14rem;
+  height: 14rem;
+  border-radius: 1.2rem;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.cfr__placeholder-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Corps texte ────────────────────────────────────────────── */
+.cfr__step-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.cfr__step-name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.cfr__step-desc {
+  font-size: 1.35rem;
+  opacity: 0.65;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.cfr__step-footer {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-top: 0.4rem;
+}
+
+.cfr__step-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cfr-accent, #C9A96E);
+}
+
+.cfr__step-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.cfr__step-link:hover { opacity: 1; }
+
+.cfr__step-link svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* ── Connecteur mobile (flèche vers le bas) ─────────────────── */
+.cfr__connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0;
+}
+
+.cfr__connector-arrow {
+  width: 2.4rem;
+  height: 2.4rem;
+  color: var(--cfr-accent, #C9A96E);
+  opacity: 0.4;
+  transform: rotate(90deg); /* pointe vers le bas sur mobile */
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LAYOUT DESKTOP — horizontal
+   ══════════════════════════════════════════════════════════════ */
+
+@media (min-width: 750px) {
+  .cfr__steps {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 0;
+  }
+
+  .cfr__step {
+    flex: 1;
+    max-width: 22rem;
+    padding: 1.6rem 1rem;
+  }
+
+  /* Connecteur horizontal */
+  .cfr__connector {
+    flex-shrink: 0;
+    width: 4rem;
+    padding: 0;
+    margin-top: 3.2rem; /* aligner avec le centre du badge numéro */
+    align-self: flex-start;
+  }
+
+  .cfr__connector-arrow {
+    transform: rotate(0deg); /* pointe vers la droite */
+  }
+}
+
+/* Pour 4+ étapes sur desktop : réduire les items */
+@media (min-width: 990px) {
+  .cfr__step {
+    max-width: none;
+  }
+
+  .cfr__step-img-wrap {
+    width: 16rem;
+    height: 16rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BOUTON "AJOUTER TOUT AU PANIER"
+   ══════════════════════════════════════════════════════════════ */
+
+.cfr__cta-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cfr__add-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.4rem 3.2rem;
+  background: var(--cfr-btn-bg, #111);
+  color: var(--cfr-btn-txt, #fff);
+  border: none;
+  border-radius: 0.8rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+  letter-spacing: 0.02em;
+}
+
+.cfr__add-all svg {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+}
+
+.cfr__add-all:hover { opacity: 0.88; }
+.cfr__add-all:active { transform: scale(0.98); }
+
+.cfr__add-all.is-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.cfr__add-all.is-success {
+  background: #22c55e;
+}
+
+.cfr__cta-note {
+  font-size: 1.3rem;
+  opacity: 0.55;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ── Réduction mouvement ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .cfr__step-img-wrap,
+  .cfr__step-img,
+  .cfr__add-all {
+    transition: none;
+  }
+}

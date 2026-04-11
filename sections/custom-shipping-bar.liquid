@@ -1,0 +1,429 @@
+{% comment %}
+  custom-shipping-bar.liquid
+  Barre de livraison gratuite — redesign moderne & personnalisable
+  Dawn 15.x · Vanilla JS · Mise à jour dynamique
+  CSS : assets/custom-shipping-bar.css
+  JS  : assets/custom-shipping-bar.js
+{% endcomment %}
+
+{%- if section.settings.enabled -%}
+
+{{ 'custom-shipping-bar.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign threshold_cents = section.settings.threshold | times: 100
+  if threshold_cents > 0
+    assign pct = cart.total_price | times: 100 | divided_by: threshold_cents | at_most: 100
+  else
+    assign pct = 100
+  endif
+  assign is_free = false
+  if cart.total_price >= threshold_cents and threshold_cents > 0
+    assign is_free = true
+  endif
+
+  assign bar_style   = section.settings.bar_style | default: 'banner'
+  assign bar_pos     = section.settings.bar_position | default: 'top'
+  assign layout_mode = section.settings.layout | default: 'inline'
+  assign icon_type   = section.settings.icon_type | default: 'truck'
+  assign show_pct    = section.settings.show_percentage
+  assign show_shimmer = section.settings.show_shimmer
+-%}
+
+{%- if section.settings.hide_when_free and is_free -%}
+  {%- comment %} Masqué — livraison gratuite atteinte {% endcomment %}
+{%- else -%}
+
+<div
+  class="csb__wrap csb__wrap--style-{{ bar_style }} csb__wrap--pos-{{ bar_pos }}{% if section.settings.make_sticky %} csb__wrap--sticky{% endif %}{% if is_free %} csb__wrap--free{% endif %}{% unless show_shimmer %} csb__wrap--no-shimmer{% endunless %}"
+  data-shipping-bar
+  data-threshold="{{ threshold_cents }}"
+  data-hide-free="{{ section.settings.hide_when_free }}"
+  data-msg-free="{{ section.settings.message_free | default: '🎉 Livraison gratuite !' | escape }}"
+  data-msg-prefix="{{ section.settings.message_prefix | default: 'Plus que' | escape }}"
+  data-msg-suffix="{{ section.settings.message_suffix | default: 'pour la livraison gratuite !' | escape }}"
+  data-msg-empty="{{ section.settings.message_empty | default: 'Livraison gratuite dès' | escape }}"
+  data-show-pct="{{ show_pct }}"
+  style="
+    --csb-bg:           {{ section.settings.bg_color }};
+    --csb-text:         {{ section.settings.text_color }};
+    --csb-fill:         {{ section.settings.bar_color }};
+    --csb-fill-free:    {{ section.settings.bar_free_color }};
+    --csb-highlight:    {{ section.settings.highlight_color | default: section.settings.bar_color }};
+    --csb-track-bg:     {{ section.settings.track_bg_color | default: 'rgba(0,0,0,.07)' }};
+    --csb-border-color: {{ section.settings.border_color | default: 'rgba(0,0,0,.08)' }};
+    --csb-border-width: {{ section.settings.border_width | default: 0 }}px;
+    --csb-bar-height:   {{ section.settings.bar_height | default: 6 }}px;
+    --csb-bar-radius:   {{ section.settings.bar_radius | default: 99 }}px;
+    --csb-radius:       {{ section.settings.corner_radius | default: 12 }}px;
+    --csb-padding-y:    {{ section.settings.padding_y | default: 10 }}px;
+    --csb-padding-x:    {{ section.settings.padding_x | default: 20 }}px;
+    --csb-font-size:    {{ section.settings.font_size | default: 13 }}px;
+    --csb-font-weight:  {{ section.settings.font_weight | default: '400' }};
+    --csb-icon-size:    {{ section.settings.icon_size | default: 22 }}px;
+  "
+>
+  <div class="csb__inner csb__inner--layout-{{ layout_mode }}{% if bar_style != 'floating' %} page-width{% endif %}">
+
+    {%- comment %} Icône ──────────────────────────────────────── {% endcomment %}
+    {%- if icon_type != 'none' -%}
+      <div class="csb__icon" aria-hidden="true">
+        {%- case icon_type -%}
+          {%- when 'truck' -%}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16h4a1 1 0 0 0 1-1v-4.5a1 1 0 0 0-.3-.7L18 7.2a1 1 0 0 0-.7-.3H16"/><rect x="1" y="4" width="15" height="12" rx="1"/><circle cx="5.5" cy="18" r="2"/><circle cx="18.5" cy="18" r="2"/><path d="M8 18h8"/></svg>
+          {%- when 'package' -%}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          {%- when 'gift' -%}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          {%- when 'star' -%}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          {%- when 'shield' -%}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+        {%- endcase -%}
+      </div>
+    {%- endif -%}
+
+    <div class="csb__content">
+
+      {%- comment %} Message ──────────────────────────────────── {% endcomment %}
+      <p class="csb__msg" data-csb-msg>
+        {%- if is_free -%}
+          {{ section.settings.message_free | default: '🎉 Livraison gratuite !' }}
+        {%- elsif cart.total_price == 0 or threshold_cents == 0 -%}
+          {%- assign threshold_display = section.settings.threshold -%}
+          {{ section.settings.message_empty | default: 'Livraison gratuite dès' | escape }}
+          <strong>{{ threshold_display }}€</strong>
+        {%- else -%}
+          {%- assign remaining = threshold_cents | minus: cart.total_price -%}
+          {{ section.settings.message_prefix | default: 'Plus que' | escape }}
+          <strong data-csb-remaining>{{ remaining | money_without_trailing_zeros }}</strong>
+          {{ section.settings.message_suffix | default: 'pour la livraison gratuite !' | escape }}
+        {%- endif -%}
+      </p>
+
+      {%- comment %} Barre de progression ─────────────────────── {% endcomment %}
+      <div
+        class="csb__track"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="{{ pct }}"
+        aria-label="Progression vers la livraison gratuite"
+      >
+        <div
+          class="csb__fill"
+          data-csb-fill
+          style="width: {{ pct }}%"
+        ></div>
+      </div>
+
+    </div>
+
+    {%- comment %} Pourcentage ──────────────────────────────── {% endcomment %}
+    {%- if show_pct -%}
+      <span class="csb__pct" data-csb-pct>{{ pct }}%</span>
+    {%- endif -%}
+
+    {%- comment %} Bouton fermer (floating) ──────────────────── {% endcomment %}
+    {%- if bar_style == 'floating' -%}
+      <button class="csb__close" type="button" aria-label="Fermer" data-csb-close>
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg>
+      </button>
+    {%- endif -%}
+
+  </div>
+</div>
+
+{%- endif -%}
+
+<script src="{{ 'custom-shipping-bar.js' | asset_url }}" defer></script>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Barre livraison gratuite",
+  "tag": "div",
+  "class": "csb-section",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "Activer la barre",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Style & Position"
+    },
+    {
+      "type": "select",
+      "id": "bar_style",
+      "label": "Style de la barre",
+      "options": [
+        { "value": "banner", "label": "Bandeau classique" },
+        { "value": "minimal", "label": "Minimal (fond transparent)" },
+        { "value": "floating", "label": "Flottant (bulle centrée)" }
+      ],
+      "default": "banner",
+      "info": "Flottant = bulle fixe avec ombre et coins arrondis"
+    },
+    {
+      "type": "select",
+      "id": "bar_position",
+      "label": "Position",
+      "options": [
+        { "value": "top", "label": "Haut de page (sous le header)" },
+        { "value": "bottom", "label": "Bas de page (fixe)" }
+      ],
+      "default": "top"
+    },
+    {
+      "type": "checkbox",
+      "id": "make_sticky",
+      "label": "Rendre collante (sticky)",
+      "default": false,
+      "info": "Reste visible en défilant (mode bandeau/haut uniquement)"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Disposition (desktop)",
+      "options": [
+        { "value": "inline", "label": "En ligne (texte + barre)" },
+        { "value": "stacked", "label": "Empilé (texte au-dessus)" }
+      ],
+      "default": "inline"
+    },
+    {
+      "type": "header",
+      "content": "Seuil & Comportement"
+    },
+    {
+      "type": "range",
+      "id": "threshold",
+      "label": "Seuil de livraison gratuite",
+      "min": 0,
+      "max": 500,
+      "step": 5,
+      "unit": "€",
+      "default": 50
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_when_free",
+      "label": "Masquer quand livraison gratuite atteinte",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_percentage",
+      "label": "Afficher le pourcentage",
+      "default": false,
+      "info": "Montre « 64% » à droite de la barre"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shimmer",
+      "label": "Animation shimmer sur la barre",
+      "default": true,
+      "info": "Effet brillant animé sur la progression"
+    },
+    {
+      "type": "header",
+      "content": "Icône"
+    },
+    {
+      "type": "select",
+      "id": "icon_type",
+      "label": "Icône",
+      "options": [
+        { "value": "truck", "label": "Camion de livraison" },
+        { "value": "package", "label": "Colis" },
+        { "value": "gift", "label": "Cadeau" },
+        { "value": "star", "label": "Étoile" },
+        { "value": "shield", "label": "Bouclier" },
+        { "value": "none", "label": "Aucune" }
+      ],
+      "default": "truck"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Taille de l'icône",
+      "min": 14,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "header",
+      "content": "Messages"
+    },
+    {
+      "type": "text",
+      "id": "message_empty",
+      "label": "Panier vide (avant le montant)",
+      "default": "Livraison gratuite dès"
+    },
+    {
+      "type": "text",
+      "id": "message_prefix",
+      "label": "Avant le montant restant",
+      "default": "Plus que"
+    },
+    {
+      "type": "text",
+      "id": "message_suffix",
+      "label": "Après le montant restant",
+      "default": "pour la livraison gratuite !"
+    },
+    {
+      "type": "text",
+      "id": "message_free",
+      "label": "Livraison gratuite atteinte",
+      "default": "🎉 Livraison gratuite !"
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Fond",
+      "default": "#1a1a2e"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Texte",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "highlight_color",
+      "label": "Texte en gras (montant)",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "bar_color",
+      "label": "Progression",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "bar_free_color",
+      "label": "Progression (livraison atteinte)",
+      "default": "#22c55e"
+    },
+    {
+      "type": "color",
+      "id": "track_bg_color",
+      "label": "Fond de la piste",
+      "default": "#333355"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Bordure",
+      "default": "#333355"
+    },
+    {
+      "type": "header",
+      "content": "Dimensions"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Taille du texte",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Épaisseur du texte",
+      "options": [
+        { "value": "300", "label": "Léger" },
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi-gras" },
+        { "value": "700", "label": "Gras" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "bar_height",
+      "label": "Épaisseur de la barre",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "bar_radius",
+      "label": "Arrondi de la barre",
+      "min": 0,
+      "max": 99,
+      "step": 1,
+      "unit": "px",
+      "default": 99
+    },
+    {
+      "type": "range",
+      "id": "corner_radius",
+      "label": "Arrondi global (mode flottant)",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Épaisseur de la bordure",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "label": "Espacement vertical",
+      "min": 4,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding_x",
+      "label": "Espacement horizontal",
+      "min": 8,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "Barre livraison gratuite"
+    }
+  ]
+}
+{% endschema %}

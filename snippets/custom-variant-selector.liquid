@@ -1,0 +1,272 @@
+{% comment %}
+  Custom Variant Selector – Beauty & Cosmetics
+  Dawn 15.x · Vanilla JS · Mobile-first
+
+  Accepts:
+  - product         : {Object} product object (required)
+  - section_id      : {String} section id     (required)
+  - product_form_id : {String} form id override (optional – auto-generated if omitted)
+{% endcomment %}
+
+{%- liquid
+  assign current_variant  = product.selected_or_first_available_variant
+  assign product_form_id  = product_form_id | default: 'cvs-form-' | append: section_id
+-%}
+
+{{ 'custom-variant-selector.css' | asset_url | stylesheet_tag }}
+
+<div
+  class="cvs"
+  data-cvs
+  data-section-id="{{ section_id }}"
+>
+
+  {%- comment %} ── Données variantes pour le JS ─────────────────── {% endcomment %}
+  <script type="application/json" data-cvs-variants>
+    {{ product.variants | json }}
+  </script>
+
+  {%- comment %} ══════════════════════════════
+      OPTIONS (swatches + pills)
+  ══════════════════════════════ {% endcomment %}
+  {%- unless product.has_only_default_variant -%}
+    {%- for option in product.options_with_values -%}
+
+      {%- liquid
+        assign opt_lower = option.name | downcase
+        assign is_color  = false
+        if opt_lower contains 'couleur' or opt_lower contains 'color' or opt_lower contains 'teinte' or opt_lower contains 'nuance'
+          assign is_color = true
+        endif
+        if opt_lower contains 'shade' or opt_lower contains 'tint' or opt_lower contains 'finition'
+          assign is_color = true
+        endif
+      -%}
+
+      <fieldset
+        class="cvs__option-group"
+        data-option-index="{{ forloop.index0 }}"
+      >
+        <legend class="cvs__option-label">
+          {{ option.name }}
+          {%- if is_color -%}
+            <span class="cvs__option-sep">:</span>
+            <span
+              class="cvs__selected-value"
+              data-selected-value="{{ forloop.index0 }}"
+            >{{ option.selected_value }}</span>
+          {%- endif -%}
+        </legend>
+
+        <div class="cvs__options cvs__options--{% if is_color %}swatches{% else %}pills{% endif %}">
+          {%- for value in option.values -%}
+            {%- liquid
+              assign is_selected   = false
+              if value == option.selected_value
+                assign is_selected = true
+              endif
+              assign is_available = value.available
+            -%}
+
+            {%- if is_color -%}
+              {%- liquid
+                assign swatch_style = ''
+                if value.swatch.image
+                  assign img_url      = value.swatch.image | image_url: width: 80
+                  assign swatch_style = 'background-image:url(' | append: img_url | append: ');background-size:cover'
+                elsif value.swatch.color
+                  assign swatch_style = 'background-color:rgb(' | append: value.swatch.color.rgb | append: ')'
+                else
+                  assign swatch_style = 'background-color:' | append: value | downcase | replace: ' ', ''
+                endif
+              -%}
+              <button
+                type="button"
+                class="cvs__swatch{% if is_selected %} is-selected{% endif %}{% unless is_available %} is-unavailable{% endunless %}"
+                data-option-btn="{{ forloop.parentloop.index0 }}"
+                data-value="{{ value | escape }}"
+                aria-pressed="{{ is_selected | json }}"
+                aria-label="{{ value | escape }}{% unless is_available %} – épuisé{% endunless %}"
+                title="{{ value | escape }}"
+                style="{{ swatch_style }}"
+              ></button>
+
+            {%- else -%}
+              <button
+                type="button"
+                class="cvs__pill{% if is_selected %} is-selected{% endif %}{% unless is_available %} is-unavailable{% endunless %}"
+                data-option-btn="{{ forloop.parentloop.index0 }}"
+                data-value="{{ value | escape }}"
+                aria-pressed="{{ is_selected | json }}"
+                {% unless is_available %}
+                  aria-label="{{ value | escape }} – épuisé"
+                {% endunless %}
+              >{{ value }}</button>
+
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </fieldset>
+
+    {%- endfor -%}
+  {%- endunless -%}
+
+  {%- comment %} ── Alerte stock bas ─────────────────────────────── {% endcomment %}
+  <div class="cvs__stock-warning" data-stock-warning aria-live="polite" aria-atomic="true">
+    {%- if current_variant.inventory_management == 'shopify'
+        and current_variant.inventory_policy == 'deny'
+        and current_variant.inventory_quantity > 0
+        and current_variant.inventory_quantity < 5 -%}
+      <span class="cvs__stock-badge">
+        Plus que {{ current_variant.inventory_quantity }} en stock&nbsp;!
+      </span>
+    {%- endif -%}
+  </div>
+
+  {%- comment %} ── Prix (zone mise à jour par JS) ───────────────── {% endcomment %}
+  <div class="cvs__price" data-cvs-price aria-live="polite" aria-atomic="true">
+    {%- if current_variant.compare_at_price > current_variant.price -%}
+      <span class="cvs__price-sale">{{ current_variant.price | money }}</span>
+      <s class="cvs__price-compare">{{ current_variant.compare_at_price | money }}</s>
+    {%- else -%}
+      <span class="cvs__price-regular">{{ current_variant.price | money }}</span>
+    {%- endif -%}
+  </div>
+
+  {%- comment %} ── Abonnement (selling plans) ────────────────────── {% endcomment %}
+  {%- render 'custom-subscription',
+      product:      product,
+      accent_color: '#C9A96E',
+      discount_pct: 10
+  -%}
+
+  {%- comment %} ══════════════════════════════
+      FORMULAIRE
+  ══════════════════════════════ {% endcomment %}
+  {%- form 'product', product,
+      id: product_form_id,
+      class: 'cvs__form',
+      novalidate: 'novalidate',
+      data-type: 'add-to-cart-form'
+  -%}
+
+    <input
+      type="hidden"
+      name="id"
+      data-cvs-variant-id
+      value="{{ current_variant.id }}"
+      {%- unless current_variant.available %} disabled{% endunless %}
+    >
+
+    {%- comment %} ── Quantité : breaks / buy-X-get-Y / stepper simple ─ {% endcomment %}
+    {%- if cqb_enabled -%}
+
+      {%- render 'custom-quantity-breaks',
+          product: product,
+          enabled: true,
+          qty2:    cqb_qty2,
+          disc2:   cqb_disc2,
+          qty3:    cqb_qty3,
+          disc3:   cqb_disc3
+      -%}
+
+    {%- elsif cbxgy_enabled -%}
+
+      {%- render 'custom-buy-x-get-y',
+          product:      product,
+          enabled:      true,
+          qty_buy:      cbxgy_qty_buy,
+          qty_free:     cbxgy_qty_free,
+          discount_pct: cbxgy_discount_pct,
+          badge_text:   cbxgy_badge_text,
+          offer_text:   cbxgy_offer_text,
+          badge_color:  cbxgy_badge_color
+      -%}
+
+    {%- else -%}
+
+      <div class="cvs__qty-row">
+        <label class="cvs__qty-label" for="cvs-qty-{{ section_id }}">
+          Quantité
+        </label>
+        <div class="cvs__qty-wrap">
+          <button
+            type="button"
+            class="cvs__qty-btn"
+            data-qty-minus
+            aria-label="Diminuer la quantité"
+          >
+            <svg width="12" height="2" viewBox="0 0 12 2" fill="none" aria-hidden="true">
+              <line x1="1" y1="1" x2="11" y2="1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <input
+            type="number"
+            id="cvs-qty-{{ section_id }}"
+            name="quantity"
+            value="1"
+            min="1"
+            class="cvs__qty-input"
+            data-qty-input
+            aria-label="Quantité"
+            inputmode="numeric"
+          >
+          <button
+            type="button"
+            class="cvs__qty-btn"
+            data-qty-plus
+            aria-label="Augmenter la quantité"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <line x1="6" y1="1" x2="6" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <line x1="1" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    {%- endif -%}
+
+    {%- comment %} ── Boutons d'achat ───────────────────────────── {% endcomment %}
+    <div class="cvs__buttons">
+
+      {%- comment %} Ajouter au panier {% endcomment %}
+      <button
+        type="submit"
+        name="add"
+        class="cvs__atc-btn"
+        data-cvs-atc
+        {%- unless current_variant.available %} disabled aria-disabled="true"{% endunless %}
+      >
+        <span class="cvs__atc-label">
+          {%- if current_variant.available -%}
+            Ajouter au panier
+          {%- else -%}
+            Épuisé
+          {%- endif -%}
+        </span>
+        <span class="cvs__atc-spinner" aria-hidden="true">
+          <svg class="cvs__spinner-svg" viewBox="0 0 24 24" fill="none">
+            <circle
+              cx="12" cy="12" r="9"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-dasharray="28"
+              stroke-dashoffset="10"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+      </button>
+
+      {%- comment %} Acheter maintenant (dynamic checkout) {% endcomment %}
+      <div class="cvs__dynamic-checkout">
+        {{ form | payment_button }}
+      </div>
+
+    </div>
+  {%- endform -%}
+
+</div>
+
+<script src="{{ 'custom-variant-selector.js' | asset_url }}" defer></script>

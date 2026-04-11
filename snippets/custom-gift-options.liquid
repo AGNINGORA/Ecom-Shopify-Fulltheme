@@ -1,0 +1,148 @@
+{% comment %}
+  custom-gift-options.liquid
+  Options cadeau dans le panier — message personnalisé + emballage cadeau
+  Dawn 15.x · Vanilla JS · fetch /cart/update.js
+  CSS : assets/custom-gift-options.css
+  JS  : assets/custom-gift-options.js
+
+  Intégration : rendre dans sections/custom-cart-drawer.liquid (dans .ccd__body)
+  ou dans sections/main-cart-footer.liquid
+
+  Accepte :
+  - accent_color   : {String}  couleur accent   (défaut : #C9A96E)
+  - wrapping_price : {Number}  prix emballage en centimes (défaut : 0 = gratuit)
+{% endcomment %}
+
+{%- liquid
+  assign cgo_accent   = accent_color | default: '#C9A96E'
+  assign cgo_price    = wrapping_price | default: 0
+  assign cgo_free     = false
+  if cgo_price == 0
+    assign cgo_free = true
+  endif
+
+  assign cgo_note     = cart.note | default: ''
+  assign cgo_has_wrap = false
+  for attr in cart.attributes
+    if attr.first == 'emballage_cadeau' and attr.last == 'oui'
+      assign cgo_has_wrap = true
+    endif
+  endfor
+  assign cgo_has_msg  = false
+  assign cgo_msg_val  = ''
+  for attr in cart.attributes
+    if attr.first == 'message_cadeau'
+      if attr.last != blank
+        assign cgo_has_msg = true
+        assign cgo_msg_val = attr.last
+      endif
+    endif
+  endfor
+-%}
+
+{{ 'custom-gift-options.css' | asset_url | stylesheet_tag }}
+
+<div
+  class="cgo__wrap"
+  data-cgo
+  style="--cgo-accent: {{ cgo_accent }};"
+>
+
+  {%- comment %} ── En-tête accordéon ──────────────────────── {% endcomment %}
+  <button
+    class="cgo__toggle"
+    type="button"
+    data-cgo-toggle
+    aria-expanded="false"
+    aria-controls="cgo-panel"
+  >
+    <span class="cgo__toggle-icon" aria-hidden="true">🎁</span>
+    <span class="cgo__toggle-label">Ajouter un message / emballage cadeau</span>
+    <span class="cgo__toggle-badge" data-cgo-badge hidden>Ajouté</span>
+    <svg class="cgo__toggle-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  {%- comment %} ── Panneau ───────────────────────────────── {% endcomment %}
+  <div
+    class="cgo__panel"
+    id="cgo-panel"
+    data-cgo-panel
+    hidden
+  >
+
+    {%- comment %} ── Option emballage ──────────────────── {% endcomment %}
+    <label class="cgo__checkbox-label" for="cgo-wrapping">
+      <input
+        type="checkbox"
+        id="cgo-wrapping"
+        class="cgo__checkbox"
+        data-cgo-wrapping
+        {% if cgo_has_wrap %}checked{% endif %}
+      >
+      <span class="cgo__checkbox-custom" aria-hidden="true"></span>
+      <span class="cgo__checkbox-text">
+        Emballage cadeau
+        {%- if cgo_free -%}
+          <span class="cgo__free-badge">Gratuit</span>
+        {%- else -%}
+          <span class="cgo__price-badge">+ {{ cgo_price | money }}</span>
+        {%- endif -%}
+      </span>
+    </label>
+
+    {%- comment %} ── Message cadeau ─────────────────────── {% endcomment %}
+    <div class="cgo__message-wrap">
+      <label class="cgo__msg-label" for="cgo-message">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M2 4h12v9H2V4Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M2 4L8 9L14 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        Message cadeau
+        <span class="cgo__optional">(optionnel)</span>
+      </label>
+      <div class="cgo__textarea-wrap">
+        <textarea
+          id="cgo-message"
+          class="cgo__textarea"
+          data-cgo-message
+          placeholder="Écrivez votre message ici…"
+          maxlength="200"
+          rows="3"
+          aria-describedby="cgo-char-count"
+        >{{ cgo_msg_val | escape }}</textarea>
+        <span class="cgo__char-count" id="cgo-char-count" data-cgo-char-count aria-live="polite">
+          {{ cgo_msg_val | size }}/200
+        </span>
+      </div>
+    </div>
+
+    {%- comment %} ── Bouton sauvegarder ─────────────────── {% endcomment %}
+    <div class="cgo__actions">
+      <button
+        type="button"
+        class="cgo__save"
+        data-cgo-save
+      >
+        <span class="cgo__save-label">Enregistrer</span>
+        <span class="cgo__save-spinner" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="2.2"
+              stroke-dasharray="22" stroke-dashoffset="8" stroke-linecap="round"/>
+          </svg>
+        </span>
+      </button>
+      <p class="cgo__save-confirm" data-cgo-confirm aria-live="polite" hidden>
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M3 8.5L6.5 12L13 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Sauvegardé !
+      </p>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="{{ 'custom-gift-options.js' | asset_url }}" defer></script>

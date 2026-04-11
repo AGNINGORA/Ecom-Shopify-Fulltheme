@@ -1,0 +1,227 @@
+{% comment %}
+  Custom Product FAQ – Accordéon + JSON-LD FAQPage
+  Dawn 15.x · Vanilla JS · Mobile-first
+{% endcomment %}
+
+{{ 'custom-faq.css' | asset_url | stylesheet_tag }}
+
+{%- assign faq_blocks = section.blocks | where: 'type', 'faq_item' -%}
+
+<section
+  class="custom-product-faq"
+  data-section-id="{{ section.id }}"
+  style="
+    --cfaq-accent:  {{ section.settings.accent_color }};
+    --cfaq-border:  {{ section.settings.border_color }};
+    --cfaq-q-color: {{ section.settings.question_color }};
+    --cfaq-a-color: {{ section.settings.answer_color }};
+  "
+>
+  <div class="cfaq__inner page-width">
+
+    {%- if section.settings.title != blank -%}
+      <h2 class="cfaq__heading">{{ section.settings.title | escape }}</h2>
+    {%- endif -%}
+
+    {%- if faq_blocks.size > 0 -%}
+      <div
+        class="cfaq__list"
+        data-faq-list
+        role="list"
+      >
+        {%- for block in faq_blocks -%}
+          {%- if block.settings.question != blank -%}
+            <div
+              class="cfaq__item"
+              role="listitem"
+              {{ block.shopify_attributes }}
+            >
+              <button
+                class="cfaq__question"
+                data-faq-trigger
+                aria-expanded="false"
+                aria-controls="cfaq-answer-{{ section.id }}-{{ forloop.index }}"
+                id="cfaq-question-{{ section.id }}-{{ forloop.index }}"
+              >
+                <span class="cfaq__question-text">{{ block.settings.question | escape }}</span>
+                <span class="cfaq__icon" aria-hidden="true"></span>
+              </button>
+
+              <div
+                class="cfaq__answer"
+                id="cfaq-answer-{{ section.id }}-{{ forloop.index }}"
+                role="region"
+                aria-labelledby="cfaq-question-{{ section.id }}-{{ forloop.index }}"
+                hidden
+              >
+                <div class="cfaq__answer-inner rte">
+                  {{ block.settings.answer }}
+                </div>
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <p class="cfaq__empty">Aucune question pour l'instant.</p>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{%- comment %} ── JSON-LD FAQPage (SEO) ──────────────────────── {% endcomment %}
+{%- if faq_blocks.size > 0 -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {%- for block in faq_blocks -%}
+        {%- if block.settings.question != blank and block.settings.answer != blank -%}
+          {
+            "@type": "Question",
+            "name": {{ block.settings.question | escape | json }},
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": {{ block.settings.answer | strip_html | escape | json }}
+            }
+          }{%- unless forloop.last -%},{%- endunless -%}
+        {%- endif -%}
+      {%- endfor -%}
+    ]
+  }
+  </script>
+{%- endif -%}
+
+<script src="{{ 'custom-faq.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "FAQ produit",
+  "tag": "section",
+  "class": "section-custom-product-faq",
+  "max_blocks": 20,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre de la section",
+      "default": "Questions fréquentes"
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent (icône + hover)",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Couleur des séparateurs",
+      "default": "#e8e2da"
+    },
+    {
+      "type": "color",
+      "id": "question_color",
+      "label": "Couleur des questions",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "answer_color",
+      "label": "Couleur des réponses",
+      "default": "#444444"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "Question / Réponse",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Convient-il à ma peau sensible ?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Réponse",
+          "default": "<p>Oui, notre formule a été testée dermatologiquement et convient aux peaux les plus sensibles. Elle est exempte de parfums synthétiques et d'alcool irritant.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ produit",
+      "blocks": [
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Convient-il à ma peau sensible ?",
+            "answer": "<p>Oui, notre formule a été testée dermatologiquement et convient aux peaux les plus sensibles. Elle est exempte de parfums synthétiques et d'alcool irritant.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Quels sont les ingrédients principaux ?",
+            "answer": "<p>Ce produit est formulé à base d'actifs naturels soigneusement sélectionnés. Retrouvez la liste complète des ingrédients dans l'onglet Composition de la fiche produit.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Comment conserver ce produit ?",
+            "answer": "<p>Conservez ce produit à l'abri de la chaleur et de la lumière directe, dans un endroit sec. Une fois ouvert, utilisez-le de préférence dans les 12 mois.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Puis-je l'utiliser pendant la grossesse ?",
+            "answer": "<p>Par précaution, nous recommandons de consulter votre médecin ou sage-femme avant d'utiliser ce produit pendant la grossesse ou l'allaitement.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Quand vais-je voir les premiers résultats ?",
+            "answer": "<p>Les premiers effets sont généralement visibles dès 2 à 4 semaines d'utilisation régulière. Pour des résultats optimaux, appliquez le produit matin et soir selon le rituel conseillé.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

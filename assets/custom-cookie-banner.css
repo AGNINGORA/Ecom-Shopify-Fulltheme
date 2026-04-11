@@ -1,0 +1,140 @@
+/* =============================================================
+   custom-cookie-banner.css
+   Bannière RGPD — fixe en bas de l'écran
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+/* ── Bannière ────────────────────────────────────────────────── */
+.ccb {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(calc(100% + 3rem));
+  z-index: 9999;
+  width: calc(100% - 3.2rem);
+  max-width: 72rem;
+  background: var(--ccb-bg, #fff);
+  color: var(--ccb-text, #111);
+  border-radius: 1.4rem;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 2rem 2.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  /* Masqué par défaut — JS révèle après vérification */
+  visibility: hidden;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0s linear 0.4s;
+}
+
+/* État visible — slide-up */
+.ccb.is-visible {
+  transform: translateX(-50%) translateY(0);
+  visibility: visible;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0s linear 0s;
+}
+
+/* Disposition desktop : texte à gauche, boutons à droite */
+@media (min-width: 600px) {
+  .ccb {
+    flex-direction: row;
+    align-items: center;
+    gap: 2.4rem;
+    padding: 1.8rem 2.4rem;
+  }
+}
+
+/* ── Texte ───────────────────────────────────────────────────── */
+.ccb__text-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.ccb__text {
+  font-size: 1.4rem;
+  line-height: 1.55;
+  margin: 0;
+  opacity: 0.85;
+}
+
+.ccb__link {
+  color: var(--ccb-accent, #C9A96E);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
+
+.ccb__link:hover {
+  opacity: 0.75;
+}
+
+/* ── Boutons ─────────────────────────────────────────────────── */
+.ccb__actions {
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 599px) {
+  .ccb__actions {
+    width: 100%;
+  }
+
+  .ccb__actions .ccb__btn {
+    flex: 1;
+  }
+}
+
+.ccb__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 1.8rem;
+  border-radius: 0.8rem;
+  font-family: inherit;
+  font-size: 1.35rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+  letter-spacing: 0.01em;
+  border: 1.5px solid transparent;
+}
+
+.ccb__btn:active {
+  transform: scale(0.97);
+}
+
+/* Bouton Accepter — plein */
+.ccb__btn--accept {
+  background: var(--ccb-btn-bg, #111);
+  color: var(--ccb-btn-text, #fff);
+  border-color: var(--ccb-btn-bg, #111);
+}
+
+.ccb__btn--accept:hover {
+  opacity: 0.85;
+}
+
+/* Bouton Refuser — outline */
+.ccb__btn--refuse {
+  background: transparent;
+  color: var(--ccb-text, #111);
+  border-color: currentColor;
+  opacity: 0.65;
+}
+
+.ccb__btn--refuse:hover {
+  opacity: 1;
+}
+
+/* ── Réduction des mouvements ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ccb {
+    transition: visibility 0s;
+  }
+
+  .ccb.is-visible {
+    transition: visibility 0s;
+  }
+}

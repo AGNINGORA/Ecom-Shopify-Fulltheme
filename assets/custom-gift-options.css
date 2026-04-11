@@ -1,0 +1,312 @@
+/* =============================================================
+   custom-gift-options.css
+   Options cadeau (message + emballage) dans le panier
+   Dawn 15.x · Mobile-first · Préfixe : cgo__
+   ============================================================= */
+
+/* ── Wrapper ────────────────────────────────────────────────── */
+.cgo__wrap {
+  border-top: 1px solid #f0f0f0;
+  background: #fefcf8;
+}
+
+/* ── Bouton toggle (accordéon) ──────────────────────────────── */
+.cgo__toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1.4rem 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  transition: background 0.15s ease;
+}
+
+.cgo__toggle:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.cgo__toggle-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.cgo__toggle-label {
+  flex: 1;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+/* Badge "Ajouté" */
+.cgo__toggle-badge {
+  font-size: 1.15rem;
+  font-weight: 600;
+  background: var(--cgo-accent, #C9A96E);
+  color: #fff;
+  padding: 0.25rem 0.8rem;
+  border-radius: 99px;
+  flex-shrink: 0;
+}
+
+.cgo__toggle-badge[hidden] {
+  display: none !important;
+}
+
+.cgo__toggle-chevron {
+  width: 1.6rem;
+  height: 1.6rem;
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: transform 0.25s ease;
+}
+
+.cgo__toggle[aria-expanded="true"] .cgo__toggle-chevron {
+  transform: rotate(180deg);
+}
+
+/* ── Panneau ────────────────────────────────────────────────── */
+.cgo__panel {
+  padding: 0 2rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  animation: cgo-slide-down 0.2s ease;
+}
+
+.cgo__panel[hidden] {
+  display: none !important;
+}
+
+@keyframes cgo-slide-down {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Checkbox emballage ─────────────────────────────────────── */
+.cgo__checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cgo__checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.cgo__checkbox-custom {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border: 1.8px solid rgba(0, 0, 0, 0.2);
+  border-radius: 0.4rem;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.cgo__checkbox:checked + .cgo__checkbox-custom {
+  background: var(--cgo-accent, #C9A96E);
+  border-color: var(--cgo-accent, #C9A96E);
+}
+
+.cgo__checkbox:checked + .cgo__checkbox-custom::after {
+  content: '';
+  display: block;
+  width: 0.5rem;
+  height: 0.9rem;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translateY(-1px);
+}
+
+.cgo__checkbox:focus-visible + .cgo__checkbox-custom {
+  outline: 2px solid var(--cgo-accent, #C9A96E);
+  outline-offset: 2px;
+}
+
+.cgo__checkbox-text {
+  font-size: 1.4rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.cgo__free-badge {
+  font-size: 1.15rem;
+  font-weight: 700;
+  background: #22c55e;
+  color: #fff;
+  padding: 0.2rem 0.7rem;
+  border-radius: 99px;
+}
+
+.cgo__price-badge {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #555;
+}
+
+/* ── Zone message ───────────────────────────────────────────── */
+.cgo__message-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.cgo__msg-label {
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #333;
+}
+
+.cgo__msg-label svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.cgo__optional {
+  font-weight: 400;
+  opacity: 0.5;
+  font-size: 1.2rem;
+}
+
+.cgo__textarea-wrap {
+  position: relative;
+}
+
+.cgo__textarea {
+  width: 100%;
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.7rem;
+  padding: 1rem 1.4rem 2.4rem;
+  font-size: 1.4rem;
+  font-family: inherit;
+  color: #111;
+  background: #fff;
+  resize: vertical;
+  min-height: 9rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+  display: block;
+  box-sizing: border-box;
+}
+
+.cgo__textarea:focus {
+  border-color: var(--cgo-accent, #C9A96E);
+}
+
+.cgo__textarea::placeholder {
+  color: #aaa;
+}
+
+.cgo__char-count {
+  position: absolute;
+  bottom: 0.7rem;
+  right: 1rem;
+  font-size: 1.15rem;
+  color: #aaa;
+  pointer-events: none;
+}
+
+/* ── Actions ────────────────────────────────────────────────── */
+.cgo__actions {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.cgo__save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 1rem 2.2rem;
+  background: var(--cgo-accent, #C9A96E);
+  color: #fff;
+  border: none;
+  border-radius: 0.7rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.cgo__save:hover {
+  opacity: 0.88;
+}
+
+.cgo__save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+.cgo__save-spinner {
+  display: none;
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.cgo__save-spinner svg {
+  width: 100%;
+  height: 100%;
+  animation: cgo-spin 0.7s linear infinite;
+}
+
+@keyframes cgo-spin {
+  to { transform: rotate(360deg); }
+}
+
+.cgo__save.is-loading .cgo__save-label   { display: none; }
+.cgo__save.is-loading .cgo__save-spinner { display: flex; }
+
+/* Confirmation */
+.cgo__save-confirm {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #22c55e;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cgo__save-confirm[hidden] {
+  display: none !important;
+}
+
+.cgo__save-confirm svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  flex-shrink: 0;
+}
+
+/* ── Réduction mouvement ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .cgo__panel {
+    animation: none;
+  }
+
+  .cgo__save-spinner svg {
+    animation: none;
+  }
+}

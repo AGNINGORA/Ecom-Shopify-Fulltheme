@@ -1,0 +1,165 @@
+{% comment %}
+  custom-cookie-banner.liquid
+  Bannière de consentement RGPD — fixe en bas de l'écran
+  Inclure via : {%- section 'custom-cookie-banner' -%} dans layout/theme.liquid
+  Dawn 15.x · Vanilla JS
+{% endcomment %}
+
+{{ 'custom-cookie-banner.css' | asset_url | stylesheet_tag }}
+
+<div
+  class="ccb"
+  role="dialog"
+  aria-live="polite"
+  aria-label="Gestion des cookies"
+  aria-hidden="true"
+  hidden
+  data-ccb
+  data-ccb-expiry="{{ section.settings.expiry_months }}"
+  style="
+    --ccb-bg:       {{ section.settings.bg_color }};
+    --ccb-text:     {{ section.settings.text_color }};
+    --ccb-accent:   {{ section.settings.link_color }};
+    --ccb-btn-bg:   {{ section.settings.accept_btn_bg }};
+    --ccb-btn-text: {{ section.settings.accept_btn_text }};
+  "
+>
+  <div class="ccb__text-wrap">
+    <p class="ccb__text">
+      {{ section.settings.banner_text | escape }}
+      {%- if section.settings.policy_url != blank and section.settings.policy_link_label != blank -%}
+        &nbsp;<a
+          href="{{ section.settings.policy_url }}"
+          class="ccb__link"
+          {% unless section.settings.policy_url contains '#' %}target="_blank" rel="noopener noreferrer"{% endunless %}
+        >{{ section.settings.policy_link_label | escape }}</a>
+      {%- endif -%}
+    </p>
+  </div>
+
+  <div class="ccb__actions">
+    <button class="ccb__btn ccb__btn--refuse" type="button" data-ccb-refuse>
+      {{ section.settings.refuse_label | escape }}
+    </button>
+    <button class="ccb__btn ccb__btn--accept" type="button" data-ccb-accept>
+      {{ section.settings.accept_label | escape }}
+    </button>
+  </div>
+</div>
+
+<script src="{{ 'custom-cookie-banner.js' | asset_url }}" defer="defer"></script>
+
+{% comment %}
+  ── Comment intégrer vos scripts analytics ──────────────────────
+  Dans votre theme.liquid ou GTM, écoutez l'événement 'cookie:accepted' :
+
+  <script>
+    document.addEventListener('cookie:accepted', function () {
+      // Charger Google Analytics, Facebook Pixel, etc.
+    });
+    // Ou pour savoir le choix déjà enregistré au chargement :
+    document.addEventListener('cookie:checked', function (e) {
+      if (e.detail.choice === 'accepted') { /* charger analytics */ }
+    });
+  </script>
+
+  ── Réinitialiser le choix (lien pied de page) ──────────────────
+  <a href="#" onclick="window.CookieBannerReset(); return false;">
+    Gérer mes cookies
+  </a>
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Bannière cookies",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Textes"
+    },
+    {
+      "type": "text",
+      "id": "banner_text",
+      "label": "Texte de la bannière",
+      "default": "Nous utilisons des cookies pour améliorer votre expérience et analyser le trafic de notre site."
+    },
+    {
+      "type": "url",
+      "id": "policy_url",
+      "label": "Lien politique de confidentialité"
+    },
+    {
+      "type": "text",
+      "id": "policy_link_label",
+      "label": "Texte du lien",
+      "default": "En savoir plus"
+    },
+    {
+      "type": "text",
+      "id": "accept_label",
+      "label": "Bouton Accepter",
+      "default": "Accepter"
+    },
+    {
+      "type": "text",
+      "id": "refuse_label",
+      "label": "Bouton Refuser",
+      "default": "Refuser"
+    },
+    {
+      "type": "header",
+      "content": "Consentement"
+    },
+    {
+      "type": "range",
+      "id": "expiry_months",
+      "label": "Durée du consentement (mois)",
+      "min": 1,
+      "max": 13,
+      "step": 1,
+      "default": 6,
+      "info": "Après cette durée, la bannière réapparaît."
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Fond de la bannière",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Couleur du texte",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Couleur du lien",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "accept_btn_bg",
+      "label": "Fond bouton Accepter",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "accept_btn_text",
+      "label": "Texte bouton Accepter",
+      "default": "#FFFFFF"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bannière cookies"
+    }
+  ]
+}
+{% endschema %}

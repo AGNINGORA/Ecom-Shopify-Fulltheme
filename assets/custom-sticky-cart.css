@@ -1,0 +1,242 @@
+/* =============================================================
+   custom-sticky-cart.css
+   Barre fixe d'ajout au panier – slide-up
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+/* ── Variables ─────────────────────────────────────────────── */
+.custom-sticky-cart {
+  --csc-h:          7rem;
+  --csc-transition: 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  --csc-shadow:     0 -4px 24px rgba(0, 0, 0, 0.12);
+  --csc-bg:         #fff;
+  --csc-border:     #e8e2da;
+  --csc-btn-bg:     #111;
+  --csc-btn-color:  #fff;
+  --csc-sale-color: #c0392b;
+}
+
+/* ── Barre fixe ─────────────────────────────────────────────── */
+.custom-sticky-cart {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: var(--csc-bg);
+  border-top: 1px solid var(--csc-border);
+  box-shadow: var(--csc-shadow);
+  min-height: var(--csc-h);
+
+  /* État initial : masqué sous le bas de l'écran */
+  transform: translateY(110%);
+  opacity: 0;
+  transition:
+    transform var(--csc-transition),
+    opacity   0.28s ease;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* État visible */
+.custom-sticky-cart.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── Disposition interne ─────────────────────────────────────── */
+.csc__inner {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  height: var(--csc-h);
+  padding-inline: 1.6rem;
+}
+
+@media (min-width: 750px) {
+  .csc__inner {
+    gap: 2rem;
+    padding-inline: 2.4rem;
+  }
+}
+
+/* ── Image miniature ────────────────────────────────────────── */
+.csc__img-link {
+  display: block;
+  flex-shrink: 0;
+}
+
+.csc__img {
+  display: block;
+  width: 4rem;
+  height: 4rem;
+  object-fit: cover;
+  border-radius: 0.6rem;
+  border: 1px solid var(--csc-border);
+}
+
+/* ── Infos produit ──────────────────────────────────────────── */
+.csc__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.csc__name {
+  font-size: 1.35rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.csc__price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.csc__price-regular,
+.csc__price-sale {
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.csc__price-sale {
+  color: var(--csc-sale-color);
+}
+
+.csc__price-compare {
+  font-size: 1.2rem;
+  color: #999;
+  font-weight: 400;
+  text-decoration: line-through;
+}
+
+/* ── Formulaire ─────────────────────────────────────────────── */
+.csc__form {
+  display: contents;
+}
+
+/* ── Dropdown variante ──────────────────────────────────────── */
+.csc__select-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.csc__select {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 4rem;
+  padding: 0 3rem 0 1.2rem;
+  border: 1.5px solid var(--csc-border);
+  border-radius: 10rem;
+  background: #fff;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: currentColor;
+  cursor: pointer;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.csc__select:focus-visible {
+  border-color: #111;
+}
+
+/* Masquer sur mobile si manque de place */
+@media (max-width: 479px) {
+  .csc__select-wrap {
+    display: none;
+  }
+}
+
+.csc__select-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #888;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Bouton ATC ─────────────────────────────────────────────── */
+.csc__atc-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 4rem;
+  padding: 0 2rem;
+  border: none;
+  border-radius: 10rem;
+  background: var(--csc-btn-bg, #111);
+  color: var(--csc-btn-color, #fff);
+  font-size: 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition:
+    opacity   0.22s ease,
+    transform 0.22s ease;
+}
+
+.csc__atc-btn:hover:not(:disabled) {
+  opacity: 0.87;
+  transform: translateY(-1px);
+}
+
+.csc__atc-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.csc__atc-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.csc__atc-btn:focus-visible {
+  outline: 2px solid var(--csc-btn-bg, #111);
+  outline-offset: 3px;
+}
+
+/* Spinner */
+.csc__btn-spinner {
+  display: none;
+  position: absolute;
+}
+
+.csc__atc-btn.is-loading .csc__btn-label   { opacity: 0; }
+.csc__atc-btn.is-loading .csc__btn-spinner { display: flex; }
+
+.csc__btn-spinner svg {
+  width: 1.8rem;
+  height: 1.8rem;
+  animation: csc-spin 0.75s linear infinite;
+}
+
+@keyframes csc-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Safe area iOS (notch) ──────────────────────────────────── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .custom-sticky-cart {
+    padding-bottom: env(safe-area-inset-bottom);
+    min-height: calc(var(--csc-h) + env(safe-area-inset-bottom));
+  }
+}

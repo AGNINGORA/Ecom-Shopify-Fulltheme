@@ -1,0 +1,116 @@
+{% comment %}
+  custom-wishlist-page.liquid
+  Page liste de souhaits — données chargées via JS (localStorage + fetch AJAX)
+  Dawn 15.x · Vanilla JS
+{% endcomment %}
+
+{{ 'custom-wishlist.css' | asset_url | stylesheet_tag }}
+
+<section
+  class="section-custom-wishlist-page"
+  data-section-id="{{ section.id }}"
+  style="
+    --cwlp-padding-top:    {{ section.settings.padding_top }}px;
+    --cwlp-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="cwlp__inner page-width" data-cwl-page>
+
+    {%- comment %} ── En-tête ── {% endcomment %}
+    <div class="cwlp__header">
+      <h1 class="cwlp__title">{{ section.settings.title | default: 'Ma liste de souhaits' | escape }}</h1>
+      <p class="cwlp__count-text" data-cwl-page-count></p>
+    </div>
+
+    {%- comment %} ── Chargement ── {% endcomment %}
+    <div class="cwlp__loading" data-cwl-loading>
+      <div class="cwlp__spinner" role="status" aria-label="Chargement…"></div>
+    </div>
+
+    {%- comment %} ── État vide (caché par défaut, affiché par JS) ── {% endcomment %}
+    <div class="cwlp__empty" data-cwl-empty hidden>
+      <span class="cwlp__empty-icon" aria-hidden="true">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </span>
+      <h2 class="cwlp__empty-title">{{ section.settings.empty_title | default: 'Votre liste de souhaits est vide' | escape }}</h2>
+      <p class="cwlp__empty-text">{{ section.settings.empty_text | default: 'Explorez notre catalogue et ajoutez les produits qui vous font envie.' | escape }}</p>
+      <a href="{{ section.settings.empty_btn_url | default: routes.collections_url }}" class="cwlp__empty-btn">
+        {{ section.settings.empty_btn_label | default: 'Découvrir nos produits' | escape }}
+      </a>
+    </div>
+
+    {%- comment %} ── Grille (peuplée par JS) ── {% endcomment %}
+    <div class="cwlp__grid" data-cwl-grid hidden></div>
+
+  </div>
+</section>
+
+<script src="{{ 'custom-wishlist.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Wishlist",
+  "tag": "section",
+  "class": "section-custom-wishlist-page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre de la page",
+      "default": "Ma liste de souhaits"
+    },
+    {
+      "type": "header",
+      "content": "Message liste vide"
+    },
+    {
+      "type": "text",
+      "id": "empty_title",
+      "label": "Titre",
+      "default": "Votre liste de souhaits est vide"
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "Description",
+      "default": "Explorez notre catalogue et ajoutez les produits qui vous font envie."
+    },
+    {
+      "type": "text",
+      "id": "empty_btn_label",
+      "label": "Texte du bouton",
+      "default": "Découvrir nos produits"
+    },
+    {
+      "type": "url",
+      "id": "empty_btn_url",
+      "label": "Lien du bouton"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0, "max": 120, "step": 4, "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0, "max": 120, "step": 4, "unit": "px",
+      "default": 64
+    }
+  ],
+  "presets": [
+    {
+      "name": "Wishlist"
+    }
+  ]
+}
+{% endschema %}

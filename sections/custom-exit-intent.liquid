@@ -1,0 +1,267 @@
+{% comment %}
+  custom-exit-intent.liquid
+  Popup exit intent — déclenché quand la souris quitte la fenêtre vers le haut
+  Fallback mobile : délai de 30s d'inactivité
+  Dawn 15.x · Vanilla JS · localStorage (1 affichage / 24h)
+  CSS : assets/custom-exit-intent.css
+  JS  : assets/custom-exit-intent.js
+
+  Intégration : {%- section 'custom-exit-intent' -%} dans layout/theme.liquid (avant </body>)
+{% endcomment %}
+
+{%- if section.settings.enabled -%}
+
+{{ 'custom-exit-intent.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign ei_title       = section.settings.title       | default: 'Attendez ! Une offre rien que pour vous 🎁'
+  assign ei_subtitle    = section.settings.subtitle    | default: 'Profitez de -10% sur votre première commande'
+  assign ei_code        = section.settings.code        | default: 'BIENVENUE10'
+  assign ei_cta         = section.settings.cta_label   | default: "J'en profite"
+  assign ei_cta_url     = section.settings.cta_url
+  assign ei_dismiss     = section.settings.dismiss_label | default: 'Non merci'
+  assign ei_img         = section.settings.image
+  assign ei_delay_h     = section.settings.cooldown_hours | default: 24
+-%}
+
+{%- comment %} ── Overlay ─────────────────────────────────────── {% endcomment %}
+<div class="cei__overlay" data-ei-overlay aria-hidden="true"></div>
+
+{%- comment %} ── Modal ────────────────────────────────────────── {% endcomment %}
+<div
+  class="cei__modal"
+  id="exit-intent-modal"
+  data-ei-modal
+  data-ei-cooldown="{{ ei_delay_h }}"
+  role="dialog"
+  aria-modal="true"
+  aria-label="{{ ei_title | escape }}"
+  tabindex="-1"
+  hidden
+  style="
+    --ei-accent:   {{ section.settings.accent_color }};
+    --ei-btn-txt:  {{ section.settings.btn_text_color }};
+    --ei-bg:       {{ section.settings.bg_color }};
+  "
+>
+
+  {%- comment %} ── Bouton fermer ──────────────────────────── {% endcomment %}
+  <button class="cei__close" data-ei-close type="button" aria-label="Fermer">
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <div class="cei__inner{% if ei_img %} cei__inner--has-img{% endif %}">
+
+    {%- comment %} ── Image (optionnelle) ────────────────── {% endcomment %}
+    {%- if ei_img -%}
+      <div class="cei__img-wrap">
+        <img
+          class="cei__img"
+          src="{{ ei_img | image_url: width: 600 }}"
+          srcset="
+            {{ ei_img | image_url: width: 300 }} 300w,
+            {{ ei_img | image_url: width: 600 }} 600w
+          "
+          sizes="(min-width: 750px) 280px, 100vw"
+          alt="{{ ei_img.alt | default: ei_title | escape }}"
+          loading="eager"
+          width="{{ ei_img.width }}"
+          height="{{ ei_img.height }}"
+        >
+      </div>
+    {%- endif -%}
+
+    {%- comment %} ── Contenu ────────────────────────────── {% endcomment %}
+    <div class="cei__content">
+
+      {%- comment %} Icône décorative si pas d'image {% endcomment %}
+      {%- unless ei_img -%}
+        <span class="cei__deco" aria-hidden="true">
+          {{ section.settings.deco_emoji | default: '🎁' }}
+        </span>
+      {%- endunless -%}
+
+      <h2 class="cei__title">{{ ei_title | escape }}</h2>
+
+      {%- if ei_subtitle != blank -%}
+        <p class="cei__subtitle">{{ ei_subtitle | escape }}</p>
+      {%- endif -%}
+
+      {%- comment %} Code promo avec copie en un clic {% endcomment %}
+      {%- if ei_code != blank -%}
+        <div class="cei__code-wrap" data-ei-code-wrap>
+          <button
+            class="cei__code"
+            type="button"
+            data-ei-copy="{{ ei_code | escape }}"
+            aria-label="Copier le code {{ ei_code | escape }}"
+          >
+            <span class="cei__code-text">{{ ei_code | escape }}</span>
+            <span class="cei__code-copy-icon" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none">
+                <rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+                <path d="M3 11V3h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="cei__code-copied" data-ei-copied aria-live="polite" hidden>Copié !</span>
+          </button>
+          <p class="cei__code-hint">Cliquez pour copier votre code</p>
+        </div>
+      {%- endif -%}
+
+      {%- comment %} ── CTA ────────────────────────────────── {% endcomment %}
+      <div class="cei__actions">
+        {%- if ei_cta_url != blank -%}
+          <a class="cei__cta" href="{{ ei_cta_url }}" data-ei-cta>
+            {{ ei_cta | escape }}
+          </a>
+        {%- else -%}
+          <button class="cei__cta" type="button" data-ei-cta data-ei-close>
+            {{ ei_cta | escape }}
+          </button>
+        {%- endif -%}
+
+        <button class="cei__dismiss" type="button" data-ei-close>
+          {{ ei_dismiss | escape }}
+        </button>
+      </div>
+
+      {%- if section.settings.trust_note != blank -%}
+        <p class="cei__trust">
+          <svg viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <rect x="2" y="6" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M5 6V4.5a2 2 0 0 1 4 0V6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          {{ section.settings.trust_note | escape }}
+        </p>
+      {%- endif -%}
+
+    </div>
+    {%- comment %} fin content {% endcomment %}
+  </div>
+
+</div>
+
+<script src="{{ 'custom-exit-intent.js' | asset_url }}" defer></script>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Exit Intent Popup",
+  "tag": "div",
+  "class": "cei-section",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "Activer le popup",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Contenu"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image (optionnelle)"
+    },
+    {
+      "type": "text",
+      "id": "deco_emoji",
+      "label": "Emoji décoratif (si pas d'image)",
+      "default": "🎁"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Attendez ! Une offre rien que pour vous 🎁"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Sous-titre",
+      "default": "Profitez de -10% sur votre première commande"
+    },
+    {
+      "type": "text",
+      "id": "code",
+      "label": "Code promo (laissez vide pour masquer)",
+      "default": "BIENVENUE10"
+    },
+    {
+      "type": "text",
+      "id": "trust_note",
+      "label": "Note de réassurance",
+      "default": "Sans engagement · Utilisable une seule fois"
+    },
+    {
+      "type": "header",
+      "content": "Boutons"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Texte du bouton principal",
+      "default": "J'en profite"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Lien du bouton (vide = ferme le popup)"
+    },
+    {
+      "type": "text",
+      "id": "dismiss_label",
+      "label": "Texte du lien refus",
+      "default": "Non merci, je préfère payer plein tarif"
+    },
+    {
+      "type": "header",
+      "content": "Comportement"
+    },
+    {
+      "type": "range",
+      "id": "cooldown_hours",
+      "label": "Ne plus afficher pendant (heures)",
+      "min": 2,
+      "max": 168,
+      "step": 2,
+      "default": 24,
+      "unit": "h"
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Fond du popup",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Texte du bouton CTA",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Exit Intent Popup"
+    }
+  ]
+}
+{% endschema %}

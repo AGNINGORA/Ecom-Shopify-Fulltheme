@@ -1,0 +1,433 @@
+/* =============================================================
+   custom-variant-selector.css
+   Beauty & Cosmetics – Sélecteur de variantes
+   Mobile-first · Dawn 15.x
+   ============================================================= */
+
+/* ── Variables ─────────────────────────────────────────────── */
+.cvs {
+  --cvs-gap:            1.6rem;
+  --cvs-radius:         10rem;
+  --cvs-radius-sm:      0.8rem;
+  --cvs-transition:     0.22s ease;
+  --cvs-color-text:     #111;
+  --cvs-color-muted:    #888;
+  --cvs-color-border:   #ddd;
+  --cvs-color-selected: #111;
+  --cvs-color-sale:     #c0392b;
+  --cvs-swatch-size:    3.6rem;
+  --cvs-pill-h:         3.8rem;
+  --cvs-btn-h:          5.2rem;
+  --cvs-qty-size:       4.4rem;
+}
+
+/* ── Conteneur principal ────────────────────────────────────── */
+.cvs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cvs-gap);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   OPTIONS
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Label d'option ─────────────────────────────────────────── */
+.cvs__option-group {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cvs__option-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  color: var(--cvs-color-text);
+}
+
+.cvs__option-sep {
+  font-weight: 400;
+}
+
+.cvs__selected-value {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 1.35rem;
+  color: var(--cvs-color-muted);
+}
+
+/* ── Rangée d'options ───────────────────────────────────────── */
+.cvs__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SWATCHES (couleurs)
+   ══════════════════════════════════════════════════════════════ */
+
+.cvs__swatch {
+  position: relative;
+  width: var(--cvs-swatch-size);
+  height: var(--cvs-swatch-size);
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    border-color var(--cvs-transition),
+    transform     var(--cvs-transition),
+    box-shadow    var(--cvs-transition);
+  box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.12);
+  outline: none;
+}
+
+/* Anneau de sélection (gap blanc entre couleur et bord) */
+.cvs__swatch.is-selected {
+  border-color: var(--cvs-color-selected);
+  box-shadow:
+    0 0 0 1.5px #fff,
+    0 0 0 3.5px var(--cvs-color-selected);
+  transform: scale(1.08);
+}
+
+.cvs__swatch:hover:not(.is-selected):not(.is-unavailable) {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.25);
+}
+
+.cvs__swatch:focus-visible {
+  outline: 2px solid var(--cvs-color-selected);
+  outline-offset: 3px;
+}
+
+/* Épuisé : diagonale */
+.cvs__swatch.is-unavailable {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.cvs__swatch.is-unavailable::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(
+    to bottom right,
+    transparent 45%,
+    rgba(255, 255, 255, 0.9) 45%,
+    rgba(255, 255, 255, 0.9) 55%,
+    transparent 55%
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PILLS (taille, contenance, etc.)
+   ══════════════════════════════════════════════════════════════ */
+
+.cvs__pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--cvs-pill-h);
+  min-width: var(--cvs-pill-h);
+  padding: 0 1.4rem;
+  border: 1.5px solid var(--cvs-color-border);
+  border-radius: var(--cvs-radius);
+  background: transparent;
+  color: var(--cvs-color-text);
+  font-size: 1.35rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background      var(--cvs-transition),
+    border-color    var(--cvs-transition),
+    color           var(--cvs-transition),
+    transform       var(--cvs-transition);
+  white-space: nowrap;
+  outline: none;
+}
+
+.cvs__pill.is-selected {
+  background: var(--cvs-color-selected);
+  border-color: var(--cvs-color-selected);
+  color: #fff;
+  font-weight: 700;
+}
+
+.cvs__pill:hover:not(.is-selected):not(.is-unavailable) {
+  border-color: var(--cvs-color-selected);
+}
+
+.cvs__pill:focus-visible {
+  outline: 2px solid var(--cvs-color-selected);
+  outline-offset: 2px;
+}
+
+/* Épuisé : texte barré + opacité */
+.cvs__pill.is-unavailable {
+  opacity: 0.38;
+  cursor: not-allowed;
+  text-decoration: line-through;
+  text-decoration-color: var(--cvs-color-muted);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ALERTE STOCK BAS
+   ══════════════════════════════════════════════════════════════ */
+
+.cvs__stock-warning {
+  min-height: 2rem; /* évite le layout shift */
+}
+
+.cvs__stock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--cvs-color-sale);
+}
+
+.cvs__stock-badge::before {
+  content: '';
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--cvs-color-sale);
+  animation: cvs-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes cvs-pulse {
+  0%, 100% { opacity: 1;   transform: scale(1);    }
+  50%       { opacity: 0.5; transform: scale(0.75); }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PRIX
+   ══════════════════════════════════════════════════════════════ */
+
+.cvs__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem 1.2rem;
+}
+
+.cvs__price-regular,
+.cvs__price-sale {
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.cvs__price-sale {
+  color: var(--cvs-color-sale);
+}
+
+.cvs__price-compare {
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--cvs-color-muted);
+  text-decoration: line-through;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SÉLECTEUR DE QUANTITÉ
+   ══════════════════════════════════════════════════════════════ */
+
+.cvs__qty-row {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+}
+
+.cvs__qty-label {
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cvs__qty-wrap {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1.5px solid var(--cvs-color-border);
+  border-radius: var(--cvs-radius);
+  overflow: hidden;
+  height: var(--cvs-qty-size);
+}
+
+.cvs__qty-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cvs-qty-size);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--cvs-color-text);
+  transition: background var(--cvs-transition);
+  flex-shrink: 0;
+}
+
+.cvs__qty-btn:hover {
+  background: #f5f5f5;
+}
+
+.cvs__qty-btn:focus-visible {
+  outline: 2px solid var(--cvs-color-selected);
+  outline-offset: -2px;
+}
+
+.cvs__qty-input {
+  width: 4.8rem;
+  border: none;
+  border-left: 1.5px solid var(--cvs-color-border);
+  border-right: 1.5px solid var(--cvs-color-border);
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--cvs-color-text);
+  background: transparent;
+  -moz-appearance: textfield;
+  padding: 0;
+}
+
+.cvs__qty-input::-webkit-outer-spin-button,
+.cvs__qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.cvs__qty-input:focus {
+  outline: none;
+  background: #fafafa;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BOUTONS D'ACHAT
+   ══════════════════════════════════════════════════════════════ */
+
+.cvs__buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* ── Ajouter au panier ───────────────────────────────────────── */
+.cvs__atc-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--cvs-btn-h);
+  padding: 0 2rem;
+  border: none;
+  border-radius: var(--cvs-radius);
+  background: var(--cvs-color-text);
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    opacity     var(--cvs-transition),
+    transform   var(--cvs-transition),
+    background  var(--cvs-transition);
+}
+
+/* Ripple au clic */
+.cvs__atc-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.2);
+  opacity: 0;
+  border-radius: inherit;
+  transition: opacity 0.15s ease;
+}
+
+.cvs__atc-btn:active:not(:disabled)::after {
+  opacity: 1;
+}
+
+.cvs__atc-btn:hover:not(:disabled) {
+  opacity: 0.87;
+  transform: translateY(-1px);
+}
+
+.cvs__atc-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+.cvs__atc-btn:focus-visible {
+  outline: 2px solid var(--cvs-color-text);
+  outline-offset: 3px;
+}
+
+.cvs__atc-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Spinner de chargement ───────────────────────────────────── */
+.cvs__atc-spinner {
+  position: absolute;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.cvs__atc-btn.is-loading .cvs__atc-label {
+  opacity: 0;
+}
+
+.cvs__atc-btn.is-loading .cvs__atc-spinner {
+  display: flex;
+}
+
+.cvs__spinner-svg {
+  width: 2.4rem;
+  height: 2.4rem;
+  animation: cvs-spin 0.75s linear infinite;
+}
+
+@keyframes cvs-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Dynamic checkout (Acheter maintenant) ───────────────────── */
+.cvs__dynamic-checkout .shopify-payment-button {
+  width: 100%;
+}
+
+.cvs__dynamic-checkout .shopify-payment-button__button {
+  border-radius: var(--cvs-radius) !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  min-height: var(--cvs-btn-h) !important;
+  transition: opacity var(--cvs-transition) !important;
+}
+
+.cvs__dynamic-checkout .shopify-payment-button__button:hover {
+  opacity: 0.9 !important;
+}
+
+.cvs__dynamic-checkout .shopify-payment-button__button--unbranded {
+  background: #f1f1f1 !important;
+  color: var(--cvs-color-text) !important;
+}

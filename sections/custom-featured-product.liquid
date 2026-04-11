@@ -1,0 +1,464 @@
+{% comment %}
+  custom-featured-product.liquid
+  Produit complet intégrable sur n'importe quelle page
+  Galerie + variantes + panier — Dawn 15.x · Vanilla JS
+{% endcomment %}
+
+{{ 'custom-featured-product.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign fp = section.settings.product
+  assign current_variant = fp.selected_or_first_available_variant
+-%}
+
+<section
+  class="section-custom-featured-product"
+  data-section-id="{{ section.id }}"
+  style="
+    --cfp-padding-top:    {{ section.settings.padding_top }}px;
+    --cfp-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --cfp-accent:         {{ section.settings.accent_color }};
+    --cfp-add-bg:         {{ section.settings.add_btn_bg }};
+    --cfp-add-color:      {{ section.settings.add_btn_color }};
+    --cfp-buy-bg:         {{ section.settings.buy_btn_bg }};
+    --cfp-buy-color:      {{ section.settings.buy_btn_color }};
+    --cfp-buy-border:     {{ section.settings.buy_btn_border }};
+  "
+>
+  <div class="cfp__inner page-width">
+
+    {%- if fp == blank -%}
+
+      {%- comment %} ── Placeholder éditeur ── {% endcomment %}
+      <div class="cfp__placeholder">
+        <p>Sélectionnez un produit dans les paramètres de la section.</p>
+      </div>
+
+    {%- else -%}
+
+      {%- comment %} ── Données JSON pour le JS ── {% endcomment %}
+      <script type="application/json" data-cfp-variants-json>
+        [
+          {%- for variant in fp.variants -%}
+            {
+              "id":               {{ variant.id }},
+              "title":            {{ variant.title | json }},
+              "price":            {{ variant.price }},
+              "compare_at_price": {{ variant.compare_at_price | default: 0 }},
+              "available":        {{ variant.available }},
+              "option1":          {{ variant.option1 | json }},
+              "option2":          {{ variant.option2 | json }},
+              "option3":          {{ variant.option3 | json }},
+              "featured_image_id": {{ variant.featured_image.id | default: 'null' }}
+            }{%- unless forloop.last -%},{%- endunless -%}
+          {%- endfor -%}
+        ]
+      </script>
+
+      <script type="application/json" data-cfp-images-json>
+        [
+          {%- for image in fp.images -%}
+            {
+              "id":  {{ image.id }},
+              "src": {{ image | image_url: width: 1200, format: 'webp' | json }},
+              "src_thumb": {{ image | image_url: width: 200, format: 'webp' | json }},
+              "alt": {{ image.alt | default: fp.title | json }}
+            }{%- unless forloop.last -%},{%- endunless -%}
+          {%- endfor -%}
+        ]
+      </script>
+
+      <div class="cfp__grid">
+
+        {%- comment %} ══════════════════════════════════════════════
+            COLONNE GAUCHE — Galerie
+        ══════════════════════════════════════════════ {% endcomment %}
+        <div class="cfp__gallery" data-cfp-gallery>
+
+          {%- comment %} Image principale {%- endcomment -%}
+          <div class="cfp__main-wrap" data-cfp-main-wrap>
+            {%- if fp.featured_image != blank -%}
+              <img
+                class="cfp__main-img"
+                data-cfp-main-img
+                src="{{ fp.featured_image | image_url: width: 1200, format: 'webp' }}"
+                srcset="
+                  {{ fp.featured_image | image_url: width: 600, format: 'webp' }}  600w,
+                  {{ fp.featured_image | image_url: width: 900, format: 'webp' }}  900w,
+                  {{ fp.featured_image | image_url: width: 1200, format: 'webp' }} 1200w
+                "
+                sizes="(min-width: 750px) 50vw, 100vw"
+                alt="{{ fp.featured_image.alt | default: fp.title | escape }}"
+                width="{{ fp.featured_image.width }}"
+                height="{{ fp.featured_image.height }}"
+                loading="eager"
+                fetchpriority="high"
+                draggable="false"
+                data-image-id="{{ fp.featured_image.id }}"
+              >
+            {%- else -%}
+              <div class="cfp__main-placeholder">
+                {{ 'product-1' | placeholder_svg_tag: 'cfp__placeholder-svg' }}
+              </div>
+            {%- endif -%}
+
+            {%- comment %} Icône zoom desktop {%- endcomment -%}
+            <span class="cfp__zoom-hint" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M9 6.5v5M6.5 9h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </div>
+
+          {%- comment %} Miniatures {%- endcomment -%}
+          {%- if fp.images.size > 1 -%}
+            <div class="cfp__thumbs" role="list" aria-label="Images du produit">
+              {%- for image in fp.images limit: 6 -%}
+                <button
+                  class="cfp__thumb {% if forloop.first %}is-active{% endif %}"
+                  data-cfp-thumb
+                  data-image-id="{{ image.id }}"
+                  type="button"
+                  role="listitem"
+                  aria-label="Image {{ forloop.index }}"
+                  aria-pressed="{{ forloop.first }}"
+                >
+                  <img
+                    src="{{ image | image_url: width: 200, format: 'webp' }}"
+                    alt="{{ image.alt | default: fp.title | escape }}"
+                    width="80"
+                    height="80"
+                    loading="lazy"
+                    draggable="false"
+                  >
+                </button>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+        </div>
+
+        {%- comment %} ══════════════════════════════════════════════
+            COLONNE DROITE — Infos produit
+        ══════════════════════════════════════════════ {% endcomment %}
+        <div class="cfp__info">
+
+          {%- comment %} ── Étoiles & avis ── {% endcomment -%}
+          {%- if section.settings.show_rating -%}
+            {%- assign rating_val   = fp.metafields.reviews.rating.value -%}
+            {%- assign rating_count = fp.metafields.reviews.rating_count -%}
+            {%- if rating_val != nil and rating_count > 0 -%}
+              {%- assign rating_int = rating_val | round -%}
+              <div class="cfp__rating" aria-label="Note : {{ rating_val }} sur 5 — {{ rating_count }} avis">
+                <span class="cfp__stars" aria-hidden="true">
+                  {%- for i in (1..5) -%}
+                    <svg class="cfp__star {% if i <= rating_int %}cfp__star--filled{% endif %}" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M8 1l1.8 3.6L14 5.3l-3 2.9.7 4.1L8 10.4l-3.7 1.9.7-4.1-3-2.9 4.2-.7L8 1z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>
+                    </svg>
+                  {%- endfor -%}
+                </span>
+                <span class="cfp__rating-val">{{ rating_val }}</span>
+                <span class="cfp__rating-count">({{ rating_count }} avis)</span>
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- comment %} ── Titre ── {% endcomment -%}
+          <h2 class="cfp__title">{{ fp.title | escape }}</h2>
+
+          {%- comment %} ── Vendeur ── {% endcomment -%}
+          {%- if fp.vendor != blank -%}
+            <p class="cfp__vendor">{{ fp.vendor | escape }}</p>
+          {%- endif -%}
+
+          {%- comment %} ── Prix ── {% endcomment -%}
+          <div class="cfp__price-wrap" data-cfp-price-wrap>
+            {%- if current_variant.compare_at_price > current_variant.price -%}
+              <span class="cfp__price cfp__price--sale" data-cfp-price>{{ current_variant.price | money }}</span>
+              <s class="cfp__price-compare" data-cfp-compare>{{ current_variant.compare_at_price | money }}</s>
+              <span class="cfp__price-savings" data-cfp-savings>
+                Économisez {{ current_variant.compare_at_price | minus: current_variant.price | money }}
+              </span>
+            {%- else -%}
+              <span class="cfp__price" data-cfp-price>{{ current_variant.price | money }}</span>
+              <s class="cfp__price-compare" data-cfp-compare hidden></s>
+              <span class="cfp__price-savings" data-cfp-savings hidden></span>
+            {%- endif -%}
+          </div>
+
+          {%- comment %} ── Description courte ── {% endcomment -%}
+          {%- if section.settings.show_description and fp.description != blank -%}
+            <div class="cfp__description">
+              {{ fp.description | strip_html | truncate: section.settings.desc_chars }}
+            </div>
+          {%- endif -%}
+
+          {%- comment %} ── Formulaire produit ── {% endcomment -%}
+          {%- form 'product', fp,
+              id: 'cfp-form-{{ section.id }}',
+              novalidate: 'novalidate'
+          -%}
+            <input type="hidden" name="id" value="{{ current_variant.id }}" data-cfp-variant-id>
+
+            {%- comment %} ── Sélecteurs de variantes ── {% endcomment -%}
+            {%- unless fp.has_only_default_variant -%}
+              <div class="cfp__options" data-cfp-options>
+                {%- for option in fp.options_with_values -%}
+                  {%- assign option_idx = forloop.index0 -%}
+                  <div class="cfp__option-group" data-option-group="{{ forloop.index }}">
+
+                    <div class="cfp__option-header">
+                      <span class="cfp__option-label">
+                        {{ option.name }}
+                        {%- assign selected_val = current_variant.options[option_idx] -%}
+                        {%- if selected_val != blank -%}
+                          : <span class="cfp__option-selected" data-cfp-selected-val="{{ forloop.index }}">{{ selected_val }}</span>
+                        {%- endif -%}
+                      </span>
+
+                      {%- comment %} Lien guide de taille — sur le groupe "Taille" ou "Size" {%- endcomment -%}
+                      {%- if section.settings.show_size_guide and section.settings.size_guide_url != blank -%}
+                        {%- assign lower_name = option.name | downcase -%}
+                        {%- if lower_name == 'taille' or lower_name == 'size' or lower_name == 'pointure' -%}
+                          <a
+                            href="{{ section.settings.size_guide_url }}"
+                            class="cfp__size-guide"
+                            {% unless section.settings.size_guide_url contains '#' %}target="_blank" rel="noopener"{% endunless %}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                              <rect x="2" y="6" width="16" height="8" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
+                              <path d="M6 6v3M9 6v2M12 6v3M15 6v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            </svg>
+                            {{ section.settings.size_guide_label | default: 'Guide de taille' | escape }}
+                          </a>
+                        {%- endif -%}
+                      {%- endif -%}
+                    </div>
+
+                    <div class="cfp__option-values" role="group" aria-label="{{ option.name }}">
+                      {%- for value in option.values -%}
+                        {%- assign is_selected = false -%}
+                        {%- if current_variant.options[option_idx] == value -%}
+                          {%- assign is_selected = true -%}
+                        {%- endif -%}
+                        <button
+                          class="cfp__option-btn{% if is_selected %} is-active{% endif %}"
+                          type="button"
+                          data-cfp-option="{{ value | escape }}"
+                          data-option-pos="{{ forloop.parentloop.index }}"
+                          aria-pressed="{{ is_selected }}"
+                        >
+                          {{ value | escape }}
+                        </button>
+                      {%- endfor -%}
+                    </div>
+
+                  </div>
+                {%- endfor -%}
+              </div>
+            {%- endunless -%}
+
+            {%- comment %} ── Quantité + ATC ── {% endcomment -%}
+            <div class="cfp__add-row">
+
+              {%- comment %} Sélecteur quantité {%- endcomment -%}
+              <div class="cfp__qty-wrap" aria-label="Quantité">
+                <button
+                  class="cfp__qty-btn"
+                  type="button"
+                  data-cfp-qty-dec
+                  aria-label="Réduire la quantité"
+                >−</button>
+                <input
+                  class="cfp__qty-input"
+                  type="number"
+                  name="quantity"
+                  value="1"
+                  min="1"
+                  aria-label="Quantité"
+                  data-cfp-qty
+                >
+                <button
+                  class="cfp__qty-btn"
+                  type="button"
+                  data-cfp-qty-inc
+                  aria-label="Augmenter la quantité"
+                >+</button>
+              </div>
+
+              {%- comment %} Bouton Ajouter au panier {%- endcomment -%}
+              <button
+                class="cfp__add-btn"
+                type="button"
+                data-cfp-add
+                {%- unless current_variant.available %} disabled aria-disabled="true"{% endunless %}
+              >
+                <span class="cfp__add-label">
+                  {%- if current_variant.available -%}Ajouter au panier{%- else -%}Épuisé{%- endif -%}
+                </span>
+                {%- if current_variant.available -%}
+                  <span class="cfp__add-sep" aria-hidden="true">|</span>
+                  <span class="cfp__add-price" data-cfp-add-price>{{ current_variant.price | money }}</span>
+                {%- endif -%}
+              </button>
+
+            </div>
+
+            {%- comment %} Bouton Acheter maintenant {%- endcomment -%}
+            {%- if section.settings.show_buy_now -%}
+              <button
+                class="cfp__buy-btn"
+                type="button"
+                data-cfp-buy-now
+                {%- unless current_variant.available %} disabled aria-disabled="true"{% endunless %}
+              >
+                Acheter maintenant
+              </button>
+            {%- endif -%}
+
+          {%- endform -%}
+
+        </div>
+        {%- comment %} fin info {%- endcomment -%}
+
+      </div>
+      {%- comment %} fin grid {%- endcomment -%}
+
+    {%- endif -%}
+
+  </div>
+</section>
+
+<script src="{{ 'custom-featured-product.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Produit vedette",
+  "tag": "section",
+  "class": "section-custom-featured-product",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Produit à afficher"
+    },
+    {
+      "type": "header",
+      "content": "Affichage"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Afficher les étoiles et avis",
+      "default": true,
+      "info": "Utilise les metafields reviews.rating et reviews.rating_count"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Afficher la description courte",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "desc_chars",
+      "label": "Nombre de caractères (description)",
+      "min": 50, "max": 500, "step": 10,
+      "default": 200
+    },
+    {
+      "type": "checkbox",
+      "id": "show_buy_now",
+      "label": "Afficher le bouton \"Acheter maintenant\"",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Guide de taille"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_size_guide",
+      "label": "Afficher le lien Guide de taille",
+      "default": false,
+      "info": "Apparaît à côté de l'option nommée \"Taille\" ou \"Size\""
+    },
+    {
+      "type": "url",
+      "id": "size_guide_url",
+      "label": "Lien du guide de taille"
+    },
+    {
+      "type": "text",
+      "id": "size_guide_label",
+      "label": "Texte du lien",
+      "default": "Guide de taille"
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur accent (étoiles, bordure active)",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "add_btn_bg",
+      "label": "Fond bouton Ajouter au panier",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "add_btn_color",
+      "label": "Texte bouton Ajouter au panier",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "buy_btn_bg",
+      "label": "Fond bouton Acheter maintenant",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "buy_btn_color",
+      "label": "Texte bouton Acheter maintenant",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "buy_btn_border",
+      "label": "Bordure bouton Acheter maintenant",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0, "max": 120, "step": 4, "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0, "max": 120, "step": 4, "unit": "px",
+      "default": 64
+    }
+  ],
+  "presets": [
+    {
+      "name": "Produit vedette"
+    }
+  ]
+}
+{% endschema %}

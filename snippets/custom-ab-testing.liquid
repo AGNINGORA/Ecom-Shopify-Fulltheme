@@ -1,0 +1,22 @@
+{% comment %}
+  Custom A/B Testing – Global snippet to include in theme.liquid
+  Loads CSS + JS for A/B test variant management, analytics, and debug panel.
+
+  Usage dans une section :
+    <div data-ab-test="hero_title" data-ab-variant="A">
+      <h1>Bienvenue</h1>
+    </div>
+    <div data-ab-test="hero_title" data-ab-variant="B">
+      <h1>Découvrez nos produits</h1>
+    </div>
+
+  Debug : ajouter ?ab_debug=1 à l'URL
+  API JS :
+    ABTesting.getAssignments()
+    ABTesting.trackConversion('hero_title')
+    ABTesting.forceVariant('hero_title', 'B')
+    ABTesting.resetAll()
+{% endcomment %}
+
+{{ 'custom-ab-testing.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'custom-ab-testing.js' | asset_url }}" defer></script>

@@ -1,0 +1,205 @@
+/* =============================================================
+   custom-back-in-stock.css
+   Formulaire alerte retour en stock
+   Dawn 15.x · Mobile-first · Préfixe : cbis__
+   ============================================================= */
+
+/* ── Wrapper ────────────────────────────────────────────────── */
+.cbis__wrap {
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 1rem;
+  padding: 2rem;
+  background: #faf8f5;
+  margin-top: 1.6rem;
+}
+
+/* ── Intro ──────────────────────────────────────────────────── */
+.cbis__intro {
+  margin: 0 0 1.6rem;
+  font-size: 1.4rem;
+  line-height: 1.5;
+  color: #444;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+}
+
+.cbis__intro-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.cbis__intro strong {
+  color: #111;
+}
+
+/* ── Label ──────────────────────────────────────────────────── */
+.cbis__label {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  color: #333;
+}
+
+/* ── Input row ──────────────────────────────────────────────── */
+.cbis__input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.cbis__input-wrap {
+  display: flex;
+  gap: 0;
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.7rem;
+  overflow: hidden;
+  background: #fff;
+  transition: border-color 0.2s ease;
+}
+
+.cbis__input-wrap:focus-within {
+  border-color: var(--cbis-accent, #C9A96E);
+}
+
+.cbis__input {
+  flex: 1;
+  border: none;
+  padding: 1.1rem 1.4rem;
+  font-size: 1.4rem;
+  background: transparent;
+  color: #111;
+  outline: none;
+  min-width: 0;
+}
+
+.cbis__input::placeholder {
+  color: #aaa;
+}
+
+/* ── Bouton soumettre ───────────────────────────────────────── */
+.cbis__submit {
+  flex-shrink: 0;
+  background: var(--cbis-accent, #C9A96E);
+  border: none;
+  color: #fff;
+  padding: 0 1.8rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.cbis__submit:hover {
+  opacity: 0.88;
+}
+
+.cbis__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+.cbis__submit-spinner {
+  display: none;
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.cbis__submit-spinner svg {
+  width: 100%;
+  height: 100%;
+  animation: cbis-spin 0.7s linear infinite;
+}
+
+@keyframes cbis-spin {
+  to { transform: rotate(360deg); }
+}
+
+.cbis__submit.is-loading .cbis__submit-label { display: none; }
+.cbis__submit.is-loading .cbis__submit-spinner { display: flex; }
+
+/* ── Erreur ─────────────────────────────────────────────────── */
+.cbis__error {
+  margin: 0.8rem 0 0;
+  font-size: 1.25rem;
+  color: #e53935;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cbis__error[hidden] {
+  display: none !important;
+}
+
+/* ── Vie privée ─────────────────────────────────────────────── */
+.cbis__privacy {
+  margin: 1rem 0 0;
+  font-size: 1.15rem;
+  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cbis__privacy svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+/* ── Succès ─────────────────────────────────────────────────── */
+.cbis__success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 0.4rem 0;
+}
+
+.cbis__success[hidden] {
+  display: none !important;
+}
+
+.cbis__success-icon {
+  color: var(--cbis-accent, #C9A96E);
+  width: 4.8rem;
+  height: 4.8rem;
+  display: flex;
+}
+
+.cbis__success-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cbis__success-title {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.cbis__success-msg {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* ── Réduction mouvement ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .cbis__submit-spinner svg {
+    animation: none;
+  }
+}

@@ -1,0 +1,250 @@
+{%- comment -%}
+  custom-quantity-breaks.liquid
+  Sélecteur de quantité avec remises progressives — cartes verticales premium
+  CSS : assets/custom-quantity-breaks.css
+  JS  : assets/custom-quantity-breaks.js
+
+  ── Paramètres (à passer via `render`) ──────────────────────────────────────
+    product       — objet product Shopify (requis)
+    enabled       — boolean              (défaut : true)
+    qty1          — quantité palier 1    (défaut : 1)
+    qty2          — quantité palier 2    (défaut : 2)
+    disc2         — remise % palier 2    (défaut : 5)
+    qty3          — quantité palier 3    (défaut : 3)
+    disc3         — remise % palier 3    (défaut : 10)
+    label_unit    — libellé singulier    (défaut : "article")
+    label_units   — libellé pluriel      (défaut : "articles")
+    accent_color  — couleur accent (non utilisé en V2, réservé)
+
+  ── Intégration dans custom-product-hero.liquid ──────────────────────────────
+  Placer DANS le bloc {%- form 'product', product ... -%},
+  juste avant <div class="cph__actions">.
+
+  ⚠  Ne pas activer simultanément avec custom-buy-x-get-y
+     (conflit sur input[name="quantity"]).
+
+  ════════════════════════════════════════════════════════════════════════════
+  APPLIQUER LA REMISE RÉELLE AU CHECKOUT — 3 approches
+
+  Option A — Shopify Scripts (Shopify Plus uniquement)
+    Créer un script Ruby dans "Scripts Editor" :
+      Input::Cart::LineItemSelector.new.by_quantity_at_least(qty)
+        .apply_discount(MoneyDiscount.new(amount, 'Remise quantité'))
+
+  Option B — Variantes "lot" avec prix ajustés
+    Créer des variantes "Lot de 2" / "Lot de 3" avec prix pré-calculés.
+    Modifier le JS pour changer input[name="id"] plutôt que input[name="quantity"].
+
+  Option C — Remise automatique Shopify (recommandé Basic/Standard)
+    Admin > Réductions > Remise automatique > "Acheter X, économiser Y%"
+    Avantage : natif Shopify, visible au checkout, sans app.
+  ════════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  # Valeurs par défaut
+  assign cqb_on    = enabled     | default: true
+  assign cqb_qty1  = qty1        | default: 1
+  assign cqb_qty2  = qty2        | default: 2
+  assign cqb_disc2 = disc2       | default: 5
+  assign cqb_qty3  = qty3        | default: 3
+  assign cqb_disc3 = disc3       | default: 10
+  assign cqb_unit  = label_unit  | default: 'article'
+  assign cqb_units = label_units | default: 'articles'
+
+  # Prix de base de la variante active (en centimes)
+  assign base_price = product.selected_or_first_available_variant.price
+
+  # ── Palier 2 ──
+  assign disc2_amount = base_price | times: cqb_disc2 | divided_by: 100
+  assign price2       = base_price | minus: disc2_amount
+  assign total2       = price2     | times: cqb_qty2
+
+  # ── Palier 3 ──
+  assign disc3_amount = base_price | times: cqb_disc3 | divided_by: 100
+  assign price3       = base_price | minus: disc3_amount
+  assign total3       = price3     | times: cqb_qty3
+
+  # Image miniature produit
+  assign thumb_img = product.featured_image
+-%}
+
+{%- if cqb_on -%}
+
+{{ 'custom-quantity-breaks.css' | asset_url | stylesheet_tag }}
+
+<div
+  class="cqb__wrap"
+  data-cqb
+  data-price="{{ base_price }}"
+  data-currency="{{ cart.currency.iso_code }}"
+>
+
+  {%- comment -%} Prix de toutes les variantes pour mise à jour JS {%- endcomment -%}
+  <script type="application/json" data-cqb-prices>
+    {
+      {%- for variant in product.variants -%}
+        "{{ variant.id }}": {{ variant.price }}
+        {%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    }
+  </script>
+
+  {%- comment -%} Quantité injectée dans le formulaire parent {%- endcomment -%}
+  <input type="hidden" name="quantity" value="{{ cqb_qty1 }}" data-cqb-qty-input>
+
+  <p class="cqb__heading">Quantité :</p>
+
+  <div class="cqb__list" role="group" aria-label="Choisir la quantité">
+
+    {%- comment -%} ── Palier 1 ─────────────────────────────────────────── {%- endcomment -%}
+    <button
+      class="cqb__card is-active"
+      type="button"
+      data-cqb-card
+      data-cqb-qty="{{ cqb_qty1 }}"
+      data-cqb-discount="0"
+      aria-pressed="true"
+    >
+      {%- comment -%} Gauche : miniature + multiplicateur {%- endcomment -%}
+      <span class="cqb__thumb" aria-hidden="true">
+        {%- if thumb_img != blank -%}
+          <img
+            class="cqb__thumb-img"
+            src="{{ thumb_img | image_url: width: 120, format: 'webp' }}"
+            alt=""
+            width="60"
+            height="60"
+            loading="lazy"
+          >
+        {%- else -%}
+          <span class="cqb__thumb-placeholder">{{ 'product-1' | placeholder_svg_tag }}</span>
+        {%- endif -%}
+        <span class="cqb__thumb-mult">×{{ cqb_qty1 }}</span>
+      </span>
+
+      {%- comment -%} Centre : label + prix {%- endcomment -%}
+      <span class="cqb__body">
+        <span class="cqb__qty-label">
+          {%- if cqb_qty1 > 1 -%}{{ cqb_qty1 }} {{ cqb_units }}{%- else -%}{{ cqb_qty1 }} {{ cqb_unit }}{%- endif -%}
+        </span>
+        <span class="cqb__price-row">
+          <span class="cqb__price-unit" data-cqb-price>{{ base_price | money }}</span>
+          <span class="cqb__price-each">/ {{ cqb_unit }}</span>
+        </span>
+      </span>
+
+      {%- comment -%} Droite : espace vide (pas de badge sur le palier 1) {%- endcomment -%}
+      <span class="cqb__badge-slot" aria-hidden="true"></span>
+    </button>
+
+    {%- comment -%} ── Palier 2 ─────────────────────────────────────────── {%- endcomment -%}
+    <button
+      class="cqb__card"
+      type="button"
+      data-cqb-card
+      data-cqb-qty="{{ cqb_qty2 }}"
+      data-cqb-discount="{{ cqb_disc2 }}"
+      aria-pressed="false"
+    >
+      <span class="cqb__thumb" aria-hidden="true">
+        {%- if thumb_img != blank -%}
+          <img
+            class="cqb__thumb-img"
+            src="{{ thumb_img | image_url: width: 120, format: 'webp' }}"
+            alt=""
+            width="60"
+            height="60"
+            loading="lazy"
+          >
+        {%- else -%}
+          <span class="cqb__thumb-placeholder">{{ 'product-1' | placeholder_svg_tag }}</span>
+        {%- endif -%}
+        <span class="cqb__thumb-mult">×{{ cqb_qty2 }}</span>
+      </span>
+
+      <span class="cqb__body">
+        <span class="cqb__qty-label">
+          {%- if cqb_qty2 > 1 -%}{{ cqb_qty2 }} {{ cqb_units }}{%- else -%}{{ cqb_qty2 }} {{ cqb_unit }}{%- endif -%}
+        </span>
+        <span class="cqb__price-row">
+          <span class="cqb__price-unit" data-cqb-price>{{ price2 | money }}</span>
+          {%- if cqb_disc2 > 0 -%}
+            <s class="cqb__price-original" data-cqb-original>{{ base_price | money }}</s>
+          {%- endif -%}
+          <span class="cqb__price-each">/ {{ cqb_unit }}</span>
+        </span>
+        {%- if cqb_disc2 > 0 -%}
+          <span class="cqb__price-total" data-cqb-total>= {{ total2 | money }}</span>
+        {%- endif -%}
+      </span>
+
+      {%- if cqb_disc2 > 0 -%}
+        <span class="cqb__badge-slot">
+          <span class="cqb__badge" aria-label="Remise de {{ cqb_disc2 }}%">
+            Économisez {{ cqb_disc2 }}%
+          </span>
+        </span>
+      {%- else -%}
+        <span class="cqb__badge-slot" aria-hidden="true"></span>
+      {%- endif -%}
+    </button>
+
+    {%- comment -%} ── Palier 3 ─────────────────────────────────────────── {%- endcomment -%}
+    <button
+      class="cqb__card"
+      type="button"
+      data-cqb-card
+      data-cqb-qty="{{ cqb_qty3 }}"
+      data-cqb-discount="{{ cqb_disc3 }}"
+      aria-pressed="false"
+    >
+      <span class="cqb__thumb" aria-hidden="true">
+        {%- if thumb_img != blank -%}
+          <img
+            class="cqb__thumb-img"
+            src="{{ thumb_img | image_url: width: 120, format: 'webp' }}"
+            alt=""
+            width="60"
+            height="60"
+            loading="lazy"
+          >
+        {%- else -%}
+          <span class="cqb__thumb-placeholder">{{ 'product-1' | placeholder_svg_tag }}</span>
+        {%- endif -%}
+        <span class="cqb__thumb-mult">×{{ cqb_qty3 }}</span>
+      </span>
+
+      <span class="cqb__body">
+        <span class="cqb__qty-label">
+          {%- if cqb_qty3 > 1 -%}{{ cqb_qty3 }} {{ cqb_units }}{%- else -%}{{ cqb_qty3 }} {{ cqb_unit }}{%- endif -%}
+        </span>
+        <span class="cqb__price-row">
+          <span class="cqb__price-unit" data-cqb-price>{{ price3 | money }}</span>
+          {%- if cqb_disc3 > 0 -%}
+            <s class="cqb__price-original" data-cqb-original>{{ base_price | money }}</s>
+          {%- endif -%}
+          <span class="cqb__price-each">/ {{ cqb_unit }}</span>
+        </span>
+        {%- if cqb_disc3 > 0 -%}
+          <span class="cqb__price-total" data-cqb-total>= {{ total3 | money }}</span>
+        {%- endif -%}
+      </span>
+
+      {%- if cqb_disc3 > 0 -%}
+        <span class="cqb__badge-slot">
+          <span class="cqb__badge" aria-label="Remise de {{ cqb_disc3 }}%">
+            Économisez {{ cqb_disc3 }}%
+          </span>
+        </span>
+      {%- else -%}
+        <span class="cqb__badge-slot" aria-hidden="true"></span>
+      {%- endif -%}
+    </button>
+
+  </div>
+</div>
+
+<script src="{{ 'custom-quantity-breaks.js' | asset_url }}" defer="defer"></script>
+
+{%- endif -%}

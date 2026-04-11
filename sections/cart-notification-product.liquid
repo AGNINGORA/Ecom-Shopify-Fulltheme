@@ -1,0 +1,69 @@
+{%- if cart != empty -%}
+  {%- for item in cart.items -%}
+    <div id="cart-notification-product-{{ item.key }}" class="cart-item">
+
+      {%- comment %} Image — on passe par .src pour éviter les filtres qui peuvent retourner vide {% endcomment %}
+      {%- assign notif_img = item.image -%}
+      {%- unless notif_img -%}
+        {%- assign notif_img = item.product.featured_image -%}
+      {%- endunless -%}
+
+      <div class="cart-notification-product__image global-media-settings" style="width:70px;height:70px;overflow:hidden;border-radius:8px;flex-shrink:0;">
+        {%- if notif_img and notif_img.src != blank -%}
+          <img
+            src="{{ notif_img | image_url: width: 140 }}"
+            alt="{{ item.product.title | escape }}"
+            width="70"
+            height="70"
+            loading="eager"
+            style="width:70px;height:70px;object-fit:cover;display:block;"
+            onerror="this.onerror=null;this.style.display='none';this.parentElement.querySelector('.cnp-placeholder').style.display='flex';"
+          >
+          <div class="cnp-placeholder" style="display:none;width:70px;height:70px;background:#f5f5f5;align-items:center;justify-content:center;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+          </div>
+        {%- else -%}
+          <div class="cnp-placeholder" style="display:flex;width:70px;height:70px;background:#f5f5f5;align-items:center;justify-content:center;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+          </div>
+        {%- endif -%}
+      </div>
+      <div>
+        {%- if settings.show_vendor -%}
+          <p class="caption-with-letter-spacing light">{{ item.product.vendor }}</p>
+        {%- endif -%}
+        <h3 class="cart-notification-product__name h4">{{ item.product.title | escape }}</h3>
+        <dl>
+          {%- unless item.product.has_only_default_variant -%}
+            {%- for option in item.options_with_values -%}
+              <div class="product-option">
+                <dt>{{ option.name }}:</dt>
+                <dd>{{ option.value }}</dd>
+              </div>
+            {%- endfor -%}
+          {%- endunless -%}
+          {%- for property in item.properties -%}
+            {%- assign property_first_char = property.first | slice: 0 -%}
+            {%- if property.last != blank and property_first_char != '_' -%}
+              <div class="product-option">
+                <dt>{{ property.first }}:</dt>
+                <dd>
+                  {%- if property.last contains '/uploads/' -%}
+                    <a href="{{ property.last }}" class="link" target="_blank">
+                      {{ property.last | split: '/' | last }}
+                    </a>
+                  {%- else -%}
+                    {{ property.last }}
+                  {%- endif -%}
+                </dd>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </dl>
+        {%- if item.selling_plan_allocation != null -%}
+          <p class="product-option">{{ item.selling_plan_allocation.selling_plan.name }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endfor -%}
+{%- endif -%}

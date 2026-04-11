@@ -1,0 +1,243 @@
+/* =============================================================
+   custom-quantity-breaks.css
+   Sélecteur de quantité — cartes verticales premium avec image
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+/* ── Conteneur ───────────────────────────────────────────────── */
+.cqb__wrap {
+  margin-bottom: 2rem;
+}
+
+/* ── Titre ───────────────────────────────────────────────────── */
+.cqb__heading {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 0.8rem;
+  letter-spacing: 0.01em;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LISTE — cartes empilées verticalement
+   ══════════════════════════════════════════════════════════════ */
+.cqb__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CARTE
+   ══════════════════════════════════════════════════════════════ */
+.cqb__card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.2rem;
+  width: 100%;
+  padding: 1rem 1.2rem;
+  background: #fff;
+  border: 1.5px solid #e8e2da;
+  border-radius: 1.2rem;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.cqb__card:hover {
+  border-color: #bbb;
+  background: #fafafa;
+}
+
+/* ── État actif — bordure noire épaisse ──────────────────────── */
+.cqb__card.is-active {
+  border-color: #111;
+  box-shadow: inset 0 0 0 1px #111;
+  background: #fafafa;
+}
+
+.cqb__card:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MINIATURE GAUCHE
+   ══════════════════════════════════════════════════════════════ */
+.cqb__thumb {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.cqb__thumb-img {
+  width: 6rem;
+  height: 6rem;
+  object-fit: cover;
+  border-radius: 0.8rem;
+  display: block;
+  border: 1px solid #f0ece6;
+}
+
+.cqb__thumb-placeholder {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: block;
+}
+
+.cqb__thumb-placeholder svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Multiplicateur ×1 / ×2 / ×3 ────────────────────────────── */
+.cqb__thumb-mult {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #888;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.cqb__card.is-active .cqb__thumb-mult {
+  color: #111;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CORPS CENTRE — label + prix
+   ══════════════════════════════════════════════════════════════ */
+.cqb__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+/* ── Label quantité ──────────────────────────────────────────── */
+.cqb__qty-label {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* ── Ligne prix ──────────────────────────────────────────────── */
+.cqb__price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.4rem;
+}
+
+.cqb__price-unit {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.cqb__price-original {
+  font-size: 1.15rem;
+  opacity: 0.4;
+  text-decoration: line-through;
+  white-space: nowrap;
+}
+
+.cqb__price-each {
+  font-size: 1.05rem;
+  opacity: 0.5;
+  white-space: nowrap;
+}
+
+/* ── Total du palier (ex: "= 60,80 €") ──────────────────────── */
+.cqb__price-total {
+  font-size: 1.1rem;
+  font-weight: 600;
+  opacity: 0.65;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BADGE DROITE — "Économisez X%"
+   ══════════════════════════════════════════════════════════════ */
+.cqb__badge-slot {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 9rem;
+}
+
+.cqb__badge {
+  display: inline-block;
+  background: #111;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 0.4rem 0.75rem;
+  border-radius: 99px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SPAN INJECTÉ DANS LE BOUTON ATC
+   ══════════════════════════════════════════════════════════════ */
+.cqb__atc-total {
+  opacity: 0.75;
+  font-weight: 600;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE — très petits écrans (<400px)
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 400px) {
+  .cqb__card {
+    gap: 0.9rem;
+    padding: 0.9rem 1rem;
+  }
+
+  .cqb__thumb-img,
+  .cqb__thumb-placeholder {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .cqb__qty-label {
+    font-size: 1.2rem;
+  }
+
+  .cqb__price-unit {
+    font-size: 1.3rem;
+  }
+
+  .cqb__badge {
+    font-size: 0.95rem;
+    padding: 0.35rem 0.6rem;
+  }
+
+  .cqb__badge-slot {
+    min-width: 7.5rem;
+  }
+}
+
+/* ── Masquer le badge-slot vide ──────────────────────────────── */
+.cqb__badge-slot:empty {
+  min-width: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RÉDUCTION DES MOUVEMENTS
+   ══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .cqb__card {
+    transition: none;
+  }
+}

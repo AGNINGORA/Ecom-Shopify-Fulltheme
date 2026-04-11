@@ -1,0 +1,567 @@
+/* =============================================================
+   custom-mega-menu.css
+   Mega menu — nav desktop avec panneaux + drawer mobile
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+/* ══════════════════════════════════════════════════════════════
+   BARRE DE NAVIGATION
+   ══════════════════════════════════════════════════════════════ */
+
+.section-custom-mega-menu {
+  background: var(--cmm-bg, #fff);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 200;
+}
+
+.section-custom-mega-menu.cmm--sticky {
+  position: sticky;
+  top: 0;
+}
+
+.cmm__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--cmm-bar-height, 5.6rem);
+  gap: 2rem;
+}
+
+/* ── Logo (optionnel) ────────────────────────────────────────── */
+.cmm__logo {
+  flex-shrink: 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: inherit;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.cmm__logo img {
+  display: block;
+  height: 3rem;
+  width: auto;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   NAVIGATION DESKTOP
+   ══════════════════════════════════════════════════════════════ */
+
+.cmm__nav {
+  display: none;
+  flex: 1;
+}
+
+@media (min-width: 990px) {
+  .cmm__nav {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.cmm__list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.4rem;
+}
+
+.cmm__item {
+  position: relative;
+}
+
+/* ── Lien simple (pas de sous-menu) ─────────────────────────── */
+.cmm__link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.8rem 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--cmm-link-color, inherit);
+  text-decoration: none;
+  border-radius: 0.6rem;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.cmm__link:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* ── Déclencheur mega menu ───────────────────────────────────── */
+.cmm__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.2rem;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--cmm-link-color, inherit);
+  cursor: pointer;
+  border-radius: 0.6rem;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.cmm__trigger:hover,
+.cmm__trigger.is-active {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--cmm-accent, #111);
+}
+
+.cmm__trigger:focus-visible {
+  outline: 2px solid var(--cmm-accent, #C9A96E);
+  outline-offset: 2px;
+}
+
+/* Chevron */
+.cmm__trigger-icon {
+  width: 1.4rem;
+  height: 1.4rem;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.cmm__trigger.is-active .cmm__trigger-icon {
+  transform: rotate(180deg);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PANNEAU MEGA MENU (desktop — position: fixed)
+   ══════════════════════════════════════════════════════════════ */
+
+.cmm__panel {
+  position: fixed;
+  top: var(--cmm-bar-bottom, 5.6rem);
+  left: 0;
+  width: 100%;
+  z-index: 199;
+  background: #fff;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+  /* Animation */
+  opacity: 0;
+  transform: translateY(-8px);
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease,
+    visibility 0s linear 0.22s;
+}
+
+.cmm__panel.is-open {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease,
+    visibility 0s linear 0s;
+}
+
+.cmm__panel-inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: 0;
+  padding-top: 3.2rem;
+  padding-bottom: 3.2rem;
+}
+
+/* ── Colonne de liens ────────────────────────────────────────── */
+.cmm__col {
+  padding: 0 2.4rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cmm__col + .cmm__col {
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
+  padding-left: 2.4rem;
+}
+
+.cmm__col-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cmm-accent, #C9A96E);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.cmm__col-title:hover {
+  text-decoration: underline;
+}
+
+.cmm__col-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.cmm__col-link {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: inherit;
+  text-decoration: none;
+  padding: 0.5rem 0;
+  opacity: 0.8;
+  transition: opacity 0.12s ease, color 0.12s ease;
+}
+
+.cmm__col-link:hover {
+  opacity: 1;
+  color: var(--cmm-accent, #C9A96E);
+}
+
+/* ── Colonne image promo ─────────────────────────────────────── */
+.cmm__col--promo {
+  padding: 0 0 0 2.4rem;
+}
+
+.cmm__promo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.cmm__promo-img-wrap {
+  border-radius: 0.8rem;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: #f0ece6;
+}
+
+.cmm__promo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.cmm__promo:hover .cmm__promo-img {
+  transform: scale(1.04);
+}
+
+.cmm__promo-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--cmm-accent, #C9A96E);
+  margin: 0;
+}
+
+.cmm__promo-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.cmm__promo-subtitle {
+  font-size: 1.3rem;
+  opacity: 0.6;
+  margin: 0;
+}
+
+.cmm__promo-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--cmm-accent, #C9A96E);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   OVERLAY
+   ══════════════════════════════════════════════════════════════ */
+
+.cmm__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 198;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.cmm__overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BOUTON HAMBURGER (mobile)
+   ══════════════════════════════════════════════════════════════ */
+
+.cmm__hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  border-radius: 0.6rem;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.cmm__hamburger:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.cmm__hamburger svg {
+  width: 2.2rem;
+  height: 2.2rem;
+}
+
+@media (min-width: 990px) {
+  .cmm__hamburger {
+    display: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DRAWER MOBILE
+   ══════════════════════════════════════════════════════════════ */
+
+.cmm__drawer {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: min(34rem, 90vw);
+  background: #fff;
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  transform: translateX(-100%);
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 4px 0 32px rgba(0, 0, 0, 0.12);
+}
+
+.cmm__drawer.is-open {
+  transform: translateX(0);
+}
+
+/* ── En-tête du drawer ───────────────────────────────────────── */
+.cmm__drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.6rem 2rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.cmm__drawer-logo {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cmm__drawer-logo img {
+  height: 2.8rem;
+  width: auto;
+}
+
+.cmm__drawer-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.6rem;
+  height: 3.6rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #555;
+  border-radius: 50%;
+  transition: background 0.12s;
+}
+
+.cmm__drawer-close:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.cmm__drawer-close svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* ── Liste mobile ────────────────────────────────────────────── */
+.cmm__drawer-list {
+  list-style: none;
+  margin: 0;
+  padding: 1.2rem 0;
+  flex: 1;
+}
+
+.cmm__drawer-item {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Lien simple (mobile) */
+.cmm__drawer-link {
+  display: flex;
+  align-items: center;
+  padding: 1.4rem 2rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.12s;
+}
+
+.cmm__drawer-link:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* ── Accordéon mobile ────────────────────────────────────────── */
+.cmm__accordion-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1.4rem 2rem;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.cmm__accordion-trigger:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.cmm__accordion-icon {
+  width: 1.6rem;
+  height: 1.6rem;
+  flex-shrink: 0;
+  color: #888;
+  transition: transform 0.25s ease;
+}
+
+.cmm__accordion-trigger[aria-expanded="true"] .cmm__accordion-icon {
+  transform: rotate(180deg);
+}
+
+/* Technique grid-template-rows 0fr → 1fr */
+.cmm__accordion-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cmm__accordion-body.is-open {
+  grid-template-rows: 1fr;
+}
+
+.cmm__accordion-inner {
+  overflow: hidden;
+  min-height: 0;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* Groupe de liens dans l'accordéon */
+.cmm__accordion-group {
+  padding: 1.2rem 2rem 1.2rem 2.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.cmm__accordion-group + .cmm__accordion-group {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.cmm__accordion-group-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--cmm-accent, #C9A96E);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.cmm__accordion-sublist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cmm__accordion-link {
+  display: block;
+  padding: 0.6rem 0;
+  font-size: 1.4rem;
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.75;
+  transition: opacity 0.12s;
+}
+
+.cmm__accordion-link:hover {
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BODY SCROLL LOCK
+   ══════════════════════════════════════════════════════════════ */
+
+body.cmm-drawer-open {
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RÉDUCTION DES MOUVEMENTS
+   ══════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .cmm__panel,
+  .cmm__overlay,
+  .cmm__drawer,
+  .cmm__accordion-body,
+  .cmm__trigger-icon,
+  .cmm__accordion-icon,
+  .cmm__promo-img {
+    transition: none;
+    animation: none;
+  }
+}

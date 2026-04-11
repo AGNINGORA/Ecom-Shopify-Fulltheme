@@ -1,0 +1,191 @@
+{%- comment -%}
+  custom-seo-schema.liquid
+  JSON-LD structured data: Product, BreadcrumbList, Organization
+  Rendered in <head> via layout/theme.liquid
+{%- endcomment -%}
+
+{%- comment -%} ══════════════════════════════════════════
+  PRODUCT SCHEMA (pages produit uniquement)
+════════════════════════════════════════════ {%- endcomment -%}
+{%- if template.name == 'product' and product != blank -%}
+  {%- liquid
+    assign product_url = shop.url | append: product.url
+    assign first_image = product.featured_image
+
+    # Prix : première variante disponible, sinon la première
+    assign ref_variant = product.first_available_variant | default: product.variants.first
+    assign price_min = product.price_min | money_without_currency | remove: ' '
+    assign price_max = product.price_max | money_without_currency | remove: ' '
+    assign currency = cart.currency.iso_code
+
+    # Disponibilité
+    if product.available
+      assign availability = 'https://schema.org/InStock'
+    else
+      assign availability = 'https://schema.org/OutOfStock'
+    endif
+
+    # Note moyenne et nombre d'avis (via Shopify metafields si présents)
+    assign review_count = product.metafields.reviews.rating_count | default: 0
+    assign review_rating = product.metafields.reviews.rating.value | default: nil
+  -%}
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": {{ product.title | json }},
+    "url": {{ product_url | json }},
+    "description": {{ product.description | strip_html | truncate: 5000 | json }},
+    {%- if first_image != blank %}
+    "image": [
+      {%- for image in product.images limit: 5 -%}
+        {{ image | image_url: width: 1200 | prepend: 'https:' | json }}
+        {%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ],
+    {%- endif %}
+    "brand": {
+      "@type": "Brand",
+      "name": {{ shop.name | json }}
+    },
+    "sku": {{ ref_variant.sku | default: ref_variant.id | json }},
+    "offers": {
+      "@type": "AggregateOffer",
+      "priceCurrency": {{ currency | json }},
+      "lowPrice": {{ price_min | json }},
+      "highPrice": {{ price_max | json }},
+      "offerCount": {{ product.variants.size }},
+      "availability": {{ availability | json }},
+      "url": {{ product_url | json }},
+      "seller": {
+        "@type": "Organization",
+        "name": {{ shop.name | json }}
+      }
+    }
+    {%- if review_count > 0 and review_rating != nil -%}
+    ,
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": {{ review_rating | json }},
+      "reviewCount": {{ review_count | json }},
+      "bestRating": "5",
+      "worstRating": "1"
+    }
+    {%- endif %}
+  }
+  </script>
+{%- endif -%}
+
+{%- comment -%} ══════════════════════════════════════════
+  BREADCRUMBLIST — toutes les pages sauf homepage
+════════════════════════════════════════════ {%- endcomment -%}
+{%- unless template.name == 'index' -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": {{ shop.name | json }},
+        "item": {{ shop.url | json }}
+      }
+      {%- if template.name == 'collection' and collection != blank -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ collection.title | json }},
+        "item": {{ shop.url | append: collection.url | json }}
+      }
+      {%- elsif template.name == 'product' and product != blank -%}
+        {%- if collection != blank -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ collection.title | json }},
+        "item": {{ shop.url | append: collection.url | json }}
+      }
+      ,{
+        "@type": "ListItem",
+        "position": 3,
+        "name": {{ product.title | json }},
+        "item": {{ shop.url | append: product.url | json }}
+      }
+        {%- else -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ product.title | json }},
+        "item": {{ shop.url | append: product.url | json }}
+      }
+        {%- endif -%}
+      {%- elsif template.name == 'article' and article != blank -%}
+        {%- if blog != blank -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ blog.title | json }},
+        "item": {{ shop.url | append: blog.url | json }}
+      }
+      ,{
+        "@type": "ListItem",
+        "position": 3,
+        "name": {{ article.title | json }},
+        "item": {{ shop.url | append: article.url | json }}
+      }
+        {%- else -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ article.title | json }},
+        "item": {{ shop.url | append: article.url | json }}
+      }
+        {%- endif -%}
+      {%- elsif template.name == 'blog' and blog != blank -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ blog.title | json }},
+        "item": {{ shop.url | append: blog.url | json }}
+      }
+      {%- elsif template.name == 'page' and page != blank -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ page.title | json }},
+        "item": {{ shop.url | append: page.url | json }}
+      }
+      {%- endif -%}
+    ]
+  }
+  </script>
+{%- endunless -%}
+
+{%- comment -%} ══════════════════════════════════════════
+  ORGANIZATION — homepage uniquement
+════════════════════════════════════════════ {%- endcomment -%}
+{%- if template.name == 'index' -%}
+  {%- assign org_logo = settings.favicon | default: blank -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": {{ shop.name | json }},
+    "url": {{ shop.url | json }}
+    {%- if org_logo != blank -%}
+    ,
+    "logo": {{ org_logo | image_url: width: 512 | prepend: 'https:' | json }}
+    {%- endif -%}
+    {%- if shop.email != blank -%}
+    ,
+    "email": {{ shop.email | json }}
+    {%- endif -%}
+    {%- if shop.phone != blank -%}
+    ,
+    "telephone": {{ shop.phone | json }}
+    {%- endif -%}
+  }
+  </script>
+{%- endif -%}

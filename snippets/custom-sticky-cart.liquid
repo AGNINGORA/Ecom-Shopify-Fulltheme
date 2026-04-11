@@ -1,0 +1,119 @@
+{% comment %}
+  Custom Sticky Cart – Barre fixe d'ajout au panier
+  Dawn 15.x · Vanilla JS · IntersectionObserver
+  Affiché uniquement sur les pages produit.
+{% endcomment %}
+
+{%- if template.name == 'product' -%}
+
+{{ 'custom-sticky-cart.css' | asset_url | stylesheet_tag }}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<div
+  class="custom-sticky-cart"
+  id="custom-sticky-cart"
+  data-sticky-cart
+  aria-hidden="true"
+  aria-label="Barre d'achat rapide"
+  role="region"
+>
+  <div class="csc__inner page-width">
+
+    {%- comment %} ── Image miniature ──────────────────────── {% endcomment %}
+    {%- if product.featured_image -%}
+      <a href="{{ product.url }}" class="csc__img-link" tabindex="-1" aria-hidden="true">
+        <img
+          class="csc__img"
+          src="{{ product.featured_image | image_url: width: 80 }}"
+          alt="{{ product.featured_image.alt | escape | default: product.title | escape }}"
+          loading="eager"
+          width="40"
+          height="40"
+        >
+      </a>
+    {%- endif -%}
+
+    {%- comment %} ── Infos produit ────────────────────────── {% endcomment %}
+    <div class="csc__info">
+      <span class="csc__name">{{ product.title | escape }}</span>
+      <div class="csc__price" data-csc-price>
+        {%- if current_variant.compare_at_price > current_variant.price -%}
+          <span class="csc__price-sale">{{ current_variant.price | money }}</span>
+          <s class="csc__price-compare">{{ current_variant.compare_at_price | money }}</s>
+        {%- else -%}
+          <span class="csc__price-regular">{{ current_variant.price | money }}</span>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- comment %} ── Données variantes pour JS ─────────────── {% endcomment %}
+    <script type="application/json" data-csc-variants>
+      {{ product.variants | json }}
+    </script>
+
+    {%- comment %} ── Formulaire ATC compact ───────────────── {% endcomment %}
+    {%- form 'product', product,
+        id: 'csc-form',
+        class: 'csc__form',
+        novalidate: 'novalidate',
+        data-type: 'add-to-cart-form'
+    -%}
+      <input type="hidden" name="id" data-csc-variant-id value="{{ current_variant.id }}">
+
+      {%- comment %} Dropdown variante (seulement si plusieurs variantes) {% endcomment %}
+      {%- unless product.has_only_default_variant -%}
+        <div class="csc__select-wrap">
+          <select
+            class="csc__select"
+            data-csc-select
+            aria-label="Variante"
+          >
+            {%- for variant in product.variants -%}
+              <option
+                value="{{ variant.id }}"
+                {% if variant == current_variant %}selected{% endif %}
+                {% unless variant.available %}disabled{% endunless %}
+                data-price="{{ variant.price }}"
+                data-compare="{{ variant.compare_at_price }}"
+                data-available="{{ variant.available }}"
+              >
+                {{ variant.title | escape }}
+                {%- unless variant.available %} – Épuisé{% endunless -%}
+              </option>
+            {%- endfor -%}
+          </select>
+          <span class="csc__select-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </div>
+      {%- endunless -%}
+
+      {%- comment %} Bouton ATC ──────────────────────────────── {% endcomment %}
+      <button
+        type="submit"
+        name="add"
+        class="csc__atc-btn"
+        data-csc-atc
+        {%- unless current_variant.available %} disabled aria-disabled="true"{% endunless %}
+      >
+        <span class="csc__btn-label" data-csc-btn-label>
+          {%- if current_variant.available -%}Ajouter{%- else -%}Épuisé{%- endif -%}
+        </span>
+        <span class="csc__btn-spinner" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5"
+              stroke-dasharray="28" stroke-dashoffset="10" stroke-linecap="round"/>
+          </svg>
+        </span>
+      </button>
+    {%- endform -%}
+
+  </div>
+</div>
+
+<script src="{{ 'custom-sticky-cart.js' | asset_url }}" defer></script>
+
+{%- endif -%}

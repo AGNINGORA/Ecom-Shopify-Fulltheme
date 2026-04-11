@@ -1,0 +1,162 @@
+{
+  "sections": {
+    "hero-banner": {
+      "type": "custom-hero-banner",
+      "settings": {
+        "content_type": "image",
+        "overlay_opacity": 30,
+        "height_desktop": 80,
+        "height_mobile": 60,
+        "title": "La beauté naturelle, réinventée",
+        "subtitle": "Des formules clean, cliniquement testées, pensées pour votre peau.",
+        "cta_label": "Découvrir la collection",
+        "cta_url": "shopify://collections/all",
+        "cta_style": "filled",
+        "text_alignment": "center",
+        "text_color": "#FFFFFF",
+        "cta_bg": "#C9A96E",
+        "cta_text_color": "#FFFFFF",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "stories": {
+      "type": "custom-stories",
+      "settings": {
+        "title": "Nos Stories",
+        "subtitle": "Nouveautés, promos & coulisses",
+        "accent_color": "#C9A96E",
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    },
+    "ab-cta": {
+      "type": "custom-ab-cta-banner",
+      "settings": {
+        "test_name": "homepage_cta",
+        "accent_color": "#C9A96E",
+        "title_a": "Offre spéciale : -20% aujourd'hui",
+        "text_a": "Profitez de notre promotion exclusive sur toute la collection.",
+        "cta_label_a": "En profiter maintenant",
+        "cta_color_a": "#C9A96E",
+        "title_b": "Livraison offerte dès 50€",
+        "text_b": "Découvrez notre collection et bénéficiez de la livraison gratuite.",
+        "cta_label_b": "Découvrir la collection",
+        "cta_color_b": "#111111",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "benefits": {
+      "type": "custom-benefits-banner",
+      "blocks": {
+        "benefit-1": {
+          "type": "benefit",
+          "settings": {
+            "icon": "leaf",
+            "title": "100 % naturel",
+            "description": "Ingrédients d'origine naturelle, certifiés et traçables."
+          }
+        },
+        "benefit-2": {
+          "type": "benefit",
+          "settings": {
+            "icon": "shield",
+            "title": "Sans parabène",
+            "description": "Aucun conservateur controversé, efficace sur toutes les peaux."
+          }
+        },
+        "benefit-3": {
+          "type": "benefit",
+          "settings": {
+            "icon": "flask",
+            "title": "Cliniquement testé",
+            "description": "Développé avec des dermatologues, résultats prouvés."
+          }
+        },
+        "benefit-4": {
+          "type": "benefit",
+          "settings": {
+            "icon": "truck",
+            "title": "Livraison offerte",
+            "description": "Dès 50 € d'achat, livraison gratuite en France métropolitaine."
+          }
+        }
+      },
+      "block_order": ["benefit-1", "benefit-2", "benefit-3", "benefit-4"],
+      "settings": {
+        "section_bg": "#F7F5F2",
+        "card_bg": "#FFFFFF",
+        "icon_bg": "#F0EDE8",
+        "accent_color": "#C9A96E",
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
+    },
+    "featured-product": {
+      "type": "custom-featured-product",
+      "settings": {
+        "title": "Notre bestseller",
+        "show_rating": true,
+        "show_description": true,
+        "desc_chars": 220,
+        "show_buy_now": true,
+        "accent_color": "#C9A96E",
+        "add_btn_bg": "#111111",
+        "add_btn_color": "#FFFFFF",
+        "buy_btn_bg": "#FFFFFF",
+        "buy_btn_color": "#111111",
+        "buy_btn_border": "#111111",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "before-after": {
+      "type": "custom-before-after",
+      "settings": {
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "featured-routine": {
+      "type": "custom-featured-routine",
+      "settings": {
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "testimonials": {
+      "type": "custom-testimonials-carousel",
+      "settings": {
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "instagram": {
+      "type": "custom-instagram-feed",
+      "settings": {
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "faq": {
+      "type": "custom-faq-contact",
+      "settings": {
+        "padding_top": 64,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "hero-banner",
+    "stories",
+    "ab-cta",
+    "benefits",
+    "featured-product",
+    "before-after",
+    "featured-routine",
+    "testimonials",
+    "instagram",
+    "faq"
+  ]
+}

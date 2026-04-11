@@ -1,0 +1,116 @@
+{% comment %}
+  custom-cart-upsell-popup.liquid
+  Popup post-ATC : confirmation + produits complémentaires
+  Dawn 15.x · Vanilla JS · fetch API
+  CSS : assets/custom-cart-upsell-popup.css
+  JS  : assets/custom-cart-upsell-popup.js
+
+  Accepte (optionnel, passé via render depuis theme.liquid) :
+  — aucun paramètre : tout est configurable via les data-* injectés par le JS
+{% endcomment %}
+
+{{ 'custom-cart-upsell-popup.css' | asset_url | stylesheet_tag }}
+
+{%- comment %} ── Overlay ─────────────────────────────────────── {% endcomment %}
+<div
+  class="cup__overlay"
+  data-cup-overlay
+  aria-hidden="true"
+></div>
+
+{%- comment %} ── Modal ────────────────────────────────────────── {% endcomment %}
+<div
+  class="cup__modal"
+  id="cart-upsell-popup"
+  data-cup-modal
+  role="dialog"
+  aria-modal="true"
+  aria-label="Produit ajouté au panier"
+  tabindex="-1"
+  hidden
+>
+
+  {%- comment %} ── En-tête ──────────────────────────────────── {% endcomment %}
+  <div class="cup__header">
+    <span class="cup__header-icon" aria-hidden="true">
+      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M6 10L9 13L14 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <h2 class="cup__header-title">Ajouté à votre panier</h2>
+    <button
+      class="cup__close"
+      data-cup-close
+      type="button"
+      aria-label="Fermer"
+    >
+      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  {%- comment %} ── Produit ajouté (rempli par JS) ───────────── {% endcomment %}
+  <div class="cup__added" data-cup-added>
+    <div class="cup__added-img-wrap">
+      <img
+        class="cup__added-img"
+        data-cup-added-img
+        src=""
+        alt=""
+        width="80"
+        height="80"
+        loading="eager"
+      >
+    </div>
+    <div class="cup__added-info">
+      <p class="cup__added-name" data-cup-added-name></p>
+      <p class="cup__added-variant" data-cup-added-variant></p>
+      <p class="cup__added-price" data-cup-added-price></p>
+    </div>
+  </div>
+
+  {%- comment %} ── Barre livraison gratuite (inline) ─────────── {% endcomment %}
+  <div class="cup__shipping" data-cup-shipping hidden>
+    <p class="cup__shipping-msg" data-cup-shipping-msg></p>
+    <div
+      class="cup__shipping-track"
+      role="progressbar"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="0"
+      data-cup-shipping-bar-wrap
+    >
+      <div class="cup__shipping-fill" data-cup-shipping-fill style="width:0%"></div>
+    </div>
+  </div>
+
+  {%- comment %} ── Upsell produits (rempli par JS) ──────────── {% endcomment %}
+  <div class="cup__upsell" data-cup-upsell hidden>
+    <p class="cup__upsell-label" data-cup-upsell-label>Complétez votre routine</p>
+    <div class="cup__upsell-list" data-cup-upsell-list></div>
+  </div>
+
+  {%- comment %} ── Actions ──────────────────────────────────── {% endcomment %}
+  <div class="cup__actions">
+    <button
+      class="cup__btn cup__btn--secondary"
+      data-cup-close
+      type="button"
+    >
+      Continuer mes achats
+    </button>
+    <a
+      class="cup__btn cup__btn--primary"
+      href="{{ routes.cart_url }}"
+      data-cup-cart-link
+    >
+      Voir mon panier
+      <span class="cup__btn-count" data-cup-cart-count></span>
+    </a>
+  </div>
+
+</div>
+
+<script src="{{ 'custom-cart-upsell-popup.js' | asset_url }}" defer></script>

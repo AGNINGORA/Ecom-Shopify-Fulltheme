@@ -1,0 +1,40 @@
+{
+  "sections": {
+    "banner": {
+      "type": "main-collection-banner",
+      "settings": {
+        "show_collection_description": true,
+        "show_collection_image": false,
+        "color_scheme": "scheme-1"
+      }
+    },
+    "collection-filters": {
+      "type": "custom-collection-filters",
+      "settings": {
+        "products_per_page": 16,
+        "columns_desktop": "4",
+        "show_filters": true,
+        "filter_layout": "sidebar",
+        "show_sort": true,
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "recently-viewed": {
+      "type": "custom-recently-viewed",
+      "settings": {
+        "title": "Récemment consultés",
+        "max_products": 8,
+        "columns": "4",
+        "accent_color": "#C9A96E",
+        "padding_top": 48,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "banner",
+    "collection-filters",
+    "recently-viewed"
+  ]
+}

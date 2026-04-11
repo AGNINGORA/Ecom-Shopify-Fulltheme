@@ -1,0 +1,512 @@
+{% comment %}
+  Custom Before/After — Mode Single + Mode Galerie Témoignages
+  Dawn 15.x · Vanilla JS · IntersectionObserver · Touch support
+{% endcomment %}
+
+{{ 'custom-before-after.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign section_mode      = section.settings.mode | default: 'single'
+  assign slider_blocks     = section.blocks | where: 'type', 'slider'
+  assign stat_blocks       = section.blocks | where: 'type', 'stat'
+  assign testimony_blocks  = section.blocks | where: 'type', 'testimony'
+-%}
+
+<section
+  class="custom-before-after"
+  data-section-id="{{ section.id }}"
+  style="
+    --cba-accent:       {{ section.settings.accent_color }};
+    --cba-label-bg:     {{ section.settings.label_bg }};
+    --cba-label-color:  {{ section.settings.label_color }};
+    --cba-handle-bg:    {{ section.settings.handle_color }};
+    --cba-stat-color:   {{ section.settings.stat_number_color }};
+    --cba-padding-top:  {{ section.settings.padding_top }}px;
+    --cba-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="cba__inner page-width">
+
+    {%- comment %} ── Titre & sous-titre ──────────────────────── {% endcomment %}
+    <div class="cba__header">
+      {%- if section.settings.title != blank -%}
+        <h2 class="cba__title">{{ section.settings.title | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtitle != blank -%}
+        <p class="cba__subtitle">{{ section.settings.subtitle | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if section_mode == 'gallery' -%}
+
+      {%- comment %} ══════════════════════════════════════════════
+          MODE GALERIE — grille de témoignages avant/après
+      ══════════════════════════════════════════════ {% endcomment %}
+
+      {%- if testimony_blocks.size > 0 -%}
+        <div
+          class="cba__gallery"
+          style="--cba-gallery-cols: {{ section.settings.gallery_columns | default: 3 }};"
+        >
+          {%- for block in testimony_blocks -%}
+            {%- assign img_b = block.settings.image_before -%}
+            {%- assign img_a = block.settings.image_after -%}
+
+            <div class="cba__testi-card" data-cba-testi-card {{ block.shopify_attributes }}>
+
+              {%- if img_b != blank and img_a != blank -%}
+
+                {%- comment %} ── Mini slider ─────────────────── {% endcomment %}
+                <div
+                  class="cba__slider cba__slider--gallery"
+                  data-cba-slider
+                  role="img"
+                  aria-label="Avant/après{% if block.settings.client_name != blank %} — {{ block.settings.client_name | escape }}{% endif %}"
+                >
+                  {%- comment %} Image APRÈS (fond) {%- endcomment -%}
+                  <div class="cba__img-wrap cba__img-wrap--after">
+                    <img
+                      class="cba__img"
+                      src="{{ img_a | image_url: width: 600, format: 'webp' }}"
+                      srcset="
+                        {{ img_a | image_url: width: 300, format: 'webp' }} 300w,
+                        {{ img_a | image_url: width: 600, format: 'webp' }} 600w
+                      "
+                      sizes="(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw"
+                      alt="{{ block.settings.label_after | default: 'Après' | escape }}"
+                      loading="lazy"
+                      draggable="false"
+                      width="{{ img_a.width }}"
+                      height="{{ img_a.height }}"
+                    >
+                    <span class="cba__label cba__label--after">
+                      {{ block.settings.label_after | default: 'Après' | escape }}
+                    </span>
+                  </div>
+
+                  {%- comment %} Image AVANT (overlay clipé) {%- endcomment -%}
+                  <div class="cba__img-wrap cba__img-wrap--before" data-cba-before style="width: 50%">
+                    <img
+                      class="cba__img"
+                      src="{{ img_b | image_url: width: 600, format: 'webp' }}"
+                      srcset="
+                        {{ img_b | image_url: width: 300, format: 'webp' }} 300w,
+                        {{ img_b | image_url: width: 600, format: 'webp' }} 600w
+                      "
+                      sizes="(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw"
+                      alt="{{ block.settings.label_before | default: 'Avant' | escape }}"
+                      loading="lazy"
+                      draggable="false"
+                      width="{{ img_b.width }}"
+                      height="{{ img_b.height }}"
+                    >
+                    <span class="cba__label cba__label--before">
+                      {{ block.settings.label_before | default: 'Avant' | escape }}
+                    </span>
+                  </div>
+
+                  {%- comment %} Curseur {%- endcomment -%}
+                  <div class="cba__divider" data-cba-divider style="left: 50%">
+                    <div class="cba__handle" data-cba-handle aria-hidden="true">
+                      <svg class="cba__handle-arrows" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 20L8 13M15 20L8 27M25 20L32 13M25 20L32 27" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                {%- comment %} fin mini slider {%- endcomment %}
+
+              {%- elsif request.design_mode -%}
+                <div class="cba__slider-placeholder cba__slider-placeholder--gallery">
+                  Ajoutez une image "Avant" et une image "Après".
+                </div>
+              {%- endif -%}
+
+              {%- comment %} ── Contenu témoignage ──────────────── {% endcomment %}
+              <div class="cba__testi-content">
+                {%- if block.settings.client_name != blank -%}
+                  <p class="cba__testi-name">{{ block.settings.client_name | escape }}</p>
+                {%- endif -%}
+
+                {%- if block.settings.testimonial != blank -%}
+                  <p class="cba__testi-text" data-cba-testi-text>
+                    {{- block.settings.testimonial | escape -}}
+                  </p>
+                  <button
+                    class="cba__testi-more"
+                    data-cba-testi-more
+                    aria-expanded="false"
+                    type="button"
+                  >Voir plus</button>
+                {%- endif -%}
+              </div>
+
+            </div>
+          {%- endfor -%}
+        </div>
+
+      {%- elsif request.design_mode -%}
+        <p class="cba__gallery-empty">
+          Ajoutez des blocks "Témoignage avant/après" pour remplir la galerie.
+        </p>
+      {%- endif -%}
+
+    {%- else -%}
+
+      {%- comment %} ══════════════════════════════════════════════
+          MODE SINGLE — slider unique + statistiques
+      ══════════════════════════════════════════════ {% endcomment %}
+
+      {%- if slider_blocks.size > 0 -%}
+        <div class="cba__sliders {% if slider_blocks.size == 1 %}cba__sliders--single{% endif %}">
+
+          {%- for block in slider_blocks -%}
+            {%- if block.settings.image_before != blank and block.settings.image_after != blank -%}
+
+              <div class="cba__slider-wrap" {{ block.shopify_attributes }}>
+                {%- if block.settings.caption != blank -%}
+                  <p class="cba__slider-caption">{{ block.settings.caption | escape }}</p>
+                {%- endif -%}
+
+                <div
+                  class="cba__slider"
+                  data-cba-slider
+                  role="img"
+                  aria-label="{{ block.settings.caption | default: 'Comparaison avant / après' | escape }}"
+                >
+                  <div class="cba__img-wrap cba__img-wrap--after">
+                    <img
+                      class="cba__img"
+                      src="{{ block.settings.image_after | image_url: width: 900 }}"
+                      srcset="
+                        {{ block.settings.image_after | image_url: width: 480 }} 480w,
+                        {{ block.settings.image_after | image_url: width: 720 }} 720w,
+                        {{ block.settings.image_after | image_url: width: 900 }} 900w
+                      "
+                      sizes="(min-width: 750px) 50vw, 100vw"
+                      alt="{{ block.settings.label_after | escape }}"
+                      loading="lazy"
+                      draggable="false"
+                      width="{{ block.settings.image_after.width }}"
+                      height="{{ block.settings.image_after.height }}"
+                    >
+                    <span class="cba__label cba__label--after">
+                      {{ block.settings.label_after | default: 'Après' | escape }}
+                    </span>
+                  </div>
+
+                  <div class="cba__img-wrap cba__img-wrap--before" data-cba-before style="width: 50%">
+                    <img
+                      class="cba__img"
+                      src="{{ block.settings.image_before | image_url: width: 900 }}"
+                      srcset="
+                        {{ block.settings.image_before | image_url: width: 480 }} 480w,
+                        {{ block.settings.image_before | image_url: width: 720 }} 720w,
+                        {{ block.settings.image_before | image_url: width: 900 }} 900w
+                      "
+                      sizes="(min-width: 750px) 50vw, 100vw"
+                      alt="{{ block.settings.label_before | escape }}"
+                      loading="lazy"
+                      draggable="false"
+                      width="{{ block.settings.image_before.width }}"
+                      height="{{ block.settings.image_before.height }}"
+                    >
+                    <span class="cba__label cba__label--before">
+                      {{ block.settings.label_before | default: 'Avant' | escape }}
+                    </span>
+                  </div>
+
+                  <div class="cba__divider" data-cba-divider style="left: 50%">
+                    <div class="cba__handle" data-cba-handle aria-hidden="true">
+                      <svg class="cba__handle-arrows" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 20L8 13M15 20L8 27M25 20L32 13M25 20L32 27" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            {%- elsif request.design_mode -%}
+              <div class="cba__slider-placeholder" {{ block.shopify_attributes }}>
+                Ajoutez une image "Avant" et une image "Après" dans ce block.
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+
+        </div>
+      {%- endif -%}
+
+      {%- if stat_blocks.size > 0 -%}
+        <div class="cba__stats" data-cba-stats>
+          {%- for block in stat_blocks -%}
+            <div
+              class="cba__stat"
+              data-cba-stat
+              data-value="{{ block.settings.number | escape }}"
+              data-suffix="{{ block.settings.suffix | escape }}"
+              data-prefix="{{ block.settings.prefix | escape }}"
+              {{ block.shopify_attributes }}
+            >
+              <div class="cba__stat-number" data-cba-stat-number aria-live="off">
+                <span class="cba__stat-prefix">{{ block.settings.prefix | escape }}</span>
+                <span class="cba__stat-value" data-cba-count>{{ block.settings.number | escape }}</span>
+                <span class="cba__stat-suffix">{{ block.settings.suffix | escape }}</span>
+              </div>
+              {%- if block.settings.label != blank -%}
+                <p class="cba__stat-label">{{ block.settings.label | escape }}</p>
+              {%- endif -%}
+              {%- if block.settings.sub_label != blank -%}
+                <p class="cba__stat-sublabel">{{ block.settings.sub_label | escape }}</p>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+    {%- endif -%}
+
+  </div>
+</section>
+
+<script src="{{ 'custom-before-after.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Avant / Après",
+  "tag": "section",
+  "class": "section-custom-before-after",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "select",
+      "id": "mode",
+      "label": "Mode d'affichage",
+      "options": [
+        { "value": "single",  "label": "Slider unique" },
+        { "value": "gallery", "label": "Galerie témoignages" }
+      ],
+      "default": "single"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Des résultats prouvés"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Sous-titre",
+      "default": "Constatez la différence avec nos clientes"
+    },
+    {
+      "type": "header",
+      "content": "Galerie — options"
+    },
+    {
+      "type": "select",
+      "id": "gallery_columns",
+      "label": "Colonnes (desktop)",
+      "options": [
+        { "value": "2", "label": "2 colonnes" },
+        { "value": "3", "label": "3 colonnes" }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "label_bg",
+      "label": "Fond des labels Avant/Après",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Texte des labels",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "handle_color",
+      "label": "Couleur du curseur",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "stat_number_color",
+      "label": "Couleur des chiffres stats",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0, "max": 100, "step": 4, "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0, "max": 100, "step": 4, "unit": "px",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimony",
+      "name": "Témoignage avant/après",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image_before",
+          "label": "Image Avant"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_after",
+          "label": "Image Après"
+        },
+        {
+          "type": "text",
+          "id": "label_before",
+          "label": "Label gauche",
+          "default": "Avant"
+        },
+        {
+          "type": "text",
+          "id": "label_after",
+          "label": "Label droite",
+          "default": "Après"
+        },
+        {
+          "type": "text",
+          "id": "client_name",
+          "label": "Prénom du client",
+          "placeholder": "ex : Marie L."
+        },
+        {
+          "type": "textarea",
+          "id": "testimonial",
+          "label": "Témoignage",
+          "placeholder": "Décrivez les résultats..."
+        }
+      ]
+    },
+    {
+      "type": "slider",
+      "name": "Paire Avant / Après",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image_before",
+          "label": "Image Avant"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_after",
+          "label": "Image Après"
+        },
+        {
+          "type": "text",
+          "id": "label_before",
+          "label": "Label image gauche",
+          "default": "Avant"
+        },
+        {
+          "type": "text",
+          "id": "label_after",
+          "label": "Label image droite",
+          "default": "Après"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Légende (optionnelle)",
+          "placeholder": "ex : Résultats après 4 semaines"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "name": "Statistique",
+      "settings": [
+        {
+          "type": "text",
+          "id": "prefix",
+          "label": "Préfixe (optionnel)",
+          "placeholder": "ex : +"
+        },
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Chiffre principal",
+          "default": "92",
+          "info": "Nombre uniquement (ex: 92, 4.8)"
+        },
+        {
+          "type": "text",
+          "id": "suffix",
+          "label": "Suffixe",
+          "default": "%",
+          "placeholder": "ex : %, /5"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Texte principal",
+          "default": "constatent une amélioration"
+        },
+        {
+          "type": "text",
+          "id": "sub_label",
+          "label": "Texte secondaire (optionnel)",
+          "placeholder": "ex : Testé cliniquement"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Avant / Après — Single",
+      "settings": { "mode": "single" },
+      "blocks": [
+        {
+          "type": "slider",
+          "settings": {
+            "label_before": "Avant",
+            "label_after": "Après",
+            "caption": "Résultats après 4 semaines d'utilisation"
+          }
+        },
+        { "type": "stat", "settings": { "number": "92", "suffix": "%", "label": "constatent une amélioration visible" } },
+        { "type": "stat", "settings": { "number": "4",  "suffix": " sem.", "label": "pour des résultats visibles" } },
+        { "type": "stat", "settings": { "number": "4.8", "suffix": "/5", "label": "note moyenne" } }
+      ]
+    },
+    {
+      "name": "Avant / Après — Galerie",
+      "settings": { "mode": "gallery", "title": "Nos avant/après" },
+      "blocks": [
+        { "type": "testimony", "settings": { "client_name": "Marie L.", "testimonial": "Résultats incroyables après seulement 3 semaines. Ma peau est transformée !" } },
+        { "type": "testimony", "settings": { "client_name": "Sophie R.", "testimonial": "Je n'aurais jamais cru voir une telle différence. Je recommande vivement ce produit à toutes mes amies." } },
+        { "type": "testimony", "settings": { "client_name": "Camille D.", "testimonial": "Enfin un soin qui tient ses promesses. Teint unifié, pores resserrés, éclat retrouvé." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

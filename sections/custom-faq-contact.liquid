@@ -1,0 +1,333 @@
+{% comment %}
+  custom-faq-contact.liquid
+  FAQ accordéon + bloc contact — 2 colonnes desktop, empilé mobile
+  Dawn 15.x · Vanilla JS · JSON-LD FAQPage
+{% endcomment %}
+
+{{ 'custom-faq-contact.css' | asset_url | stylesheet_tag }}
+
+{%- assign faq_blocks = section.blocks | where: 'type', 'faq_item' -%}
+
+<section
+  class="section-custom-faq-contact"
+  data-section-id="{{ section.id }}"
+  style="
+    --cfc-padding-top:    {{ section.settings.padding_top }}px;
+    --cfc-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --cfc-contact-bg:     {{ section.settings.contact_bg }};
+    --cfc-accent:         {{ section.settings.accent_color }};
+  "
+>
+  <div class="cfc__inner page-width">
+    <div class="cfc__grid">
+
+      {%- comment %} ══════════════════════════════════════════════
+          COLONNE GAUCHE — Contact
+      ══════════════════════════════════════════════ {% endcomment %}
+      <div class="cfc__contact">
+
+        {%- if section.settings.contact_title != blank -%}
+          <h2 class="cfc__contact-title">{{ section.settings.contact_title | escape }}</h2>
+        {%- endif -%}
+
+        {%- if section.settings.contact_hours != blank -%}
+          <div class="cfc__contact-hours rte">
+            {{ section.settings.contact_hours }}
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.contact_phone != blank -%}
+          <a
+            href="tel:{{ section.settings.contact_phone | remove: ' ' | remove: '.' }}"
+            class="cfc__contact-phone"
+          >
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M3.3 5.8c1.2 2.7 3.1 5.1 5.8 6.9l1.9-1.9a1 1 0 011.1-.3c1.2.4 2.5.7 3.9.7a1 1 0 011 1V16a1 1 0 01-1 1C6.5 17 3 10 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.4.3 2.7.7 3.9a1 1 0 01-.3 1.1L7 10.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {{ section.settings.contact_phone | escape }}
+          </a>
+        {%- endif -%}
+
+        <div class="cfc__contact-btns">
+          {%- if section.settings.btn_primary_label != blank -%}
+            <a
+              href="{{ section.settings.btn_primary_url | default: '/pages/contact' }}"
+              class="cfc__btn cfc__btn--primary"
+            >
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M2.5 5.5A1.5 1.5 0 014 4h12a1.5 1.5 0 011.5 1.5v9A1.5 1.5 0 0116 16H4a1.5 1.5 0 01-1.5-1.5v-9zM2.5 7l7.5 4.5L17.5 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              {{ section.settings.btn_primary_label | escape }}
+            </a>
+          {%- endif -%}
+
+          {%- if section.settings.btn_secondary_label != blank -%}
+            <a
+              href="{{ section.settings.btn_secondary_url | default: '/pages/aide' }}"
+              class="cfc__btn cfc__btn--secondary"
+            >
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 5v3m0 3v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              {{ section.settings.btn_secondary_label | escape }}
+            </a>
+          {%- endif -%}
+        </div>
+
+      </div>
+
+      {%- comment %} ══════════════════════════════════════════════
+          COLONNE DROITE — FAQ accordéon
+      ══════════════════════════════════════════════ {% endcomment %}
+      <div class="cfc__faq">
+
+        {%- if section.settings.faq_title != blank -%}
+          <h2 class="cfc__faq-title">{{ section.settings.faq_title | escape }}</h2>
+        {%- endif -%}
+
+        {%- if faq_blocks.size > 0 -%}
+          <div class="cfc__faq-list" data-cfc-accordion>
+
+            {%- for block in faq_blocks -%}
+              {%- if block.settings.question != blank -%}
+                <div
+                  class="cfc__faq-item"
+                  data-cfc-item
+                  {{ block.shopify_attributes }}
+                >
+                  <h3 class="cfc__faq-heading">
+                    <button
+                      class="cfc__faq-trigger"
+                      data-cfc-trigger
+                      aria-expanded="false"
+                      aria-controls="cfc-answer-{{ section.id }}-{{ forloop.index }}"
+                      id="cfc-question-{{ section.id }}-{{ forloop.index }}"
+                    >
+                      <span class="cfc__faq-question">{{ block.settings.question | escape }}</span>
+                      <span class="cfc__faq-icon" aria-hidden="true">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                          <path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </button>
+                  </h3>
+
+                  <div
+                    class="cfc__faq-answer"
+                    data-cfc-answer
+                    id="cfc-answer-{{ section.id }}-{{ forloop.index }}"
+                    role="region"
+                    aria-labelledby="cfc-question-{{ section.id }}-{{ forloop.index }}"
+                  >
+                    <div class="cfc__faq-answer-inner">
+                      {%- if block.settings.answer != blank -%}
+                        <div class="cfc__faq-answer-content rte">
+                          {{ block.settings.answer }}
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+
+          </div>
+
+        {%- elsif request.design_mode -%}
+          <p class="cfc__faq-empty">
+            Ajoutez des blocks "Question / Réponse" pour remplir la FAQ.
+          </p>
+        {%- endif -%}
+
+      </div>
+      {%- comment %} fin colonne FAQ {% endcomment %}
+
+    </div>
+  </div>
+</section>
+
+{%- comment %} ── JSON-LD FAQPage ──────────────────────────────── {% endcomment %}
+{%- if faq_blocks.size > 0 -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {%- for block in faq_blocks -%}
+        {%- if block.settings.question != blank -%}
+          {
+            "@type": "Question",
+            "name": {{ block.settings.question | escape | json }},
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": {{ block.settings.answer | default: '' | strip_html | json }}
+            }
+          }{%- unless forloop.last -%},{%- endunless -%}
+        {%- endif -%}
+      {%- endfor -%}
+    ]
+  }
+  </script>
+{%- endif -%}
+
+<script src="{{ 'custom-faq-contact.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "FAQ + Contact",
+  "tag": "section",
+  "class": "section-custom-faq-contact",
+  "max_blocks": 20,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Bloc contact (colonne gauche)"
+    },
+    {
+      "type": "text",
+      "id": "contact_title",
+      "label": "Titre",
+      "default": "Besoin d'aide ?"
+    },
+    {
+      "type": "richtext",
+      "id": "contact_hours",
+      "label": "Texte horaires / description",
+      "default": "<p>Notre équipe est là pour vous répondre du Lundi au Vendredi de 8h30 à 19h. Samedi de 10h à 17h.</p>"
+    },
+    {
+      "type": "text",
+      "id": "contact_phone",
+      "label": "Téléphone (optionnel)",
+      "placeholder": "ex : +33 1 23 45 67 89"
+    },
+    {
+      "type": "text",
+      "id": "btn_primary_label",
+      "label": "Bouton principal — texte",
+      "default": "Contactez notre support"
+    },
+    {
+      "type": "url",
+      "id": "btn_primary_url",
+      "label": "Bouton principal — lien"
+    },
+    {
+      "type": "text",
+      "id": "btn_secondary_label",
+      "label": "Bouton secondaire — texte",
+      "default": "Consultez notre aide"
+    },
+    {
+      "type": "url",
+      "id": "btn_secondary_url",
+      "label": "Bouton secondaire — lien"
+    },
+    {
+      "type": "header",
+      "content": "FAQ (colonne droite)"
+    },
+    {
+      "type": "text",
+      "id": "faq_title",
+      "label": "Titre",
+      "default": "Questions fréquentes"
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "contact_bg",
+      "label": "Fond colonne contact",
+      "default": "#F7F5F2"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur accent",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0, "max": 120, "step": 4, "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0, "max": 120, "step": 4, "unit": "px",
+      "default": 64
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "Question / Réponse",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "placeholder": "ex : Quelle est votre politique de retour ?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Réponse"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ + Contact",
+      "blocks": [
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Quelle est votre politique de retour ?",
+            "answer": "<p>Vous disposez de 30 jours à compter de la réception de votre commande pour nous retourner un produit non ouvert et non utilisé. Les frais de retour sont à votre charge, sauf en cas d'erreur de notre part.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Quels sont les délais de livraison ?",
+            "answer": "<p>La livraison standard est effectuée en 3 à 5 jours ouvrés. La livraison express (24h) est disponible pour les commandes passées avant 12h. La livraison est offerte dès 50€ d'achat.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Où sont fabriqués vos produits ?",
+            "answer": "<p>Tous nos produits sont fabriqués en France, dans des laboratoires certifiés, selon des formules développées avec des dermatologues. Nous privilégions des ingrédients naturels et sourcés de manière responsable.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Quels moyens de paiement acceptez-vous ?",
+            "answer": "<p>Nous acceptons les cartes bancaires (Visa, Mastercard, American Express), PayPal, Apple Pay et Google Pay. Vos paiements sont 100% sécurisés via notre partenaire de paiement certifié.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Comment suivre ma commande ?",
+            "answer": "<p>Dès l'expédition de votre commande, vous recevrez un email avec votre numéro de suivi. Vous pouvez également suivre votre commande directement depuis votre espace client dans la rubrique \"Mes commandes\".</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

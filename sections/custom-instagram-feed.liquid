@@ -1,0 +1,299 @@
+{% comment %}
+  custom-instagram-feed.liquid
+  Grille style Instagram — image_picker blocks, hover overlay
+  Dawn 15.x · CSS only (pas de JS, pas d'API)
+  CSS : assets/custom-instagram-feed.css
+{% endcomment %}
+
+{{ 'custom-instagram-feed.css' | asset_url | stylesheet_tag }}
+
+{%- assign photo_blocks = section.blocks | where: 'type', 'photo' -%}
+{%- assign grid_cols = section.settings.grid_columns -%}
+
+<section
+  class="cig"
+  data-section-id="{{ section.id }}"
+  style="
+    --cig-accent:       {{ section.settings.accent_color }};
+    --cig-overlay:      {{ section.settings.overlay_color }};
+    --cig-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --cig-btn-bg:       {{ section.settings.btn_bg }};
+    --cig-btn-txt:      {{ section.settings.btn_text_color }};
+    --cig-cols-desktop: {{ grid_cols }};
+  "
+>
+  <div class="cig__inner page-width">
+
+    {%- comment %} En-tête ─────────────────────────────────── {% endcomment %}
+    <div class="cig__header">
+      {%- if section.settings.handle != blank -%}
+        <p class="cig__handle">
+          <svg class="cig__handle-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+          </svg>
+          {{ section.settings.handle | escape }}
+        </p>
+      {%- endif -%}
+      {%- if section.settings.title != blank -%}
+        <h2 class="cig__title">{{ section.settings.title | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtitle != blank -%}
+        <p class="cig__subtitle">{{ section.settings.subtitle | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- comment %} Grille ──────────────────────────────────── {% endcomment %}
+    {%- if photo_blocks.size > 0 -%}
+      <div
+        class="cig__grid cig__grid--{{ grid_cols }}col"
+        role="list"
+        aria-label="Galerie {{ section.settings.handle | default: 'Instagram' | escape }}"
+      >
+        {%- for block in photo_blocks -%}
+          {%- if block.settings.image != blank -%}
+            <div
+              class="cig__item"
+              role="listitem"
+              {{ block.shopify_attributes }}
+            >
+              {%- comment %} Image {% endcomment %}
+              <div class="cig__img-wrap">
+                <img
+                  class="cig__img"
+                  src="{{ block.settings.image | image_url: width: 600, format: 'webp' }}"
+                  srcset="
+                    {{ block.settings.image | image_url: width: 300, format: 'webp' }} 300w,
+                    {{ block.settings.image | image_url: width: 600, format: 'webp' }} 600w,
+                    {{ block.settings.image | image_url: width: 900, format: 'webp' }} 900w
+                  "
+                  sizes="(min-width: 990px) {{ 100 | divided_by: grid_cols }}vw, (min-width: 750px) 33vw, 50vw"
+                  alt="{{ block.settings.caption | default: block.settings.image.alt | default: 'Photo Instagram' | escape }}"
+                  width="{{ block.settings.image.width }}"
+                  height="{{ block.settings.image.height }}"
+                  loading="lazy"
+                >
+              </div>
+
+              {%- comment %} Overlay au survol {% endcomment %}
+              <div class="cig__overlay" aria-hidden="true">
+                <div class="cig__overlay-content">
+                  {%- if block.settings.caption != blank -%}
+                    <p class="cig__caption">{{ block.settings.caption | truncatewords: 12 | escape }}</p>
+                  {%- endif -%}
+                  <span class="cig__cta-btn">
+                    {{ section.settings.cta_label | default: 'Voir' | escape }}
+                  </span>
+                </div>
+              </div>
+
+              {%- comment %} Lien cliquable {% endcomment %}
+              {%- if block.settings.url != blank -%}
+                <a
+                  class="cig__link"
+                  href="{{ block.settings.url }}"
+                  aria-label="{{ block.settings.caption | default: 'Voir' | escape }}"
+                  {% if block.settings.url contains 'instagram.com' or block.settings.open_new_tab %}
+                    target="_blank" rel="noopener noreferrer"
+                  {% endif %}
+                ></a>
+              {%- endif -%}
+
+            </div>
+          {%- elsif request.design_mode -%}
+            <div class="cig__item cig__item--placeholder" {{ block.shopify_attributes }}>
+              {{ 'image' | placeholder_svg_tag: 'cig__placeholder-svg' }}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment %} Lien vers le profil ─────────────────────── {% endcomment %}
+    {%- if section.settings.profile_url != blank and section.settings.profile_cta != blank -%}
+      <div class="cig__profile-link-wrap">
+        <a
+          class="cig__profile-link"
+          href="{{ section.settings.profile_url }}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+          </svg>
+          {{ section.settings.profile_cta | escape }}
+        </a>
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Galerie Instagram",
+  "tag": "section",
+  "class": "section-custom-instagram-feed",
+  "max_blocks": 9,
+  "settings": [
+    {
+      "type": "text",
+      "id": "handle",
+      "label": "Identifiant Instagram",
+      "placeholder": "ex : @mamarque"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre (optionnel)",
+      "placeholder": "ex : Suivez notre quotidien"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Sous-titre (optionnel)"
+    },
+    {
+      "type": "header",
+      "content": "Grille"
+    },
+    {
+      "type": "select",
+      "id": "grid_columns",
+      "label": "Colonnes (desktop)",
+      "options": [
+        { "value": "2", "label": "2 colonnes (2×3 = 6 photos)" },
+        { "value": "3", "label": "3 colonnes (3×3 = 9 photos)" }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "header",
+      "content": "Hover"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Texte du bouton au survol",
+      "default": "Voir"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Couleur de l'overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Opacité de l'overlay",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Fond du bouton hover",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Texte du bouton hover",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Lien profil"
+    },
+    {
+      "type": "url",
+      "id": "profile_url",
+      "label": "URL du profil Instagram"
+    },
+    {
+      "type": "text",
+      "id": "profile_cta",
+      "label": "Texte du lien profil",
+      "placeholder": "ex : Nous suivre sur Instagram"
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0, "max": 100, "step": 4, "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0, "max": 100, "step": 4, "unit": "px",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "photo",
+      "name": "Photo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Légende (hover)",
+          "placeholder": "ex : Notre best-seller du moment ✨"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Lien (optionnel)"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_new_tab",
+          "label": "Ouvrir dans un nouvel onglet",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Galerie Instagram",
+      "blocks": [
+        { "type": "photo" },
+        { "type": "photo" },
+        { "type": "photo" },
+        { "type": "photo" },
+        { "type": "photo" },
+        { "type": "photo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,150 @@
+{%- comment -%}
+  custom-buy-x-get-y.liquid
+  Offre "Achetez X, obtenez Y gratuit" — 2 cartes cliquables
+  CSS : assets/custom-buy-x-get-y.css
+  JS  : assets/custom-buy-x-get-y.js
+
+  ── Paramètres (à passer via `render`) ──────────────────────────────────────
+    product        — objet product Shopify (requis)
+    enabled        — boolean                  (défaut : true)
+    qty_buy        — quantité à acheter        (défaut : 2)
+    qty_free       — quantité offerte          (défaut : 1)
+    discount_pct   — remise % override (0 = auto "qty_free/total × 100")
+                     (défaut : 0)
+    badge_text     — texte du badge            (défaut : "1 offert 🎉")
+    offer_text     — description de l'offre    (défaut : "2 achetés = 1 offert")
+    badge_color    — couleur fond du badge     (défaut : "#111111")
+
+  ── Intégration dans custom-product-hero.liquid ──────────────────────────────
+  Placer DANS le bloc {%- form 'product', product ... -%},
+  juste avant <div class="cph__actions">.
+
+  ⚠  NE PAS activer simultanément avec custom-quantity-breaks :
+     les deux snippets injectent un input[name="quantity"] dans le
+     formulaire — activer un seul à la fois via le Theme Editor.
+
+  ── Appliquer la remise réelle au checkout ───────────────────────────────────
+  Ce snippet gère l'interface uniquement. Pour la remise effective :
+
+  → Admin Shopify > Réductions > Créer une réduction > "Achetez X obtenez Y"
+    1. Type : "Acheter X articles, obtenir Y articles"
+    2. Produit éligible : ce produit (ou collection)
+    3. Acheter : {{ qty_buy }} articles
+    4. Obtenir : {{ qty_free }} article(s) à 100% de réduction
+    5. Réduction automatique (appliquée dès le panier)
+    Avantage : 100 % natif Shopify, visible au checkout, sans app.
+
+  → Alternative (Shopify Plus) : Shopify Scripts — apply_discount()
+    pour un contrôle programmatique plus fin.
+{%- endcomment -%}
+
+{%- liquid
+  # Valeurs par défaut
+  assign cbxgy_on        = enabled      | default: true
+  assign cbxgy_qty_buy   = qty_buy      | default: 2
+  assign cbxgy_qty_free  = qty_free     | default: 1
+  assign cbxgy_disc_pct  = discount_pct | default: 0
+  assign cbxgy_badge     = badge_text   | default: '1 offert 🎉'
+  assign cbxgy_offer     = offer_text   | default: '2 achetés = 1 offert'
+  assign cbxgy_badge_clr = badge_color  | default: '#111111'
+
+  # Prix de base (centimes)
+  assign base_price  = product.selected_or_first_available_variant.price
+  assign total_qty   = cbxgy_qty_buy | plus: cbxgy_qty_free
+  assign normal_total = base_price | times: total_qty
+
+  # Prix remisé total
+  # Soit override %, soit remise naturelle (tu paies seulement qty_buy)
+  if cbxgy_disc_pct > 0
+    assign disc_amount    = normal_total | times: cbxgy_disc_pct | divided_by: 100
+    assign offer_total    = normal_total | minus: disc_amount
+  else
+    # Remise naturelle : le client paie qty_buy articles, reçoit total_qty
+    assign offer_total    = base_price | times: cbxgy_qty_buy
+    assign disc_amount    = normal_total | minus: offer_total
+    # Calculer le % équivalent pour le badge si besoin
+    assign cbxgy_disc_pct = disc_amount | times: 100 | divided_by: normal_total
+  endif
+-%}
+
+{%- if cbxgy_on -%}
+
+{{ 'custom-buy-x-get-y.css' | asset_url | stylesheet_tag }}
+
+<div
+  class="cbxgy__wrap"
+  data-cbxgy
+  data-price="{{ base_price }}"
+  data-currency="{{ cart.currency.iso_code }}"
+  data-qty-buy="{{ cbxgy_qty_buy }}"
+  data-qty-free="{{ cbxgy_qty_free }}"
+  data-disc-pct="{{ cbxgy_disc_pct }}"
+  style="--cbxgy-badge-bg: {{ cbxgy_badge_clr }};"
+>
+
+  {%- comment -%} Prix de toutes les variantes pour mise à jour JS {%- endcomment -%}
+  <script type="application/json" data-cbxgy-prices>
+    {
+      {%- for variant in product.variants -%}
+        "{{ variant.id }}": {{ variant.price }}
+        {%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    }
+  </script>
+
+  {%- comment -%} Quantité injectée dans le formulaire parent {%- endcomment -%}
+  <input type="hidden" name="quantity" value="1" data-cbxgy-qty-input>
+
+  <p class="cbxgy__heading">Choisissez votre offre :</p>
+
+  <div class="cbxgy__grid" role="group" aria-label="Choisir une offre">
+
+    {%- comment -%} ── Carte 1 : 1 article au prix normal ──────────────────── {%- endcomment -%}
+    <button
+      class="cbxgy__card is-active"
+      type="button"
+      data-cbxgy-card
+      data-cbxgy-qty="1"
+      data-cbxgy-offer="false"
+      aria-pressed="true"
+    >
+      <span class="cbxgy__check" aria-hidden="true"></span>
+
+      <span class="cbxgy__body">
+        <span class="cbxgy__qty-label">1 article</span>
+        <span class="cbxgy__price-row">
+          <span class="cbxgy__price-unit" data-cbxgy-price1>{{ base_price | money }}</span>
+        </span>
+      </span>
+    </button>
+
+    {%- comment -%} ── Carte 2 : offre X+Y ──────────────────────────────────── {%- endcomment -%}
+    <button
+      class="cbxgy__card"
+      type="button"
+      data-cbxgy-card
+      data-cbxgy-qty="{{ total_qty }}"
+      data-cbxgy-offer="true"
+      aria-pressed="false"
+    >
+      <span class="cbxgy__badge">{{ cbxgy_badge }}</span>
+      <span class="cbxgy__check" aria-hidden="true"></span>
+
+      <span class="cbxgy__body">
+        <span class="cbxgy__qty-label">
+          {{ total_qty }} articles
+        </span>
+        <span class="cbxgy__price-row">
+          <span class="cbxgy__price-offer" data-cbxgy-price-offer>{{ offer_total | money }}</span>
+          <s class="cbxgy__price-normal" data-cbxgy-price-normal>{{ normal_total | money }}</s>
+        </span>
+        <span class="cbxgy__offer-text">{{ cbxgy_offer }}</span>
+      </span>
+    </button>
+
+  </div>
+</div>
+
+<script src="{{ 'custom-buy-x-get-y.js' | asset_url }}" defer="defer"></script>
+
+{%- endif -%}

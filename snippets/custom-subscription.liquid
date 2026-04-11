@@ -1,0 +1,163 @@
+{% comment %}
+  Custom Subscription Widget
+  Dawn 15.x · Selling Plans API · Mobile-first
+
+  Accepts:
+  - product       : {Object}  product (required)
+  - accent_color  : {String}  hex color (optional, default #C9A96E)
+  - discount_pct  : {Number}  subscription discount percentage (optional, default 10)
+  - benefit_1..3  : {String}  subscription benefits text (optional)
+
+  Usage in a section:
+    {%- render 'custom-subscription',
+        product:      product,
+        accent_color: '#C9A96E',
+        discount_pct: 10,
+        benefit_1:    'Livraison gratuite',
+        benefit_2:    'Modifiable ou annulable à tout moment',
+        benefit_3:    'Économisez 10% sur chaque envoi'
+    -%}
+{% endcomment %}
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign accent = accent_color | default: '#C9A96E'
+  assign disc = discount_pct | default: 10
+  assign has_selling_plans = false
+
+  if product.selling_plan_groups.size > 0
+    assign has_selling_plans = true
+    assign first_group = product.selling_plan_groups.first
+  endif
+
+  assign onetime_price = current_variant.price
+  assign sub_price = onetime_price | times: 100 | minus: onetime_price | times: disc | divided_by: 100
+  assign sub_price_calc = onetime_price | minus: sub_price
+-%}
+
+{%- if has_selling_plans or request.design_mode -%}
+
+{{ 'custom-subscription.css' | asset_url | stylesheet_tag }}
+
+<div
+  class="csub"
+  data-csub
+  style="--csub-accent: {{ accent }};"
+>
+  <p class="csub__freq-label" style="margin-bottom: 10px; font-size: .88rem; font-weight: 600;">
+    Choisissez votre option :
+  </p>
+
+  <div class="csub__options">
+
+    {%- comment %} ── One-time purchase ── {% endcomment %}
+    <div class="csub__option is-active" data-csub-option="onetime">
+      <div class="csub__radio"></div>
+      <div class="csub__content">
+        <div class="csub__label">
+          Achat unique
+          <span class="csub__price" data-csub-onetime-price>{{ onetime_price | money }}</span>
+        </div>
+      </div>
+    </div>
+
+    {%- comment %} ── Subscription ── {% endcomment %}
+    <div class="csub__option" data-csub-option="subscribe">
+      <div class="csub__radio"></div>
+      <div class="csub__content">
+        <div class="csub__label">
+          S'abonner
+          <span class="csub__badge">{{ disc }}%</span>
+          <span class="csub__price">
+            {%- if has_selling_plans -%}
+              {%- assign first_plan = first_group.selling_plans.first -%}
+              {%- if first_plan.price_adjustments.size > 0 -%}
+                {%- assign adj = first_plan.price_adjustments.first -%}
+                {%- if adj.value_type == 'percentage' -%}
+                  <span class="csub__price-compare">{{ onetime_price | money }}</span>
+                  <span data-csub-sub-price>{{ onetime_price | minus: onetime_price | times: adj.value | divided_by: 100 | money }}</span>
+                {%- elsif adj.value_type == 'fixed_amount' -%}
+                  <span class="csub__price-compare">{{ onetime_price | money }}</span>
+                  <span data-csub-sub-price>{{ onetime_price | minus: adj.value | money }}</span>
+                {%- else -%}
+                  <span data-csub-sub-price>{{ adj.value | money }}</span>
+                {%- endif -%}
+              {%- else -%}
+                <span data-csub-sub-price>{{ onetime_price | money }}</span>
+              {%- endif -%}
+            {%- else -%}
+              <span class="csub__price-compare">{{ onetime_price | money }}</span>
+              <span data-csub-sub-price>{{ sub_price_calc | money }}</span>
+            {%- endif -%}
+          </span>
+        </div>
+        <div class="csub__desc">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Pause ou annulation à tout moment
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  {%- comment %} ── Frequency selector ── {% endcomment %}
+  <div class="csub__frequency" data-csub-frequency>
+    <span class="csub__freq-label">Fréquence :</span>
+    <div class="csub__freq-options">
+      {%- if has_selling_plans -%}
+        {%- for plan in first_group.selling_plans -%}
+          {%- assign plan_price = onetime_price -%}
+          {%- if plan.price_adjustments.size > 0 -%}
+            {%- assign padj = plan.price_adjustments.first -%}
+            {%- if padj.value_type == 'percentage' -%}
+              {%- assign discount_amount = onetime_price | times: padj.value | divided_by: 100 -%}
+              {%- assign plan_price = onetime_price | minus: discount_amount -%}
+            {%- elsif padj.value_type == 'fixed_amount' -%}
+              {%- assign plan_price = onetime_price | minus: padj.value -%}
+            {%- elsif padj.value_type == 'price' -%}
+              {%- assign plan_price = padj.value -%}
+            {%- endif -%}
+          {%- endif -%}
+          <button
+            type="button"
+            class="csub__freq-btn{% if forloop.first %} is-active{% endif %}"
+            data-csub-freq="{{ plan.id }}"
+            data-csub-price="{{ plan_price | money }}"
+          >
+            {{ plan.name }}
+          </button>
+        {%- endfor -%}
+      {%- else -%}
+        <button type="button" class="csub__freq-btn is-active" data-csub-freq="" data-csub-price="{{ sub_price_calc | money }}">
+          Chaque mois
+        </button>
+        <button type="button" class="csub__freq-btn" data-csub-freq="" data-csub-price="{{ sub_price_calc | money }}">
+          Tous les 2 mois
+        </button>
+        <button type="button" class="csub__freq-btn" data-csub-freq="" data-csub-price="{{ sub_price_calc | money }}">
+          Tous les 3 mois
+        </button>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- comment %} ── Benefits ── {% endcomment %}
+  <div class="csub__benefits" data-csub-benefits>
+    <ul>
+      {%- assign b1 = benefit_1 | default: 'Livraison gratuite à chaque envoi' -%}
+      {%- assign b2 = benefit_2 | default: 'Modifiable ou annulable à tout moment' -%}
+      {%- assign b3 = benefit_3 | default: 'Économisez ' | append: disc | append: '% sur chaque commande' -%}
+      <li>{{ b1 }}</li>
+      <li>{{ b2 }}</li>
+      <li>{{ b3 }}</li>
+    </ul>
+  </div>
+
+  {%- comment %} Hidden selling_plan input ── injected into form by JS {% endcomment %}
+  <input type="hidden" data-csub-selling-plan value="">
+
+</div>
+
+<script src="{{ 'custom-subscription.js' | asset_url }}" defer></script>
+
+{%- endif -%}

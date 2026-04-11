@@ -1,0 +1,336 @@
+{% comment %}
+  custom-newsletter-popup.liquid
+  Popup newsletter — délai + exit intent · Dawn 15.x · Vanilla JS
+  Inclure via : {%- section 'custom-newsletter-popup' -%} dans layout/theme.liquid
+{% endcomment %}
+
+{%- if section.settings.enabled -%}
+
+{{ 'custom-newsletter-popup.css' | asset_url | stylesheet_tag }}
+
+<div
+  data-cnp
+  data-cnp-delay="{{ section.settings.delay_seconds }}"
+  data-cnp-dismiss-days="{{ section.settings.dismiss_days }}"
+  data-cnp-exit-intent="{{ section.settings.exit_intent }}"
+  data-cnp-mobile-hide="{{ section.settings.hide_on_mobile }}"
+  style="
+    --cnp-bg:       {{ section.settings.bg_color }};
+    --cnp-accent:   {{ section.settings.accent_color }};
+    --cnp-btn-bg:   {{ section.settings.btn_bg }};
+    --cnp-btn-text: {{ section.settings.btn_text_color }};
+    --cnp-image-bg: {{ section.settings.image_bg }};
+  "
+>
+  {%- comment %} ── Overlay ── {% endcomment %}
+  <div class="cnp__overlay" data-cnp-overlay aria-hidden="true"></div>
+
+  {%- comment %} ── Modal ── {% endcomment %}
+  <div
+    class="cnp__modal"
+    data-cnp-modal
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cnp-title-{{ section.id }}"
+    aria-hidden="true"
+  >
+    <div class="cnp__dialog">
+
+      {%- comment %} Bouton fermer {% endcomment %}
+      <button
+        class="cnp__close"
+        type="button"
+        data-cnp-close
+        aria-label="Fermer"
+      >
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <path d="M5 5l10 10M15 5L5 15"/>
+        </svg>
+      </button>
+
+      {%- comment %} ── Colonne image (desktop gauche / mobile haut) ── {% endcomment %}
+      {%- if section.settings.image != blank -%}
+        <div class="cnp__image-col" aria-hidden="true">
+          <img
+            class="cnp__image"
+            src="{{ section.settings.image | image_url: width: 800, format: 'webp' }}"
+            alt="{{ section.settings.image.alt | escape }}"
+            width="{{ section.settings.image.width }}"
+            height="{{ section.settings.image.height }}"
+            loading="lazy"
+          >
+        </div>
+        <img
+          class="cnp__image-mobile"
+          src="{{ section.settings.image | image_url: width: 800, format: 'webp' }}"
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+        >
+      {%- endif -%}
+
+      {%- comment %} ── Colonne formulaire ── {% endcomment %}
+      <div class="cnp__form-col">
+
+        {%- comment %} Formulaire {% endcomment %}
+        <div class="cnp__form-content" data-cnp-form-content>
+
+          {%- if section.settings.eyebrow != blank -%}
+            <p class="cnp__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+          {%- endif -%}
+
+          <h2 class="cnp__title" id="cnp-title-{{ section.id }}">
+            {{ section.settings.title | escape }}
+          </h2>
+
+          {%- if section.settings.subtitle != blank -%}
+            <p class="cnp__subtitle">{{ section.settings.subtitle | escape }}</p>
+          {%- endif -%}
+
+          {%- assign cnp_btn_label = section.settings.btn_label | default: "S'inscrire" -%}
+          {%- form 'customer', id: 'cnp-form-{{ section.id }}' -%}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+
+            <div
+              class="cnp__field"
+              data-cnp-form="{{ form.id }}"
+            >
+              <label class="cnp__label" for="cnp-email-{{ section.id }}">
+                {{- section.settings.email_label | default: 'Votre adresse email' | escape -}}
+              </label>
+              <div class="cnp__input-wrap">
+                <input
+                  class="cnp__input"
+                  type="email"
+                  id="cnp-email-{{ section.id }}"
+                  name="contact[email]"
+                  placeholder="{{ section.settings.email_placeholder | default: 'votre@email.com' | escape }}"
+                  autocomplete="email"
+                  required
+                  data-cnp-email
+                >
+                <button
+                  class="cnp__submit"
+                  type="submit"
+                  data-cnp-submit
+                  data-label="{{ cnp_btn_label | escape }}"
+                >
+                  {{ cnp_btn_label | escape }}
+                </button>
+              </div>
+            </div>
+
+          {%- endform -%}
+
+          {%- comment %} Attacher le data-cnp-form au vrai formulaire ← le endform génère le form HTML {% endcomment %}
+          <script>
+            (function() {
+              var formCol = document.querySelector('[data-cnp-form-content]');
+              if (!formCol) return;
+              var realForm = formCol.querySelector('form');
+              if (realForm) realForm.setAttribute('data-cnp-form', '');
+            })();
+          </script>
+
+          {%- if section.settings.legal_text != blank -%}
+            <p class="cnp__legal">
+              {{ section.settings.legal_text }}
+            </p>
+          {%- endif -%}
+
+        </div>
+        {%- comment %} fin form-content {% endcomment %}
+
+        {%- comment %} ── État succès ── {% endcomment %}
+        <div class="cnp__success" data-cnp-success aria-live="polite">
+          <div class="cnp__success-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+          </div>
+          <h3 class="cnp__success-title">{{ section.settings.success_title | default: 'Merci !' | escape }}</h3>
+          <p class="cnp__success-text">{{ section.settings.success_text | default: 'Votre code de bienvenue :' | escape }}</p>
+          {%- if section.settings.promo_code != blank -%}
+            <span class="cnp__code">{{ section.settings.promo_code | escape }}</span>
+          {%- endif -%}
+        </div>
+
+      </div>
+      {%- comment %} fin form-col {% endcomment %}
+
+    </div>
+    {%- comment %} fin dialog {% endcomment %}
+  </div>
+  {%- comment %} fin modal {% endcomment %}
+
+</div>
+
+<script src="{{ 'custom-newsletter-popup.js' | asset_url }}" defer="defer"></script>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Popup newsletter",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "Activer le popup",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Comportement"
+    },
+    {
+      "type": "range",
+      "id": "delay_seconds",
+      "label": "Délai avant affichage (secondes)",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "dismiss_days",
+      "label": "Délai avant réapparition après fermeture (jours)",
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "default": 7
+    },
+    {
+      "type": "checkbox",
+      "id": "exit_intent",
+      "label": "Exit intent (afficher quand la souris quitte la page)",
+      "default": true,
+      "info": "Desktop uniquement."
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "Masquer sur mobile",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image (colonne gauche)"
+    },
+    {
+      "type": "color",
+      "id": "image_bg",
+      "label": "Couleur de fond si pas d'image",
+      "default": "#F0ECE6"
+    },
+    {
+      "type": "header",
+      "content": "Textes"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Label au-dessus du titre",
+      "default": "Offre exclusive"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Profitez de -10% sur votre première commande"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Sous-titre",
+      "default": "Inscrivez-vous à notre newsletter et recevez votre code de réduction."
+    },
+    {
+      "type": "text",
+      "id": "email_label",
+      "label": "Label du champ email",
+      "default": "Votre adresse email"
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Placeholder du champ email",
+      "default": "votre@email.com"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Texte du bouton",
+      "default": "S'inscrire"
+    },
+    {
+      "type": "richtext",
+      "id": "legal_text",
+      "label": "Mention légale / RGPD",
+      "default": "<p>En vous inscrivant, vous acceptez de recevoir nos emails. Désabonnement possible à tout moment.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Message de confirmation"
+    },
+    {
+      "type": "text",
+      "id": "success_title",
+      "label": "Titre",
+      "default": "Merci !"
+    },
+    {
+      "type": "text",
+      "id": "success_text",
+      "label": "Texte",
+      "default": "Votre code de bienvenue :"
+    },
+    {
+      "type": "text",
+      "id": "promo_code",
+      "label": "Code promo à afficher",
+      "default": "BIENVENUE10"
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Fond du popup",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur accent",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Fond du bouton",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Texte du bouton",
+      "default": "#FFFFFF"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Popup newsletter"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,485 @@
+/* =============================================================
+   custom-routine-builder.css
+   Routine beauté – Mobile (empilé) → Desktop (côte à côte)
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+/* ── Variables ─────────────────────────────────────────────── */
+.custom-routine-builder {
+  --crb-transition:  0.24s ease;
+  --crb-radius:      1.2rem;
+  --crb-radius-sm:   0.8rem;
+  --crb-img-size:    11rem;
+  --crb-check-size:  2.2rem;
+}
+
+/* ── Section ────────────────────────────────────────────────── */
+.custom-routine-builder {
+  padding-block: var(--crb-padding-top, 4.8rem) var(--crb-padding-bottom, 4.8rem);
+}
+
+.crb__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 3.2rem;
+}
+
+/* ── En-tête ────────────────────────────────────────────────── */
+.crb__header {
+  text-align: center;
+}
+
+.crb__title {
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  font-weight: 700;
+  margin: 0 0 0.8rem;
+  line-height: 1.2;
+}
+
+.crb__subtitle {
+  font-size: 1.5rem;
+  opacity: 0.65;
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GRILLE DES ÉTAPES
+   ══════════════════════════════════════════════════════════════ */
+
+/* Mobile : colonne */
+.crb__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  position: relative;
+}
+
+/* Desktop : ligne */
+@media (min-width: 750px) {
+  .crb__steps {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+  }
+}
+
+/* ── Étape individuelle ─────────────────────────────────────── */
+.crb__step {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  padding: 1.6rem;
+  border: 1.5px solid var(--crb-border, #e8e2da);
+  border-radius: var(--crb-radius);
+  background: #fff;
+  position: relative;
+  transition:
+    border-color  var(--crb-transition),
+    background    var(--crb-transition),
+    box-shadow    var(--crb-transition);
+  flex: 1;
+}
+
+.crb__step.is-checked {
+  border-color: var(--crb-accent, #C9A96E);
+  background: var(--crb-checked-bg, #fdf8f2);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+}
+
+.crb__step.is-unavailable {
+  opacity: 0.5;
+}
+
+/* Arrondis adjacents sur desktop */
+@media (min-width: 750px) {
+  .crb__step {
+    border-radius: 0;
+    border-right-width: 0;
+  }
+
+  .crb__step:first-child {
+    border-radius: var(--crb-radius) 0 0 var(--crb-radius);
+  }
+
+  .crb__step:last-child {
+    border-radius: 0 var(--crb-radius) var(--crb-radius) 0;
+    border-right-width: 1.5px;
+  }
+
+  .crb__step.is-checked {
+    border-right-width: 1.5px;
+    margin-right: -1.5px;
+    z-index: 1;
+  }
+}
+
+/* ── Connecteur + ────────────────────────────────────────────── */
+.crb__connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--crb-border, #e8e2da);
+  flex-shrink: 0;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Mobile : entre les cartes verticalement */
+@media (max-width: 749px) {
+  .crb__connector {
+    position: absolute;
+    bottom: -1.6rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    background: #fff;
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--crb-border, #e8e2da);
+    font-size: 1.4rem;
+  }
+}
+
+/* Desktop : dans le flux, entre les cartes */
+@media (min-width: 750px) {
+  .crb__connector {
+    width: 3.2rem;
+    flex-shrink: 0;
+    font-size: 2.4rem;
+    color: var(--crb-accent, #C9A96E);
+  }
+}
+
+/* ── Checkbox ────────────────────────────────────────────────── */
+.crb__check-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  position: relative;
+}
+
+.crb__checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.crb__checkmark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--crb-check-size);
+  height: var(--crb-check-size);
+  border: 2px solid var(--crb-border, #e8e2da);
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #fff;
+  transition:
+    background     var(--crb-transition),
+    border-color   var(--crb-transition),
+    transform      var(--crb-transition);
+  flex-shrink: 0;
+}
+
+.crb__checkmark svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  opacity: 0;
+  transform: scale(0.5);
+  transition:
+    opacity   var(--crb-transition),
+    transform var(--crb-transition);
+}
+
+.crb__checkbox:checked ~ .crb__checkmark,
+.crb__check-wrap:hover .crb__checkmark {
+  border-color: var(--crb-accent, #C9A96E);
+}
+
+.crb__checkbox:checked ~ .crb__checkmark {
+  background: var(--crb-accent, #C9A96E);
+  transform: scale(1.05);
+}
+
+.crb__checkbox:checked ~ .crb__checkmark svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.crb__check-wrap:focus-within .crb__checkmark {
+  outline: 2px solid var(--crb-accent, #C9A96E);
+  outline-offset: 2px;
+}
+
+/* ── Image ───────────────────────────────────────────────────── */
+.crb__img-link {
+  display: block;
+  flex-shrink: 0;
+}
+
+.crb__img {
+  display: block;
+  width: var(--crb-img-size);
+  height: var(--crb-img-size);
+  object-fit: cover;
+  border-radius: var(--crb-radius-sm);
+  transition: opacity var(--crb-transition);
+}
+
+.crb__img--placeholder {
+  width: var(--crb-img-size);
+  height: var(--crb-img-size);
+  background: #f5f5f5;
+  border-radius: var(--crb-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crb__img--placeholder svg {
+  width: 3.2rem;
+  height: 3.2rem;
+  opacity: 0.3;
+}
+
+/* ── Infos produit ───────────────────────────────────────────── */
+.crb__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.crb__step-label {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--crb-accent, #C9A96E);
+}
+
+.crb__product-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: currentColor;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.crb__product-name:hover {
+  text-decoration: underline;
+}
+
+.crb__price-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.8rem;
+}
+
+.crb__price {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.crb__price--sale {
+  color: #c0392b;
+}
+
+.crb__price--compare {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.crb__unavailable {
+  font-size: 1.2rem;
+  color: #999;
+  font-style: italic;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RÉCAPITULATIF
+   ══════════════════════════════════════════════════════════════ */
+
+.crb__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  padding: 2.4rem;
+  border: 1.5px solid var(--crb-border, #e8e2da);
+  border-radius: var(--crb-radius);
+  background: #fafafa;
+}
+
+@media (min-width: 750px) {
+  .crb__summary {
+    flex-direction: row;
+    align-items: center;
+    gap: 3.2rem;
+  }
+}
+
+/* ── Lignes de prix ─────────────────────────────────────────── */
+.crb__prices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.crb__price-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.4rem;
+  gap: 1.2rem;
+}
+
+.crb__price-line--total {
+  font-size: 1.8rem;
+  font-weight: 700;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--crb-border, #e8e2da);
+  margin-top: 0.2rem;
+}
+
+.crb__price-line--discount .crb__price-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.crb__price-label {
+  opacity: 0.7;
+}
+
+.crb__discount-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2em 0.6em;
+  background: #c0392b;
+  color: #fff;
+  border-radius: 10rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.crb__savings {
+  font-weight: 700;
+  color: #c0392b;
+}
+
+.crb__price-original {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
+/* ── Bouton CTA ─────────────────────────────────────────────── */
+.crb__add-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 1.5rem 2.4rem;
+  border: none;
+  border-radius: 10rem;
+  background: var(--crb-btn-bg, #111);
+  color: var(--crb-btn-color, #fff);
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    opacity    0.22s ease,
+    transform  0.22s ease;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+@media (min-width: 750px) {
+  .crb__add-btn {
+    width: auto;
+    min-width: 26rem;
+  }
+}
+
+.crb__add-btn:hover:not(:disabled) {
+  opacity: 0.87;
+  transform: translateY(-1px);
+}
+
+.crb__add-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.crb__add-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.crb__add-btn:focus-visible {
+  outline: 2px solid var(--crb-btn-bg, #111);
+  outline-offset: 3px;
+}
+
+/* Spinner */
+.crb__btn-spinner {
+  display: none;
+  position: absolute;
+}
+
+.crb__add-btn.is-loading .crb__btn-label {
+  opacity: 0;
+}
+
+.crb__add-btn.is-loading .crb__btn-spinner {
+  display: flex;
+}
+
+.crb__btn-spinner svg {
+  width: 2.2rem;
+  height: 2.2rem;
+  animation: crb-spin 0.75s linear infinite;
+}
+
+@keyframes crb-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Notice (succès / erreur) ───────────────────────────────── */
+.crb__notice {
+  margin: 0;
+  font-size: 1.35rem;
+  text-align: center;
+  min-height: 1.8rem;
+  transition: opacity 0.3s ease;
+}
+
+.crb__notice--success { color: #2e7d32; }
+.crb__notice--error   { color: #c0392b; }
+
+/* ── Vide (design mode) ─────────────────────────────────────── */
+.crb__empty {
+  text-align: center;
+  opacity: 0.5;
+  font-size: 1.5rem;
+  padding: 3.2rem;
+  border: 2px dashed var(--crb-border, #e8e2da);
+  border-radius: var(--crb-radius);
+}

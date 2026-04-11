@@ -1,0 +1,956 @@
+{% comment %}
+  Custom Product Hero – Beauty & Cosmetics
+  Dawn 15.x · Vanilla JS · Mobile-first
+{% endcomment %}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign media_count = product.media.size -%}
+
+{%- comment %} ── Badge : Nouveau (< 30 jours) ── {% endcomment %}
+{%- assign now_ts     = 'now'               | date: '%s' | times: 1 -%}
+{%- assign created_ts = product.created_at  | date: '%s' | times: 1 -%}
+{%- assign days_old   = now_ts | minus: created_ts | divided_by: 86400 -%}
+{%- assign is_new = false -%}
+{%- if days_old < 30 -%}
+  {%- assign is_new = true -%}
+{%- endif -%}
+
+{%- comment %} ── Badge : % de réduction ── {% endcomment %}
+{%- assign discount_pct = 0 -%}
+{%- if current_variant.compare_at_price > current_variant.price -%}
+  {%- assign discount_pct = current_variant.compare_at_price
+      | minus: current_variant.price
+      | times: 100
+      | divided_by: current_variant.compare_at_price -%}
+{%- endif -%}
+
+{{ 'custom-product-hero.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+
+<section
+  class="custom-product-hero"
+  data-section-id="{{ section.id }}"
+  style="
+    --badge-bestseller-bg:    {{ section.settings.badge_bestseller_bg }};
+    --badge-bestseller-color: {{ section.settings.badge_bestseller_color }};
+    --badge-vegan-bg:         {{ section.settings.badge_vegan_bg }};
+    --badge-vegan-color:      {{ section.settings.badge_vegan_color }};
+    --badge-cruelty-bg:       {{ section.settings.badge_cruelty_bg }};
+    --badge-cruelty-color:    {{ section.settings.badge_cruelty_color }};
+    --badge-mif-bg:           {{ section.settings.badge_mif_bg }};
+    --badge-mif-color:        {{ section.settings.badge_mif_color }};
+    --badge-new-bg:           {{ section.settings.badge_new_bg }};
+    --badge-new-color:        {{ section.settings.badge_new_color }};
+    --badge-discount-bg:      {{ section.settings.badge_discount_bg }};
+    --badge-discount-color:   {{ section.settings.badge_discount_color }};
+  "
+>
+  <div class="cph__inner page-width">
+
+    {%- comment %} ══════════════════════════════
+        GALERIE
+    ══════════════════════════════ {% endcomment %}
+    <div class="cph__gallery" id="cph-gallery-{{ section.id }}">
+
+      {%- comment %} Track (slides) {% endcomment %}
+      <div
+        class="gallery__track"
+        id="gallery-track-{{ section.id }}"
+        role="region"
+        aria-label="{{ product.title | escape }} – galerie média"
+      >
+        {%- for media in product.media -%}
+          <div
+            class="gallery__slide{% if forloop.first %} is-active{% endif %}"
+            data-index="{{ forloop.index0 }}"
+            data-media-id="{{ media.id }}"
+            role="group"
+            aria-label="Slide {{ forloop.index }} sur {{ media_count }}"
+          >
+            {%- case media.media_type -%}
+
+              {%- when 'image' -%}
+                <div class="gallery__zoom-wrap" data-zoom>
+                  <img
+                    src="{{ media | image_url: width: 800 }}"
+                    srcset="
+                      {{ media | image_url: width: 400 }} 400w,
+                      {{ media | image_url: width: 600 }} 600w,
+                      {{ media | image_url: width: 800 }} 800w,
+                      {{ media | image_url: width: 1200 }} 1200w
+                    "
+                    sizes="(min-width: 750px) 50vw, 100vw"
+                    alt="{{ media.alt | escape | default: product.title | escape }}"
+                    loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                    width="{{ media.width }}"
+                    height="{{ media.height }}"
+                    class="gallery__img"
+                    draggable="false"
+                  >
+                </div>
+
+              {%- when 'video' -%}
+                <div class="gallery__video-wrap">
+                  <video
+                    class="gallery__video"
+                    controls
+                    playsinline
+                    preload="metadata"
+                    poster="{{ media.preview_image | image_url: width: 800 }}"
+                  >
+                    {%- for source in media.sources -%}
+                      <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                    {%- endfor -%}
+                  </video>
+                </div>
+
+              {%- when 'external_video' -%}
+                <div class="gallery__video-wrap gallery__video-wrap--external">
+                  {{- media | external_video_tag: class: 'gallery__video', loading: 'lazy' -}}
+                </div>
+
+              {%- when 'model' -%}
+                <div class="gallery__model-wrap">
+                  {{- media | model_viewer_tag: class: 'gallery__model' -}}
+                </div>
+
+            {%- endcase -%}
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if media_count > 1 -%}
+
+        {%- comment %} Flèches (visibles au survol desktop) {% endcomment %}
+        <button
+          class="gallery__arrow gallery__arrow--prev"
+          aria-label="Slide précédente"
+          data-gallery-prev
+        >
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M13 4L7 10L13 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button
+          class="gallery__arrow gallery__arrow--next"
+          aria-label="Slide suivante"
+          data-gallery-next
+        >
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M7 4L13 10L7 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        {%- comment %} Miniatures (desktop) {% endcomment %}
+        <div class="gallery__thumbs" role="tablist" aria-label="Miniatures produit">
+          {%- for media in product.media -%}
+            <button
+              class="gallery__thumb{% if forloop.first %} is-active{% endif %}"
+              role="tab"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              aria-label="Image {{ forloop.index }}"
+              data-thumb="{{ forloop.index0 }}"
+            >
+              <img
+                src="{{ media.preview_image | image_url: width: 120 }}"
+                alt="{{ media.alt | escape | default: product.title | escape }}"
+                loading="lazy"
+                width="120"
+                height="120"
+                draggable="false"
+              >
+            </button>
+          {%- endfor -%}
+        </div>
+
+        {%- comment %} Dots (mobile) {% endcomment %}
+        <div class="gallery__dots" role="tablist" aria-label="Indicateurs de slide">
+          {%- for media in product.media -%}
+            <button
+              class="gallery__dot{% if forloop.first %} is-active{% endif %}"
+              role="tab"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              aria-label="Aller au slide {{ forloop.index }}"
+              data-dot="{{ forloop.index0 }}"
+            ></button>
+          {%- endfor -%}
+        </div>
+
+      {%- endif -%}
+    </div>
+    {%- comment %} fin galerie {% endcomment %}
+
+    {%- comment %} ══════════════════════════════
+        INFOS PRODUIT
+    ══════════════════════════════ {% endcomment %}
+    <div class="cph__info">
+
+      {%- comment %} ── Badges ── {% endcomment %}
+      <div class="product-badges" aria-label="Labels produit">
+
+        {%- if discount_pct > 0 -%}
+          <span class="product-badge product-badge--discount" aria-label="Réduction de {{ discount_pct }}%">
+            -{{ discount_pct }}%
+          </span>
+        {%- endif -%}
+
+        {%- if product.metafields.custom.best_seller == true
+            or product.metafields.custom.best_seller == 'true' -%}
+          <span class="product-badge product-badge--bestseller">Best-seller</span>
+        {%- endif -%}
+
+        {%- if is_new -%}
+          <span class="product-badge product-badge--new">Nouveau</span>
+        {%- endif -%}
+
+        {%- if section.settings.show_badge_vegan -%}
+          <span class="product-badge product-badge--vegan">Vegan</span>
+        {%- endif -%}
+
+        {%- if section.settings.show_badge_cruelty_free -%}
+          <span class="product-badge product-badge--cruelty">Cruelty-free</span>
+        {%- endif -%}
+
+        {%- if section.settings.show_badge_made_in_france -%}
+          <span class="product-badge product-badge--mif">🇫🇷 Made in France</span>
+        {%- endif -%}
+
+      </div>
+
+      {%- comment %} ── Titre ── {% endcomment %}
+      <h1 class="cph__title">{{ product.title | escape }}</h1>
+
+      {%- comment %} ── Marque ── {% endcomment %}
+      {%- if product.vendor != blank -%}
+        <p class="cph__vendor">{{ product.vendor | escape }}</p>
+      {%- endif -%}
+
+      {%- comment %} ── Description courte ── {% endcomment %}
+      {%- if product.description != blank -%}
+        <div class="cph__description rte">
+          {{ product.description | strip_html | truncate: 200 }}
+        </div>
+      {%- endif -%}
+
+      {%- comment %} ── Sélecteur variante, quantité, ATC + Acheter maintenant ── {% endcomment %}
+      <product-form data-section-id="{{ section.id }}" data-product-id="{{ product.id }}">
+        {%- render 'custom-variant-selector',
+            product:             product,
+            section_id:          section.id,
+            cqb_enabled:         section.settings.cqb_enabled,
+            cqb_qty2:            section.settings.cqb_qty2,
+            cqb_disc2:           section.settings.cqb_disc2,
+            cqb_qty3:            section.settings.cqb_qty3,
+            cqb_disc3:           section.settings.cqb_disc3,
+            cbxgy_enabled:       section.settings.cbxgy_enabled,
+            cbxgy_qty_buy:       section.settings.cbxgy_qty_buy,
+            cbxgy_qty_free:      section.settings.cbxgy_qty_free,
+            cbxgy_discount_pct:  section.settings.cbxgy_discount_pct,
+            cbxgy_badge_text:    section.settings.cbxgy_badge_text,
+            cbxgy_offer_text:    section.settings.cbxgy_offer_text,
+            cbxgy_badge_color:   section.settings.cbxgy_badge_color
+        -%}
+      </product-form>
+
+      {%- comment %} ── Blocs dynamiques (urgence, livraison, réassurance, paiement) ── {% endcomment %}
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+
+          {%- when 'urgency' -%}
+            {%- render 'custom-urgency', product: product, block: block -%}
+
+          {%- when 'delivery' -%}
+            <div
+              class="cph__delivery"
+              {{ block.shopify_attributes }}
+              style="--cph-delivery-accent: {{ block.settings.accent_color }};"
+            >
+              <span class="cph__delivery-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                  <path d="M1 3h13v13H1zM14 8h4l3 3v5h-7V8z"/>
+                  <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                </svg>
+              </span>
+              <span class="cph__delivery-text">
+                {%- if block.settings.title != blank -%}
+                  <strong>{{ block.settings.title | escape }}</strong>
+                  {%- if block.settings.min_days != blank and block.settings.max_days != blank -%}
+                    &nbsp;: {{ block.settings.min_days }}–{{ block.settings.max_days }} jours ouvrés
+                  {%- endif -%}
+                {%- endif -%}
+                {%- if block.settings.show_free and block.settings.free_threshold != blank -%}
+                  &ensp;<span class="cph__delivery-free">Gratuite dès {{ block.settings.free_threshold }}</span>
+                {%- endif -%}
+              </span>
+            </div>
+
+          {%- when 'reassurance' -%}
+            <ul
+              class="cph__reassurance"
+              {{ block.shopify_attributes }}
+              style="--cph-check-color: {{ block.settings.check_color }};"
+            >
+              {%- for i in (1..4) -%}
+                {%- assign item_key = 'item_' | append: i -%}
+                {%- assign item_val = block.settings[item_key] -%}
+                {%- if item_val != blank -%}
+                  <li class="cph__reassurance-item">
+                    <svg class="cph__reassurance-check" viewBox="0 0 16 16" fill="none" aria-hidden="true" width="14" height="14">
+                      <path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    {{ item_val | escape }}
+                  </li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+
+          {%- when 'payment' -%}
+            <div class="cph__payment" {{ block.shopify_attributes }}>
+              {%- if block.settings.title != blank -%}
+                <span class="cph__payment-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                  {{ block.settings.title | escape }}
+                </span>
+              {%- endif -%}
+              <div class="cph__payment-icons">
+                {%- if block.settings.show_visa -%}
+                  <span class="cph__payment-badge" aria-label="Visa">VISA</span>
+                {%- endif -%}
+                {%- if block.settings.show_mastercard -%}
+                  <span class="cph__payment-badge" aria-label="Mastercard">MC</span>
+                {%- endif -%}
+                {%- if block.settings.show_paypal -%}
+                  <span class="cph__payment-badge" aria-label="PayPal">PayPal</span>
+                {%- endif -%}
+                {%- if block.settings.show_amex -%}
+                  <span class="cph__payment-badge" aria-label="Amex">Amex</span>
+                {%- endif -%}
+                {%- if block.settings.show_apple_pay -%}
+                  <span class="cph__payment-badge" aria-label="Apple Pay">Apple Pay</span>
+                {%- endif -%}
+              </div>
+            </div>
+
+        {%- endcase -%}
+      {%- endfor -%}
+
+    </div>
+    {%- comment %} fin infos produit {% endcomment %}
+
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  class ProductGallery {
+    constructor(sectionEl) {
+      this.root    = sectionEl;
+      this.track   = sectionEl.querySelector('[id^="gallery-track-"]');
+      this.slides  = Array.from(sectionEl.querySelectorAll('.gallery__slide'));
+      this.dots    = Array.from(sectionEl.querySelectorAll('[data-dot]'));
+      this.thumbs  = Array.from(sectionEl.querySelectorAll('[data-thumb]'));
+      this.prevBtn = sectionEl.querySelector('[data-gallery-prev]');
+      this.nextBtn = sectionEl.querySelector('[data-gallery-next]');
+      this.zooms   = Array.from(sectionEl.querySelectorAll('[data-zoom]'));
+      this.current = 0;
+      this.total   = this.slides.length;
+      this._dragStartX = 0;
+      this._dragging   = false;
+
+      this._bindVariantChange();
+
+      if (this.total <= 1) return;
+
+      this._bindArrows();
+      this._bindDots();
+      this._bindThumbs();
+      this._bindSwipe();
+      this._bindZoom();
+    }
+
+    // ── Navigation ────────────────────────────────────────────────────────
+    goTo(index) {
+      const prev = this.current;
+      this.current = ((index % this.total) + this.total) % this.total;
+
+      this.slides[prev].classList.remove('is-active');
+      this.slides[this.current].classList.add('is-active');
+
+      // Pause la vidéo du slide quitté
+      const video = this.slides[prev].querySelector('video');
+      if (video) video.pause();
+
+      this._syncIndicators();
+    }
+
+    _syncIndicators() {
+      const active = this.current;
+      [...this.dots, ...this.thumbs].forEach((el) => {
+        const i   = parseInt(el.dataset.dot ?? el.dataset.thumb, 10);
+        const on  = i === active;
+        el.classList.toggle('is-active', on);
+        el.setAttribute('aria-selected', String(on));
+      });
+    }
+
+    // ── Flèches ───────────────────────────────────────────────────────────
+    _bindArrows() {
+      this.prevBtn?.addEventListener('click', () => this.goTo(this.current - 1));
+      this.nextBtn?.addEventListener('click', () => this.goTo(this.current + 1));
+    }
+
+    // ── Dots ──────────────────────────────────────────────────────────────
+    _bindDots() {
+      this.dots.forEach((dot) =>
+        dot.addEventListener('click', () => this.goTo(+dot.dataset.dot))
+      );
+    }
+
+    // ── Miniatures ────────────────────────────────────────────────────────
+    _bindThumbs() {
+      this.thumbs.forEach((thumb) =>
+        thumb.addEventListener('click', () => this.goTo(+thumb.dataset.thumb))
+      );
+    }
+
+    // ── Swipe (touch + drag souris) ───────────────────────────────────────
+    _bindSwipe() {
+      const t = this.track;
+
+      // Touch
+      t.addEventListener('touchstart', (e) => {
+        this._dragStartX = e.touches[0].clientX;
+        this._dragging   = true;
+      }, { passive: true });
+
+      t.addEventListener('touchend', (e) => {
+        if (!this._dragging) return;
+        const delta = e.changedTouches[0].clientX - this._dragStartX;
+        if (Math.abs(delta) > 40) this.goTo(this.current + (delta < 0 ? 1 : -1));
+        this._dragging = false;
+      }, { passive: true });
+
+      // Souris
+      t.addEventListener('mousedown', (e) => {
+        this._dragStartX = e.clientX;
+        this._dragging   = true;
+      });
+
+      t.addEventListener('mouseup', (e) => {
+        if (!this._dragging) return;
+        const delta = e.clientX - this._dragStartX;
+        if (Math.abs(delta) > 40) this.goTo(this.current + (delta < 0 ? 1 : -1));
+        this._dragging = false;
+      });
+
+      t.addEventListener('mouseleave', () => { this._dragging = false; });
+    }
+
+    // ── Changement de variante → navigation vers l'image associée ─────────
+    _bindVariantChange() {
+      document.addEventListener('variant:change', (e) => {
+        const variant = e.detail?.variant;
+        if (!variant || !variant.featured_media) return;
+
+        const mediaId = variant.featured_media.id;
+        const targetSlide = this.slides.findIndex(
+          (s) => s.dataset.mediaId === String(mediaId)
+        );
+
+        if (targetSlide >= 0 && targetSlide !== this.current) {
+          this.goTo(targetSlide);
+        }
+      });
+    }
+
+    // ── Zoom au survol (desktop uniquement) ───────────────────────────────
+    _bindZoom() {
+      if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+      this.zooms.forEach((wrap) => {
+        const img = wrap.querySelector('img');
+        if (!img) return;
+
+        wrap.addEventListener('mousemove', (e) => {
+          const r    = wrap.getBoundingClientRect();
+          const xPct = ((e.clientX - r.left) / r.width)  * 100;
+          const yPct = ((e.clientY - r.top)  / r.height) * 100;
+          img.style.transformOrigin = `${xPct}% ${yPct}%`;
+          img.classList.add('is-zoomed');
+        });
+
+        wrap.addEventListener('mouseleave', () => {
+          img.classList.remove('is-zoomed');
+          img.style.transformOrigin = 'center center';
+        });
+      });
+    }
+  }
+
+  // ── Initialisation ────────────────────────────────────────────────────────
+  function init() {
+    document.querySelectorAll('.custom-product-hero[data-section-id]').forEach((el) => {
+      if (!el._galleryInit) {
+        el._galleryInit = new ProductGallery(el);
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // Rechargement dans l'éditeur de thème Shopify
+  document.addEventListener('shopify:section:load', (e) => {
+    const el = e.target.querySelector('.custom-product-hero');
+    if (el) { el._galleryInit = new ProductGallery(el); }
+  });
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Custom Product Hero",
+  "tag": "section",
+  "class": "section-custom-product-hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Remises par quantité"
+    },
+    {
+      "type": "checkbox",
+      "id": "cqb_enabled",
+      "label": "Activer les remises par quantité",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "cqb_qty2",
+      "label": "Palier 2 — quantité",
+      "min": 2, "max": 10, "step": 1, "default": 2
+    },
+    {
+      "type": "range",
+      "id": "cqb_disc2",
+      "label": "Palier 2 — remise",
+      "min": 0, "max": 50, "step": 1, "default": 5,
+      "unit": "%"
+    },
+    {
+      "type": "range",
+      "id": "cqb_qty3",
+      "label": "Palier 3 — quantité",
+      "min": 2, "max": 20, "step": 1, "default": 3
+    },
+    {
+      "type": "range",
+      "id": "cqb_disc3",
+      "label": "Palier 3 — remise",
+      "min": 0, "max": 50, "step": 1, "default": 10,
+      "unit": "%"
+    },
+    {
+      "type": "header",
+      "content": "Offre \"Achetez X, obtenez Y gratuit\""
+    },
+    {
+      "type": "paragraph",
+      "content": "⚠ Ne pas activer simultanément avec les remises par quantité."
+    },
+    {
+      "type": "checkbox",
+      "id": "cbxgy_enabled",
+      "label": "Activer l'offre X+Y",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "cbxgy_qty_buy",
+      "label": "Quantité à acheter",
+      "min": 1, "max": 10, "step": 1, "default": 2
+    },
+    {
+      "type": "range",
+      "id": "cbxgy_qty_free",
+      "label": "Quantité offerte",
+      "min": 1, "max": 5, "step": 1, "default": 1
+    },
+    {
+      "type": "range",
+      "id": "cbxgy_discount_pct",
+      "label": "Remise % (0 = calcul auto)",
+      "min": 0, "max": 80, "step": 1, "default": 0,
+      "unit": "%"
+    },
+    {
+      "type": "text",
+      "id": "cbxgy_badge_text",
+      "label": "Texte du badge",
+      "default": "1 offert 🎉"
+    },
+    {
+      "type": "text",
+      "id": "cbxgy_offer_text",
+      "label": "Description de l'offre",
+      "default": "2 achetés = 1 offert"
+    },
+    {
+      "type": "color",
+      "id": "cbxgy_badge_color",
+      "label": "Couleur du badge",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Badges – Affichage"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge_vegan",
+      "label": "Afficher le badge Vegan",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge_cruelty_free",
+      "label": "Afficher le badge Cruelty-free",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge_made_in_france",
+      "label": "Afficher le badge Made in France",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Badges – Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "badge_bestseller_bg",
+      "label": "Best-seller – fond",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "badge_bestseller_color",
+      "label": "Best-seller – texte",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "badge_vegan_bg",
+      "label": "Vegan – fond",
+      "default": "#4CAF50"
+    },
+    {
+      "type": "color",
+      "id": "badge_vegan_color",
+      "label": "Vegan – texte",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "badge_cruelty_bg",
+      "label": "Cruelty-free – fond",
+      "default": "#E91E8C"
+    },
+    {
+      "type": "color",
+      "id": "badge_cruelty_color",
+      "label": "Cruelty-free – texte",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "badge_mif_bg",
+      "label": "Made in France – fond",
+      "default": "#002395"
+    },
+    {
+      "type": "color",
+      "id": "badge_mif_color",
+      "label": "Made in France – texte",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "badge_new_bg",
+      "label": "Nouveau – fond",
+      "default": "#9C27B0"
+    },
+    {
+      "type": "color",
+      "id": "badge_new_color",
+      "label": "Nouveau – texte",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "badge_discount_bg",
+      "label": "Réduction – fond",
+      "default": "#E53935"
+    },
+    {
+      "type": "color",
+      "id": "badge_discount_color",
+      "label": "Réduction – texte",
+      "default": "#FFFFFF"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "urgency",
+      "name": "Compte à rebours",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Stock bas"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_stock",
+          "label": "Afficher l'alerte stock bas",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "stock_threshold",
+          "label": "Seuil stock bas",
+          "min": 1, "max": 20, "step": 1, "default": 5
+        },
+        {
+          "type": "header",
+          "content": "Visiteurs en ligne"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_visitors",
+          "label": "Afficher le compteur de visiteurs",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "visitors_min",
+          "label": "Visiteurs minimum",
+          "min": 5, "max": 50, "step": 1, "default": 12
+        },
+        {
+          "type": "range",
+          "id": "visitors_max",
+          "label": "Visiteurs maximum",
+          "min": 10, "max": 200, "step": 2, "default": 48
+        },
+        {
+          "type": "text",
+          "id": "visitors_label",
+          "label": "Texte compteur",
+          "default": "personnes regardent ce produit"
+        },
+        {
+          "type": "header",
+          "content": "Minuterie promo"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_timer",
+          "label": "Afficher la minuterie",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "timer_label",
+          "label": "Texte avant le timer",
+          "default": "Offre se termine dans"
+        },
+        {
+          "type": "text",
+          "id": "timer_end",
+          "label": "Date/heure de fin (ISO 8601)",
+          "info": "Format : 2025-12-31T23:59:59",
+          "placeholder": "2025-12-31T23:59:59"
+        },
+        {
+          "type": "select",
+          "id": "timer_expired_behavior",
+          "label": "Comportement à l'expiration",
+          "options": [
+            { "value": "hide",    "label": "Masquer le timer" },
+            { "value": "message", "label": "Afficher un message" }
+          ],
+          "default": "hide"
+        },
+        {
+          "type": "text",
+          "id": "timer_expired_message",
+          "label": "Message d'expiration",
+          "default": "Offre expirée"
+        },
+        {
+          "type": "header",
+          "content": "Couleurs"
+        },
+        {
+          "type": "color",
+          "id": "accent_color",
+          "label": "Couleur accent",
+          "default": "#C9A96E"
+        },
+        {
+          "type": "color",
+          "id": "low_stock_color",
+          "label": "Couleur stock critique",
+          "default": "#E53935"
+        },
+        {
+          "type": "color",
+          "id": "timer_bg",
+          "label": "Fond timer",
+          "default": "#111111"
+        },
+        {
+          "type": "color",
+          "id": "timer_text_color",
+          "label": "Texte timer",
+          "default": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "type": "delivery",
+      "name": "Estimation de livraison",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titre",
+          "default": "Livraison estimée"
+        },
+        {
+          "type": "text",
+          "id": "min_days",
+          "label": "Délai minimum (jours ouvrés)",
+          "default": "3"
+        },
+        {
+          "type": "text",
+          "id": "max_days",
+          "label": "Délai maximum (jours ouvrés)",
+          "default": "5"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_free",
+          "label": "Afficher la mention livraison gratuite",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "free_threshold",
+          "label": "Seuil livraison gratuite",
+          "default": "50€"
+        },
+        {
+          "type": "color",
+          "id": "accent_color",
+          "label": "Couleur accent",
+          "default": "#C9A96E"
+        }
+      ]
+    },
+    {
+      "type": "reassurance",
+      "name": "Texte de réassurance",
+      "settings": [
+        {
+          "type": "text",
+          "id": "item_1",
+          "label": "Point 1",
+          "default": "100% satisfaite ou remboursée"
+        },
+        {
+          "type": "text",
+          "id": "item_2",
+          "label": "Point 2",
+          "default": "Formule testée dermatologiquement"
+        },
+        {
+          "type": "text",
+          "id": "item_3",
+          "label": "Point 3",
+          "default": "Livraison offerte dès 50€"
+        },
+        {
+          "type": "text",
+          "id": "item_4",
+          "label": "Point 4 (optionnel)",
+          "placeholder": "Optionnel"
+        },
+        {
+          "type": "color",
+          "id": "check_color",
+          "label": "Couleur des coches",
+          "default": "#C9A96E"
+        }
+      ]
+    },
+    {
+      "type": "payment",
+      "name": "Garanties de paiement",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titre",
+          "default": "Paiement 100% sécurisé"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_visa",
+          "label": "Afficher Visa",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_mastercard",
+          "label": "Afficher Mastercard",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_paypal",
+          "label": "Afficher PayPal",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_amex",
+          "label": "Afficher American Express",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "show_apple_pay",
+          "label": "Afficher Apple Pay",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Product Hero"
+    }
+  ]
+}
+{% endschema %}

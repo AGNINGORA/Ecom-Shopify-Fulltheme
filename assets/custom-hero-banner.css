@@ -1,0 +1,277 @@
+/* =============================================================
+   custom-hero-banner.css
+   Hero plein écran — image/vidéo, overlay, parallax, CTA
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+/* ══════════════════════════════════════════════════════════════
+   SECTION
+   ══════════════════════════════════════════════════════════════ */
+
+.chb {
+  position: relative;
+  width: 100%;
+  min-height: var(--chb-height-mobile, 60vh);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--chb-padding-top, 0px);
+  padding-bottom: var(--chb-padding-bottom, 0px);
+}
+
+@media (min-width: 750px) {
+  .chb {
+    min-height: var(--chb-height-desktop, 80vh);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MEDIA (image / vidéo)
+   ══════════════════════════════════════════════════════════════ */
+
+.chb__media {
+  position: absolute;
+  inset: -15%; /* Marge pour le parallax sans laisser de blanc */
+  z-index: 0;
+  will-change: transform;
+  transition: transform 0s linear; /* Contrôlé par JS rAF */
+}
+
+/* Désactiver l'extra-inset si pas de parallax */
+.chb:not([data-chb-parallax]) .chb__media {
+  inset: 0;
+}
+
+/* ── Image ──────────────────────────────────────────────────── */
+.chb__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Vidéo ──────────────────────────────────────────────────── */
+.chb__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  pointer-events: none;
+}
+
+/* ── Placeholder (éditeur) ──────────────────────────────────── */
+.chb__placeholder {
+  position: absolute;
+  inset: 0;
+  background: #e8e3dd;
+}
+
+.chb__placeholder-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   OVERLAY
+   ══════════════════════════════════════════════════════════════ */
+
+.chb__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--chb-overlay, #000);
+  opacity: var(--chb-overlay-opacity, 0.4);
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CONTENU TEXTE
+   ══════════════════════════════════════════════════════════════ */
+
+.chb__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1;
+  width: 100%;
+  padding: 4rem 0;
+  color: var(--chb-text, #fff);
+}
+
+/* ── Alignement horizontal ──────────────────────────────────── */
+.chb__content--left   { justify-content: flex-start; }
+.chb__content--center { justify-content: center; }
+.chb__content--right  { justify-content: flex-end; }
+
+/* ── Position verticale ─────────────────────────────────────── */
+.chb__content--top    { align-items: flex-start; }
+.chb__content--middle { align-items: center; }
+.chb__content--bottom { align-items: flex-end; }
+
+/* ── Wrapper texte ──────────────────────────────────────────── */
+.chb__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  max-width: 72rem;
+}
+
+.chb__content--center .chb__text { text-align: center; align-items: center; }
+.chb__content--left   .chb__text { text-align: left;   align-items: flex-start; }
+.chb__content--right  .chb__text { text-align: right;  align-items: flex-end; }
+
+/* ── Accroche (eyebrow) ─────────────────────────────────────── */
+.chb__eyebrow {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+/* ── Titre ──────────────────────────────────────────────────── */
+.chb__title {
+  margin: 0;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* Tailles */
+.chb__title--sm { font-size: clamp(2rem,   3.5vw, 3.2rem); }
+.chb__title--md { font-size: clamp(2.8rem, 4.5vw, 4.4rem); }
+.chb__title--lg { font-size: clamp(3.6rem, 5.5vw, 6rem);   }
+.chb__title--xl { font-size: clamp(4.4rem, 7vw,   8rem);   }
+
+/* ── Sous-titre ─────────────────────────────────────────────── */
+.chb__subtitle {
+  margin: 0;
+  font-size: clamp(1.5rem, 2vw, 1.8rem);
+  line-height: 1.55;
+  opacity: 0.85;
+  max-width: 56rem;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BOUTONS CTA
+   ══════════════════════════════════════════════════════════════ */
+
+.chb__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-top: 0.8rem;
+}
+
+.chb__content--center .chb__ctas { justify-content: center; }
+.chb__content--right  .chb__ctas { justify-content: flex-end; }
+
+/* ── Base bouton ────────────────────────────────────────────── */
+.chb__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem 2.8rem;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: 0.6rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+  white-space: nowrap;
+}
+
+.chb__cta:hover  { opacity: 0.88; }
+.chb__cta:active { transform: scale(0.98); }
+
+/* ── Style plein ────────────────────────────────────────────── */
+.chb__cta--filled {
+  background: var(--chb-cta-bg, #C9A96E);
+  color:      var(--chb-cta-txt, #fff);
+  border: 2px solid var(--chb-cta-bg, #C9A96E);
+}
+
+/* ── Style contour ──────────────────────────────────────────── */
+.chb__cta--outline {
+  background:  transparent;
+  color:       var(--chb-text, #fff);
+  border:      2px solid currentColor;
+}
+
+.chb__cta--outline:hover {
+  background: rgba(255, 255, 255, 0.12);
+  opacity: 1;
+}
+
+/* ── Style lien texte ───────────────────────────────────────── */
+.chb__cta--link {
+  background: transparent;
+  color:      var(--chb-text, #fff);
+  border:     none;
+  padding:    0.4rem 0;
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FLÈCHE DE DÉFILEMENT
+   ══════════════════════════════════════════════════════════════ */
+
+.chb__scroll-arrow {
+  position: absolute;
+  bottom: 2.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  color: var(--chb-text, #fff);
+  opacity: 0.6;
+  animation: chb-bounce 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.chb__scroll-arrow svg {
+  width: 2.8rem;
+  height: 2.8rem;
+}
+
+@keyframes chb-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(6px); }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ESPACEMENT (schema padding_top / padding_bottom)
+   Injecté via inline style sur la section parente
+   ══════════════════════════════════════════════════════════════ */
+
+.section-custom-hero-banner {
+  padding-top:    var(--section-padding-top, 0);
+  padding-bottom: var(--section-padding-bottom, 0);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RÉDUCTION DE MOUVEMENT
+   ══════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .chb__media {
+    inset: 0 !important;
+    transform: none !important;
+    will-change: auto;
+  }
+
+  .chb__scroll-arrow {
+    animation: none;
+  }
+}

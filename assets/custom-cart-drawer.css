@@ -1,0 +1,647 @@
+/* =============================================================
+   custom-cart-drawer.css
+   Drawer panier — slide-in depuis la droite
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+/* ── Variables ─────────────────────────────────────────────── */
+:root {
+  --ccd-width:       42rem;
+  --ccd-radius:      0;
+  --ccd-duration:    0.35s;
+  --ccd-ease:        cubic-bezier(0.4, 0, 0.2, 1);
+  --ccd-z:           1000;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   OVERLAY
+   ══════════════════════════════════════════════════════════════ */
+
+.ccd__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  z-index: calc(var(--ccd-z) - 1);
+  pointer-events: none;
+  transition: background var(--ccd-duration) var(--ccd-ease);
+}
+
+.ccd__overlay.is-open {
+  background: rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DRAWER
+   ══════════════════════════════════════════════════════════════ */
+
+.ccd__drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(var(--ccd-width), 100vw);
+  z-index: var(--ccd-z);
+
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  box-shadow: -4px 0 32px rgba(0, 0, 0, 0.12);
+
+  transform: translateX(100%);
+  visibility: hidden;
+  transition:
+    transform var(--ccd-duration) var(--ccd-ease),
+    visibility 0s var(--ccd-duration);
+}
+
+.ccd__drawer.is-open {
+  transform: translateX(0);
+  visibility: visible;
+  transition:
+    transform var(--ccd-duration) var(--ccd-ease),
+    visibility 0s;
+}
+
+/* Safe area iOS */
+@supports (padding: env(safe-area-inset-right)) {
+  .ccd__drawer {
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.ccd__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.8rem 2rem;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+
+.ccd__title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.ccd__header-count {
+  font-size: 1.5rem;
+  font-weight: 400;
+  opacity: 0.5;
+}
+
+.ccd__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.6rem;
+  height: 3.6rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.15s ease;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.ccd__close:hover,
+.ccd__close:focus-visible {
+  background: #f5f5f5;
+  outline: none;
+}
+
+.ccd__close svg {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+/* ── Body (défilable) ───────────────────────────────────────── */
+.ccd__body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BARRE LIVRAISON GRATUITE
+   ══════════════════════════════════════════════════════════════ */
+
+.ccd__shipping {
+  padding: 1.4rem 2rem;
+  background: #faf8f5;
+  border-bottom: 1px solid #f0ece6;
+  flex-shrink: 0;
+}
+
+.ccd__shipping-msg {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 0.8rem;
+  color: inherit;
+}
+
+.ccd__shipping-track {
+  width: 100%;
+  height: 0.5rem;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.ccd__shipping-fill {
+  height: 100%;
+  background: var(--ccd-accent, #C9A96E);
+  border-radius: 99px;
+  transition: width 0.5s var(--ccd-ease);
+  min-width: 0;
+}
+
+.ccd__shipping-fill[style*="width: 100"] {
+  /* Vert quand livraison gratuite atteinte */
+  background: #22c55e;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ARTICLES
+   ══════════════════════════════════════════════════════════════ */
+
+.ccd__items {
+  flex: 1;
+  padding: 0.8rem 0;
+  min-height: 0;
+}
+
+/* ── Item ───────────────────────────────────────────────────── */
+.ccd-item {
+  display: flex;
+  gap: 1.4rem;
+  padding: 1.4rem 2rem;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background 0.15s ease;
+}
+
+.ccd-item:last-child {
+  border-bottom: none;
+}
+
+.ccd-item.is-loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ── Image ──────────────────────────────────────────────────── */
+.ccd-item__img-wrap {
+  flex-shrink: 0;
+  display: block;
+  width: 8rem;
+  height: 8rem;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.ccd-item__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ccd-item__img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ccd-item__img-placeholder svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Infos ──────────────────────────────────────────────────── */
+.ccd-item__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ccd-item__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.ccd-item__name {
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: inherit;
+  text-decoration: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ccd-item__name:hover {
+  text-decoration: underline;
+}
+
+.ccd-item__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0.35;
+  transition: opacity 0.15s ease;
+  color: inherit;
+  padding: 0;
+}
+
+.ccd-item__remove:hover {
+  opacity: 1;
+}
+
+.ccd-item__remove svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.ccd-item__variant,
+.ccd-item__plan {
+  font-size: 1.25rem;
+  opacity: 0.55;
+  margin: 0;
+}
+
+/* ── Bas de l'item : quantité + prix ─────────────────────────── */
+.ccd-item__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 0.6rem;
+}
+
+/* Quantité */
+.ccd-item__qty {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.6rem;
+  overflow: hidden;
+}
+
+.ccd-item__qty-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  color: inherit;
+}
+
+.ccd-item__qty-btn:hover {
+  background: #f5f5f5;
+}
+
+.ccd-item__qty-btn svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.ccd-item__qty-num {
+  min-width: 2.8rem;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Prix */
+.ccd-item__prices {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+.ccd-item__price {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.ccd-item__price--original {
+  font-size: 1.2rem;
+  font-weight: 400;
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.ccd-item__price--sale {
+  color: var(--ccd-accent, #C9A96E);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PANIER VIDE
+   ══════════════════════════════════════════════════════════════ */
+
+/*
+ * Fix : display:flex/block sur ces éléments peut écraser l'attribut HTML
+ * `hidden` dont la valeur par défaut UA (display:none) n'est pas !important.
+ * On force explicitement le masquage pour chaque classe concernée.
+ */
+.ccd__empty[hidden],
+.ccd__footer[hidden],
+.ccd__upsell[hidden] {
+  display: none !important;
+}
+
+.ccd__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.6rem;
+  padding: 4rem 2rem;
+  text-align: center;
+  flex: 1;
+}
+
+.ccd__empty-icon {
+  width: 8rem;
+  height: 8rem;
+  opacity: 0.4;
+}
+
+.ccd__empty-msg {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.ccd__empty-cta {
+  display: inline-block;
+  padding: 1rem 2.4rem;
+  background: var(--ccd-accent, #C9A96E);
+  color: var(--ccd-btn-txt, #fff);
+  border-radius: 0.6rem;
+  text-decoration: none;
+  font-size: 1.4rem;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+
+.ccd__empty-cta:hover {
+  opacity: 0.85;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UPSELL
+   ══════════════════════════════════════════════════════════════ */
+
+.ccd__upsell {
+  padding: 1.6rem 2rem;
+  border-top: 1px solid #f0f0f0;
+  background: #faf8f5;
+  flex-shrink: 0;
+}
+
+.ccd__upsell-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin: 0 0 1.2rem;
+}
+
+.ccd__upsell-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ccd__upsell-item {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  background: #fff;
+  border-radius: 0.8rem;
+  padding: 1rem;
+  border: 1px solid #f0ece6;
+}
+
+.ccd__upsell-item.is-in-cart {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.ccd__upsell-img {
+  width: 6rem;
+  height: 6rem;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  flex-shrink: 0;
+  background: #f5f5f5;
+}
+
+.ccd__upsell-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ccd__upsell-name {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 0.3rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ccd__upsell-price {
+  font-size: 1.3rem;
+  color: var(--ccd-accent, #C9A96E);
+  font-weight: 700;
+  margin: 0;
+}
+
+.ccd__upsell-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  background: var(--ccd-accent, #C9A96E);
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  flex-shrink: 0;
+}
+
+.ccd__upsell-add:hover {
+  transform: scale(1.1);
+}
+
+.ccd__upsell-add.is-loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.ccd__upsell-add svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FOOTER
+   ══════════════════════════════════════════════════════════════ */
+
+.ccd__footer {
+  flex-shrink: 0;
+  padding: 1.6rem 2rem;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #fff;
+}
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  .ccd__footer {
+    padding-bottom: calc(1.6rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* Sous-total */
+.ccd__subtotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.ccd__subtotal-label {
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.ccd__subtotal-price {
+  font-size: 1.8rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Note taxes */
+.ccd__tax-note {
+  font-size: 1.2rem;
+  opacity: 0.45;
+  margin: 0;
+  text-align: center;
+}
+
+/* Bouton commander */
+.ccd__checkout {
+  display: block;
+  width: 100%;
+  padding: 1.4rem;
+  background: var(--ccd-accent, #C9A96E);
+  color: var(--ccd-btn-txt, #fff);
+  text-align: center;
+  text-decoration: none;
+  font-size: 1.6rem;
+  font-weight: 700;
+  border-radius: 0.8rem;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+  letter-spacing: 0.03em;
+}
+
+.ccd__checkout:hover {
+  opacity: 0.9;
+}
+
+.ccd__checkout:active {
+  transform: scale(0.99);
+}
+
+/* Icônes de paiement */
+.ccd__payment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.ccd__pay-icon {
+  height: 2rem;
+  width: auto;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SPINNER DE CHARGEMENT
+   ══════════════════════════════════════════════════════════════ */
+
+.ccd__spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3.2rem;
+}
+
+.ccd__spinner::after {
+  content: '';
+  width: 3.2rem;
+  height: 3.2rem;
+  border: 3px solid #f0f0f0;
+  border-top-color: var(--ccd-accent, #C9A96E);
+  border-radius: 50%;
+  animation: ccd-spin 0.7s linear infinite;
+}
+
+@keyframes ccd-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Réduction mouvement ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ccd__drawer,
+  .ccd__overlay,
+  .ccd__shipping-fill {
+    transition: none;
+  }
+
+  .ccd__spinner::after {
+    animation: none;
+    border-top-color: var(--ccd-accent, #C9A96E);
+  }
+}

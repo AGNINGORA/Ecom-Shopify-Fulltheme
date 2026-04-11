@@ -1,0 +1,318 @@
+{% comment %}
+  custom-featured-routine.liquid
+  Routine beauté étape par étape + "Ajouter tout au panier"
+  Dawn 15.x · blocks: routine_step (3-5)
+  CSS : assets/custom-featured-routine.css
+  JS  : assets/custom-featured-routine.js
+{% endcomment %}
+
+{{ 'custom-featured-routine.css' | asset_url | stylesheet_tag }}
+
+{%- assign step_blocks = section.blocks | where: 'type', 'routine_step' -%}
+
+<section
+  class="cfr"
+  data-section-id="{{ section.id }}"
+  style="
+    --cfr-accent:    {{ section.settings.accent_color }};
+    --cfr-number-bg: {{ section.settings.number_bg }};
+    --cfr-number-txt:{{ section.settings.number_text }};
+    --cfr-btn-bg:    {{ section.settings.btn_bg }};
+    --cfr-btn-txt:   {{ section.settings.btn_text_color }};
+  "
+>
+  <div class="cfr__inner page-width">
+
+    {%- comment %} En-tête ─────────────────────────────────── {% endcomment %}
+    <div class="cfr__header">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="cfr__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.title != blank -%}
+        <h2 class="cfr__title">{{ section.settings.title | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtitle != blank -%}
+        <p class="cfr__subtitle">{{ section.settings.subtitle | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- comment %} Étapes ─────────────────────────────────── {% endcomment %}
+    {%- if step_blocks.size > 0 -%}
+      <div class="cfr__steps" style="--cfr-step-count: {{ step_blocks.size }}">
+
+        {%- for block in step_blocks -%}
+          {%- liquid
+            assign prod      = block.settings.product
+            assign img_src   = block.settings.image
+            assign has_prod  = false
+            if prod != blank
+              assign has_prod = true
+            endif
+            assign display_img = img_src
+            if display_img == blank and has_prod
+              assign display_img = prod.featured_image
+            endif
+          -%}
+
+          <div
+            class="cfr__step"
+            data-cfr-step
+            data-variant-id="{%- if has_prod -%}{{ prod.first_available_variant.id }}{%- endif -%}"
+            {{ block.shopify_attributes }}
+          >
+
+            {%- comment %} Numéro d'étape {% endcomment %}
+            <div class="cfr__step-badge" aria-hidden="true">
+              <span class="cfr__step-num">{{ forloop.index }}</span>
+            </div>
+
+            {%- comment %} Image produit {% endcomment %}
+            {%- if display_img != blank -%}
+              <div class="cfr__step-img-wrap">
+                <a
+                  class="cfr__step-img-link"
+                  href="{%- if has_prod -%}{{ prod.url }}{%- else -%}#{%- endif -%}"
+                  {%- unless has_prod -%} tabindex="-1" aria-hidden="true"{%- endunless -%}
+                >
+                  <img
+                    class="cfr__step-img"
+                    src="{{ display_img | image_url: width: 400, format: 'webp' }}"
+                    srcset="
+                      {{ display_img | image_url: width: 200, format: 'webp' }} 200w,
+                      {{ display_img | image_url: width: 400, format: 'webp' }} 400w,
+                      {{ display_img | image_url: width: 600, format: 'webp' }} 600w
+                    "
+                    sizes="(min-width: 990px) 20vw, (min-width: 750px) 25vw, 50vw"
+                    alt="{{ display_img.alt | default: block.settings.name | escape }}"
+                    width="{{ display_img.width }}"
+                    height="{{ display_img.height }}"
+                    loading="lazy"
+                  >
+                </a>
+              </div>
+            {%- elsif request.design_mode -%}
+              <div class="cfr__step-img-placeholder">
+                {{ 'product-1' | placeholder_svg_tag: 'cfr__placeholder-svg' }}
+              </div>
+            {%- endif -%}
+
+            {%- comment %} Contenu texte {% endcomment %}
+            <div class="cfr__step-body">
+              {%- if block.settings.name != blank -%}
+                <h3 class="cfr__step-name">{{ block.settings.name | escape }}</h3>
+              {%- endif -%}
+              {%- if block.settings.description != blank -%}
+                <p class="cfr__step-desc">{{ block.settings.description | escape }}</p>
+              {%- endif -%}
+              {%- if has_prod -%}
+                <div class="cfr__step-footer">
+                  <span class="cfr__step-price">{{ prod.price | money }}</span>
+                  <a class="cfr__step-link" href="{{ prod.url }}">
+                    {{ section.settings.step_link_label | default: 'Voir' | escape }}
+                    <svg viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                      <path d="M1 7H13M8 2L13 7L8 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </a>
+                </div>
+              {%- endif -%}
+            </div>
+
+          </div>
+
+          {%- comment %} Connecteur entre les étapes {% endcomment %}
+          {%- unless forloop.last -%}
+            <div class="cfr__connector" aria-hidden="true">
+              <svg class="cfr__connector-arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 12H19M14 7L19 12L14 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          {%- endunless -%}
+
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment %} Bouton "Ajouter tout au panier" ─────────── {% endcomment %}
+    {%- if section.settings.show_add_all and step_blocks.size > 0 -%}
+      <div class="cfr__cta-wrap">
+        {%- comment %} Collecter les variant IDs disponibles {% endcomment %}
+        {%- assign variant_ids = '' -%}
+        {%- for block in step_blocks -%}
+          {%- if block.type == 'routine_step' and block.settings.product != blank -%}
+            {%- unless variant_ids == '' -%}{%- assign variant_ids = variant_ids | append: ',' -%}{%- endunless -%}
+            {%- assign variant_ids = variant_ids | append: block.settings.product.first_available_variant.id -%}
+          {%- endif -%}
+        {%- endfor -%}
+
+        <button
+          class="cfr__add-all"
+          data-cfr-add-all
+          data-variants="{{ variant_ids }}"
+          type="button"
+        >
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M7 17a1 1 0 1 0 2 0 1 1 0 0 0-2 0ZM15 17a1 1 0 1 0 2 0 1 1 0 0 0-2 0ZM3 3h1.5L6 12h9l1.5-7H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span data-cfr-btn-text>{{ section.settings.add_all_label | default: 'Ajouter la routine au panier' | escape }}</span>
+        </button>
+
+        {%- if section.settings.add_all_note != blank -%}
+          <p class="cfr__cta-note">{{ section.settings.add_all_note | escape }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+<script src="{{ 'custom-featured-routine.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Routine beauté",
+  "tag": "section",
+  "class": "section-custom-featured-routine",
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Accroche (au-dessus du titre)",
+      "placeholder": "ex : Notre routine signature"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Ma routine beauté quotidienne"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Sous-titre",
+      "default": "5 étapes pour une peau parfaite, matin et soir."
+    },
+    {
+      "type": "text",
+      "id": "step_link_label",
+      "label": "Texte du lien produit",
+      "default": "Voir"
+    },
+    {
+      "type": "header",
+      "content": "Bouton panier"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_add_all",
+      "label": "Afficher le bouton \"Ajouter tout au panier\"",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "add_all_label",
+      "label": "Texte du bouton",
+      "default": "Ajouter la routine au panier"
+    },
+    {
+      "type": "text",
+      "id": "add_all_note",
+      "label": "Note sous le bouton",
+      "placeholder": "ex : Économisez 15% sur la routine complète"
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "number_bg",
+      "label": "Fond des numéros d'étape",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "number_text",
+      "label": "Couleur des numéros",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Fond du bouton panier",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Texte du bouton panier",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0, "max": 100, "step": 4, "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0, "max": 100, "step": 4, "unit": "px",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "routine_step",
+      "name": "Étape de routine",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Produit"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image personnalisée (optionnelle)",
+          "info": "Remplace l'image du produit si renseignée"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Nom de l'étape",
+          "default": "Sérum éclat"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description courte",
+          "default": "Appliqué le matin sur peau propre pour un teint lumineux."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Routine beauté",
+      "blocks": [
+        { "type": "routine_step", "settings": { "name": "Nettoyant doux", "description": "Commence par purifier ta peau en douceur." } },
+        { "type": "routine_step", "settings": { "name": "Sérum éclat", "description": "Concentré d'actifs pour un teint lumineux." } },
+        { "type": "routine_step", "settings": { "name": "Crème hydratante", "description": "Nourrit et protège pendant 24h." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

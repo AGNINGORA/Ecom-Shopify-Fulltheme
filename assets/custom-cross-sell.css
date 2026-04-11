@@ -1,0 +1,375 @@
+/* =============================================================
+   custom-cross-sell.css
+   Carrousel produits recommandés – CSS scroll-snap
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+/* ── Variables ─────────────────────────────────────────────── */
+.custom-cross-sell {
+  --ccs-transition:   0.26s ease;
+  --ccs-radius:       1.2rem;
+  --ccs-radius-sm:    0.8rem;
+  --ccs-card-width:   22rem;
+  --ccs-card-gap:     1.6rem;
+  --ccs-img-ratio:    1 / 1;
+}
+
+/* ── Section ────────────────────────────────────────────────── */
+.custom-cross-sell {
+  padding-block: var(--ccs-padding-top, 4.8rem) var(--ccs-padding-bottom, 4.8rem);
+  overflow: hidden;
+}
+
+.ccs__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+}
+
+/* ── En-tête ────────────────────────────────────────────────── */
+.ccs__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ccs__title {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CARROUSEL
+   ══════════════════════════════════════════════════════════════ */
+
+.ccs__carousel-wrap {
+  position: relative;
+}
+
+/* ── Track scroll-snap ──────────────────────────────────────── */
+.ccs__track {
+  display: flex;
+  gap: var(--ccs-card-gap);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  /* Masquer la scrollbar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Débordement sur les côtés (mobile) */
+  padding-inline: 0.4rem;
+  margin-inline: -0.4rem;
+}
+
+.ccs__track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Zones de contenu dans le track */
+.ccs__loading,
+.ccs__fallback,
+.ccs__results {
+  display: contents; /* les cartes enfants participent directement au flex */
+}
+
+/* ── Flèches ────────────────────────────────────────────────── */
+.ccs__arrow {
+  display: none;
+}
+
+@media (min-width: 750px) {
+  .ccs__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 4.4rem;
+    height: 4.4rem;
+    border: none;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.13);
+    cursor: pointer;
+    color: #111;
+    transition:
+      box-shadow  var(--ccs-transition),
+      transform   var(--ccs-transition),
+      opacity     var(--ccs-transition);
+    padding: 0;
+  }
+
+  .ccs__arrow[hidden] {
+    display: none !important;
+  }
+
+  .ccs__arrow:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+    transform: translateY(-50%) scale(1.06);
+  }
+
+  .ccs__arrow:focus-visible {
+    outline: 2px solid var(--ccs-accent, #C9A96E);
+    outline-offset: 2px;
+  }
+
+  .ccs__arrow--prev { left:  -2.2rem; }
+  .ccs__arrow--next { right: -2.2rem; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CARTE PRODUIT
+   ══════════════════════════════════════════════════════════════ */
+
+.ccs__card {
+  flex: 0 0 var(--ccs-card-width);
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--ccs-radius);
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #f0ece6;
+  transition: box-shadow var(--ccs-transition), transform var(--ccs-transition);
+  role: listitem;
+}
+
+.ccs__card:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.09);
+  transform: translateY(-3px);
+}
+
+/* ── Image ──────────────────────────────────────────────────── */
+.ccs__img-wrap {
+  position: relative;
+  aspect-ratio: var(--ccs-img-ratio);
+  overflow: hidden;
+  background: #f8f5f1;
+}
+
+.ccs__img-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ccs__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity var(--ccs-transition), transform 0.5s ease;
+}
+
+/* Hover : image secondaire */
+.ccs__img--primary {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+}
+
+.ccs__img--secondary {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ccs__img-wrap:hover .ccs__img--primary {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+
+  .ccs__img-wrap:hover .ccs__img--secondary {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+/* Si pas d'image secondaire, zoom simple */
+.ccs__img-wrap:not([data-has-secondary]):hover .ccs__img--primary {
+  opacity: 1;
+  transform: scale(1.06);
+}
+
+/* ── Corps de la carte ──────────────────────────────────────── */
+.ccs__card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.4rem 1.6rem 1.6rem;
+  flex: 1;
+}
+
+/* ── Étoiles ────────────────────────────────────────────────── */
+.ccs__stars {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  line-height: 1;
+}
+
+.ccs__star {
+  display: inline-block;
+  width: 1.3rem;
+  height: 1.3rem;
+  color: var(--ccs-star-color, #F4B942);
+}
+
+.ccs__star svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ccs__star--empty {
+  color: #ddd;
+}
+
+.ccs__rating-count {
+  font-size: 1.15rem;
+  opacity: 0.55;
+  margin-left: 0.3rem;
+}
+
+/* ── Nom produit ────────────────────────────────────────────── */
+.ccs__product-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: currentColor;
+  text-decoration: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ccs__product-name:hover {
+  color: var(--ccs-accent, #C9A96E);
+}
+
+/* ── Prix ───────────────────────────────────────────────────── */
+.ccs__price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.8rem;
+  margin-top: auto;
+}
+
+.ccs__price {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.ccs__price--sale {
+  color: #c0392b;
+}
+
+.ccs__price-compare {
+  font-size: 1.2rem;
+  color: #999;
+  font-weight: 400;
+  text-decoration: line-through;
+}
+
+/* ── Bouton Ajouter ─────────────────────────────────────────── */
+.ccs__atc-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 1rem 1.4rem;
+  margin-top: 0.8rem;
+  border: none;
+  border-radius: 10rem;
+  background: var(--ccs-btn-bg, #111);
+  color: var(--ccs-btn-color, #fff);
+  font-size: 1.35rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    opacity   var(--ccs-transition),
+    transform var(--ccs-transition);
+}
+
+.ccs__atc-btn:hover:not(:disabled) {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.ccs__atc-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ccs__atc-btn:focus-visible {
+  outline: 2px solid var(--ccs-btn-bg, #111);
+  outline-offset: 2px;
+}
+
+/* Spinner */
+.ccs__atc-spinner {
+  display: none;
+  position: absolute;
+}
+
+.ccs__atc-btn.is-loading .ccs__atc-label   { opacity: 0; }
+.ccs__atc-btn.is-loading .ccs__atc-spinner { display: flex; }
+
+.ccs__atc-spinner svg {
+  width: 1.8rem;
+  height: 1.8rem;
+  animation: ccs-spin 0.75s linear infinite;
+}
+
+@keyframes ccs-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SKELETON (chargement)
+   ══════════════════════════════════════════════════════════════ */
+
+.ccs__card--skeleton {
+  pointer-events: none;
+}
+
+.ccs__img-wrap--skeleton {
+  aspect-ratio: var(--ccs-img-ratio);
+  background: linear-gradient(90deg, #f0ece6 25%, #e8e2da 50%, #f0ece6 75%);
+  background-size: 200% 100%;
+  animation: ccs-shimmer 1.4s infinite;
+}
+
+.ccs__card-body--skeleton {
+  gap: 1rem;
+}
+
+.ccs__skeleton-line {
+  border-radius: 0.4rem;
+  background: linear-gradient(90deg, #f0ece6 25%, #e8e2da 50%, #f0ece6 75%);
+  background-size: 200% 100%;
+  animation: ccs-shimmer 1.4s infinite;
+}
+
+.ccs__skeleton-line--title {
+  height: 1.4rem;
+  width: 75%;
+}
+
+.ccs__skeleton-line--price {
+  height: 1.2rem;
+  width: 40%;
+}
+
+@keyframes ccs-shimmer {
+  0%   { background-position:  200% 0; }
+  100% { background-position: -200% 0; }
+}

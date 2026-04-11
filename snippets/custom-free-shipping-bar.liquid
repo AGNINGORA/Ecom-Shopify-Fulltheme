@@ -1,0 +1,112 @@
+{% comment %}
+  custom-free-shipping-bar.liquid
+  Barre de progression livraison gratuite — snippet injectable partout
+  Dawn 15.x · Vanilla JS (mise à jour via event cart:updated)
+  CSS : assets/custom-free-shipping-bar.css
+  JS  : assets/custom-free-shipping-bar.js
+
+  Accepte :
+  - threshold_euros  : {Number}  seuil en euros       (défaut : 50)
+  - show_icon        : {Boolean} afficher l'icône camion (défaut : true)
+  - accent_color     : {String}  couleur de la barre  (défaut : #C9A96E)
+  - free_color       : {String}  couleur quand atteint (défaut : #22c55e)
+  - free_msg         : {String}  message quand atteint
+  - context          : {String}  identifiant (pour plusieurs instances)
+{% endcomment %}
+
+{%- liquid
+  assign threshold_euros = threshold_euros | default: 50
+  assign threshold_cents = threshold_euros | times: 100
+  assign show_icon       = show_icon | default: true
+  assign accent_color    = accent_color | default: '#C9A96E'
+  assign free_color      = free_color | default: '#22c55e'
+  assign free_msg        = free_msg | default: 'Livraison offerte !'
+  assign context         = context | default: 'default'
+
+  assign current_total = cart.total_price | default: 0
+  if threshold_cents > 0
+    assign pct = current_total | times: 100 | divided_by: threshold_cents | at_most: 100
+  else
+    assign pct = 100
+  endif
+  assign is_free = false
+  if current_total >= threshold_cents
+    assign is_free = true
+  endif
+  assign remaining_cents = threshold_cents | minus: current_total
+-%}
+
+{{ 'custom-free-shipping-bar.css' | asset_url | stylesheet_tag }}
+
+<div
+  class="cfsb__wrap{% if is_free %} cfsb__wrap--free{% endif %}"
+  data-cfsb
+  data-cfsb-context="{{ context | escape }}"
+  data-threshold="{{ threshold_cents }}"
+  data-free-msg="{{ free_msg | escape }}"
+  style="--cfsb-fill: {{ accent_color }}; --cfsb-fill-free: {{ free_color }};"
+  aria-label="Progression vers la livraison gratuite"
+>
+
+  {%- comment %} ── Ligne texte ──────────────────────────────── {% endcomment %}
+  <div class="cfsb__row">
+
+    {%- if show_icon -%}
+      <span class="cfsb__icon" aria-hidden="true">
+        {%- if is_free -%}
+          {%- comment %} Camion avec coche {% endcomment %}
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 3H16V16H1V3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M16 8H20L23 11V16H16V8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <circle cx="5.5" cy="18.5" r="2" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="18.5" cy="18.5" r="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 10L11 13L16 8" stroke="var(--cfsb-fill-free, #22c55e)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {%- else -%}
+          {%- comment %} Camion simple {% endcomment %}
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 3H16V16H1V3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M16 8H20L23 11V16H16V8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <circle cx="5.5" cy="18.5" r="2" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="18.5" cy="18.5" r="2" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        {%- endif -%}
+      </span>
+    {%- endif -%}
+
+    <p
+      class="cfsb__msg{% if is_free %} cfsb__msg--free{% endif %}"
+      data-cfsb-msg
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      {%- if is_free -%}
+        <strong>{{ free_msg | escape }}</strong>
+      {%- elsif threshold_cents > 0 -%}
+        Plus que <strong>{{ remaining_cents | money_without_trailing_zeros }}</strong> pour la livraison gratuite
+      {%- endif -%}
+    </p>
+
+  </div>
+
+  {%- comment %} ── Barre de progression ─────────────────────── {% endcomment %}
+  {%- unless is_free -%}
+    <div
+      class="cfsb__track"
+      role="progressbar"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="{{ pct }}"
+      data-cfsb-bar-wrap
+    >
+      <div
+        class="cfsb__fill"
+        data-cfsb-fill
+        style="width: {{ pct }}%"
+      ></div>
+    </div>
+  {%- endunless -%}
+
+</div>
+
+<script src="{{ 'custom-free-shipping-bar.js' | asset_url }}" defer></script>

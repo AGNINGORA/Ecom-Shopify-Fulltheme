@@ -1,0 +1,214 @@
+/* ═══════════════════════════════════════════════
+   Custom Subscription Widget
+   Dawn 15.x · Mobile-first
+   ═══════════════════════════════════════════════ */
+
+.csub {
+  margin: 16px 0 20px;
+}
+
+/* ── Toggle cards ── */
+.csub__options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.csub__option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 2px solid #e5e5e5;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  position: relative;
+}
+
+.csub__option:hover {
+  border-color: #ccc;
+}
+
+.csub__option.is-active {
+  border-color: var(--csub-accent, #C9A96E);
+  background: color-mix(in srgb, var(--csub-accent, #C9A96E) 5%, transparent);
+}
+
+/* radio circle */
+.csub__radio {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color .2s;
+}
+
+.csub__option.is-active .csub__radio {
+  border-color: var(--csub-accent, #C9A96E);
+}
+
+.csub__radio::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--csub-accent, #C9A96E);
+  transform: scale(0);
+  transition: transform .2s;
+}
+
+.csub__option.is-active .csub__radio::after {
+  transform: scale(1);
+}
+
+/* content */
+.csub__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.csub__label {
+  font-weight: 600;
+  font-size: .95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.csub__price {
+  margin-left: auto;
+  font-weight: 700;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.csub__price-compare {
+  font-size: .85rem;
+  text-decoration: line-through;
+  opacity: .5;
+  margin-right: 4px;
+  font-weight: 400;
+}
+
+.csub__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-size: .7rem;
+  font-weight: 700;
+  border-radius: 4px;
+  background: var(--csub-accent, #C9A96E);
+  color: #fff;
+}
+
+.csub__desc {
+  font-size: .82rem;
+  opacity: .6;
+  margin-top: 3px;
+}
+
+.csub__desc svg {
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+  margin-right: 4px;
+  stroke: currentColor;
+  fill: none;
+}
+
+/* ── Frequency selector ── */
+.csub__frequency {
+  margin-top: 12px;
+  padding: 0 0 0 34px;
+  display: none;
+}
+
+.csub__frequency.is-visible {
+  display: block;
+}
+
+.csub__freq-label {
+  font-size: .82rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.csub__freq-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.csub__freq-btn {
+  padding: 8px 16px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  font-size: .82rem;
+  cursor: pointer;
+  transition: all .15s;
+  text-align: center;
+}
+
+.csub__freq-btn:hover {
+  border-color: #bbb;
+}
+
+.csub__freq-btn.is-active {
+  border-color: var(--csub-accent, #C9A96E);
+  background: var(--csub-accent, #C9A96E);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ── Benefits list ── */
+.csub__benefits {
+  margin-top: 10px;
+  padding: 0 0 0 34px;
+  display: none;
+}
+
+.csub__benefits.is-visible {
+  display: block;
+}
+
+.csub__benefits ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.csub__benefits li {
+  font-size: .8rem;
+  opacity: .7;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.csub__benefits li::before {
+  content: '✓';
+  color: var(--csub-accent, #C9A96E);
+  font-weight: 700;
+  font-size: .85rem;
+}
+
+/* ── Mobile ── */
+@media (max-width: 749px) {
+  .csub__option {
+    padding: 12px 14px;
+  }
+
+  .csub__label {
+    font-size: .88rem;
+  }
+}

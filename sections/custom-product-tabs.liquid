@@ -1,0 +1,468 @@
+{% comment %}
+  Custom Product Tabs – Onglets / Accordéon produit
+  Dawn 15.x · Vanilla JS · Mobile-first
+  Desktop : onglets horizontaux
+  Mobile  : accordéon
+{% endcomment %}
+
+{{ 'custom-product-tabs.css' | asset_url | stylesheet_tag }}
+
+{%- comment %} ── Récupération des contenus ─────────────────── {% endcomment %}
+{%- assign tab_description   = product.description -%}
+{%- assign tab_ingredients   = product.metafields.custom.ingredients -%}
+{%- assign tab_how_to_use    = product.metafields.custom.how_to_use -%}
+{%- assign tab_composition   = product.metafields.custom.full_composition -%}
+
+{%- comment %} ── Tags de peau ─────────────────────────────────── {% endcomment %}
+{%- assign skin_keywords = 'sèche,grasse,mixte,sensible,normale,mature,terne,acnéique' | split: ',' -%}
+{%- assign matched_skin_tags = '' -%}
+{%- for tag in product.tags -%}
+  {%- assign tag_lower = tag | downcase -%}
+  {%- for keyword in skin_keywords -%}
+    {%- if tag_lower contains keyword -%}
+      {%- if matched_skin_tags == '' -%}
+        {%- assign matched_skin_tags = tag -%}
+      {%- else -%}
+        {%- assign matched_skin_tags = matched_skin_tags | append: '||' | append: tag -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endfor -%}
+{%- assign skin_tags_array = matched_skin_tags | split: '||' -%}
+
+<section
+  class="custom-product-tabs"
+  data-section-id="{{ section.id }}"
+  style="
+    --cpt-accent:     {{ section.settings.accent_color }};
+    --cpt-border:     {{ section.settings.border_color }};
+    --cpt-tab-bg:     {{ section.settings.tab_bg }};
+    --cpt-tab-active: {{ section.settings.tab_active_bg }};
+  "
+>
+  <div class="cpt__inner page-width">
+
+    {%- comment %} ══════════════════════════════
+        ONGLETS DESKTOP
+    ══════════════════════════════ {% endcomment %}
+    <div class="cpt__tabs-wrapper" data-cpt>
+
+      {%- comment %} Barre d'onglets {% endcomment %}
+      <div class="cpt__tab-bar" role="tablist" aria-label="Informations produit">
+
+        {%- if tab_description != blank -%}
+          <button
+            class="cpt__tab is-active"
+            role="tab"
+            aria-selected="true"
+            aria-controls="cpt-panel-description-{{ section.id }}"
+            id="cpt-tab-description-{{ section.id }}"
+            data-tab="description"
+          >{{ section.settings.label_description }}</button>
+        {%- endif -%}
+
+        {%- if tab_ingredients != blank -%}
+          <button
+            class="cpt__tab"
+            role="tab"
+            aria-selected="false"
+            aria-controls="cpt-panel-ingredients-{{ section.id }}"
+            id="cpt-tab-ingredients-{{ section.id }}"
+            data-tab="ingredients"
+          >{{ section.settings.label_ingredients }}</button>
+        {%- endif -%}
+
+        {%- if tab_how_to_use != blank -%}
+          <button
+            class="cpt__tab"
+            role="tab"
+            aria-selected="false"
+            aria-controls="cpt-panel-how-to-use-{{ section.id }}"
+            id="cpt-tab-how-to-use-{{ section.id }}"
+            data-tab="how-to-use"
+          >{{ section.settings.label_how_to_use }}</button>
+        {%- endif -%}
+
+        {%- if tab_composition != blank -%}
+          <button
+            class="cpt__tab"
+            role="tab"
+            aria-selected="false"
+            aria-controls="cpt-panel-composition-{{ section.id }}"
+            id="cpt-tab-composition-{{ section.id }}"
+            data-tab="composition"
+          >{{ section.settings.label_composition }}</button>
+        {%- endif -%}
+
+      </div>
+      {%- comment %} Indicateur slide sous la barre {% endcomment %}
+      <div class="cpt__tab-indicator" aria-hidden="true"></div>
+
+      {%- comment %} ── Panneaux de contenu ───────────────────── {% endcomment %}
+      <div class="cpt__panels">
+
+        {%- if tab_description != blank -%}
+          <div
+            class="cpt__panel is-active"
+            role="tabpanel"
+            id="cpt-panel-description-{{ section.id }}"
+            aria-labelledby="cpt-tab-description-{{ section.id }}"
+            data-panel="description"
+            tabindex="0"
+          >
+            {%- comment %} Mobile : titre accordéon {% endcomment %}
+            <button class="cpt__accordion-trigger" data-accordion-trigger aria-expanded="true">
+              {{ section.settings.label_description }}
+              <span class="cpt__accordion-icon" aria-hidden="true"></span>
+            </button>
+            <div class="cpt__accordion-body">
+              <div class="cpt__content rte">
+                {{ tab_description }}
+              </div>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if tab_ingredients != blank -%}
+          <div
+            class="cpt__panel"
+            role="tabpanel"
+            id="cpt-panel-ingredients-{{ section.id }}"
+            aria-labelledby="cpt-tab-ingredients-{{ section.id }}"
+            data-panel="ingredients"
+            tabindex="0"
+            hidden
+          >
+            <button class="cpt__accordion-trigger" data-accordion-trigger aria-expanded="false">
+              {{ section.settings.label_ingredients }}
+              <span class="cpt__accordion-icon" aria-hidden="true"></span>
+            </button>
+            <div class="cpt__accordion-body">
+              <div class="cpt__content rte">
+                {{ tab_ingredients | metafield_tag }}
+              </div>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if tab_how_to_use != blank -%}
+          <div
+            class="cpt__panel"
+            role="tabpanel"
+            id="cpt-panel-how-to-use-{{ section.id }}"
+            aria-labelledby="cpt-tab-how-to-use-{{ section.id }}"
+            data-panel="how-to-use"
+            tabindex="0"
+            hidden
+          >
+            <button class="cpt__accordion-trigger" data-accordion-trigger aria-expanded="false">
+              {{ section.settings.label_how_to_use }}
+              <span class="cpt__accordion-icon" aria-hidden="true"></span>
+            </button>
+            <div class="cpt__accordion-body">
+              <div class="cpt__content rte">
+                {{ tab_how_to_use | metafield_tag }}
+              </div>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if tab_composition != blank -%}
+          <div
+            class="cpt__panel"
+            role="tabpanel"
+            id="cpt-panel-composition-{{ section.id }}"
+            aria-labelledby="cpt-tab-composition-{{ section.id }}"
+            data-panel="composition"
+            tabindex="0"
+            hidden
+          >
+            <button class="cpt__accordion-trigger" data-accordion-trigger aria-expanded="false">
+              {{ section.settings.label_composition }}
+              <span class="cpt__accordion-icon" aria-hidden="true"></span>
+            </button>
+            <div class="cpt__accordion-body">
+              <div class="cpt__content rte">
+                {{ tab_composition | metafield_tag }}
+              </div>
+            </div>
+          </div>
+        {%- endif -%}
+
+      </div>
+      {%- comment %} fin panels {% endcomment %}
+
+    </div>
+    {%- comment %} fin tabs-wrapper {% endcomment %}
+
+    {%- comment %} ══════════════════════════════
+        SECTION "ADAPTÉ À"
+    ══════════════════════════════ {% endcomment %}
+    {%- if skin_tags_array.size > 0 and skin_tags_array.first != '' -%}
+      <div class="cpt__skin-section">
+        <p class="cpt__skin-label">{{ section.settings.skin_label }}</p>
+        <ul class="cpt__skin-tags" role="list">
+          {%- for skin_tag in skin_tags_array -%}
+            {%- if skin_tag != '' -%}
+              <li class="cpt__skin-tag">{{ skin_tag | escape }}</li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  const MOBILE_BP = window.matchMedia('(max-width: 749px)');
+
+  class ProductTabs {
+    constructor(root) {
+      this.root       = root;
+      this.tabs       = Array.from(root.querySelectorAll('.cpt__tab'));
+      this.panels     = Array.from(root.querySelectorAll('.cpt__panel'));
+      this.indicator  = root.querySelector('.cpt__tab-indicator');
+      this.triggers   = Array.from(root.querySelectorAll('[data-accordion-trigger]'));
+
+      if (this.tabs.length === 0) return;
+
+      this._bindTabs();
+      this._bindAccordions();
+      this._updateIndicator();
+
+      // Recalcul de l'indicateur au resize
+      window.addEventListener('resize', () => this._updateIndicator(), { passive: true });
+    }
+
+    // ── Onglets (desktop) ──────────────────────────────────────
+    _bindTabs() {
+      this.tabs.forEach((tab) => {
+        tab.addEventListener('click', () => this._activateTab(tab));
+
+        // Navigation clavier
+        tab.addEventListener('keydown', (e) => {
+          const idx = this.tabs.indexOf(tab);
+          if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            this._activateTab(this.tabs[(idx + 1) % this.tabs.length]);
+            this.tabs[(idx + 1) % this.tabs.length].focus();
+          }
+          if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            const prev = (idx - 1 + this.tabs.length) % this.tabs.length;
+            this._activateTab(this.tabs[prev]);
+            this.tabs[prev].focus();
+          }
+        });
+      });
+    }
+
+    _activateTab(tab) {
+      const target = tab.dataset.tab;
+
+      // Mise à jour des onglets
+      this.tabs.forEach((t) => {
+        const active = t === tab;
+        t.classList.toggle('is-active', active);
+        t.setAttribute('aria-selected', String(active));
+      });
+
+      // Mise à jour des panneaux
+      this.panels.forEach((panel) => {
+        const active = panel.dataset.panel === target;
+        panel.classList.toggle('is-active', active);
+        panel.hidden = !active;
+
+        // Sync accordéon : ouvre le bon sur mobile
+        const trigger = panel.querySelector('[data-accordion-trigger]');
+        const body    = panel.querySelector('.cpt__accordion-body');
+        if (trigger && body) {
+          trigger.setAttribute('aria-expanded', String(active));
+          body.style.maxHeight = active ? body.scrollHeight + 'px' : '0';
+        }
+      });
+
+      this._updateIndicator();
+    }
+
+    // ── Indicateur glissant (desktop) ─────────────────────────
+    _updateIndicator() {
+      if (!this.indicator || MOBILE_BP.matches) return;
+
+      const activeTab = this.root.querySelector('.cpt__tab.is-active');
+      if (!activeTab) return;
+
+      const barRect = this.root.querySelector('.cpt__tab-bar').getBoundingClientRect();
+      const tabRect = activeTab.getBoundingClientRect();
+
+      this.indicator.style.width     = tabRect.width + 'px';
+      this.indicator.style.transform = `translateX(${tabRect.left - barRect.left}px)`;
+    }
+
+    // ── Accordéon (mobile) ─────────────────────────────────────
+    _bindAccordions() {
+      this.triggers.forEach((trigger) => {
+        const body = trigger.nextElementSibling; // .cpt__accordion-body
+
+        // État initial
+        const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+        body.style.maxHeight = isOpen ? body.scrollHeight + 'px' : '0';
+
+        trigger.addEventListener('click', () => {
+          if (!MOBILE_BP.matches) return; // accordéon mobile uniquement
+
+          const open = trigger.getAttribute('aria-expanded') === 'true';
+
+          // Fermer tous les autres
+          this.triggers.forEach((t) => {
+            if (t === trigger) return;
+            t.setAttribute('aria-expanded', 'false');
+            t.nextElementSibling.style.maxHeight = '0';
+          });
+
+          // Basculer celui-ci
+          trigger.setAttribute('aria-expanded', String(!open));
+          body.style.maxHeight = open ? '0' : body.scrollHeight + 'px';
+
+          // Sync onglet desktop
+          if (!open) {
+            const panel  = trigger.closest('[data-panel]');
+            const tabKey = panel?.dataset.panel;
+            if (tabKey) {
+              const matchingTab = this.tabs.find((t) => t.dataset.tab === tabKey);
+              if (matchingTab) this._activateTab(matchingTab);
+            }
+          }
+        });
+      });
+    }
+  }
+
+  // ── Init ──────────────────────────────────────────────────────
+  function init() {
+    document.querySelectorAll('.custom-product-tabs[data-section-id]').forEach((el) => {
+      if (!el._cptInit) el._cptInit = new ProductTabs(el);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  document.addEventListener('shopify:section:load', (e) => {
+    const el = e.target.querySelector('.custom-product-tabs');
+    if (el) el._cptInit = new ProductTabs(el);
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Onglets produit",
+  "tag": "section",
+  "class": "section-custom-product-tabs",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Labels des onglets"
+    },
+    {
+      "type": "text",
+      "id": "label_description",
+      "label": "Onglet Description",
+      "default": "Description"
+    },
+    {
+      "type": "text",
+      "id": "label_ingredients",
+      "label": "Onglet Ingrédients clés",
+      "default": "Ingrédients clés"
+    },
+    {
+      "type": "text",
+      "id": "label_how_to_use",
+      "label": "Onglet Comment utiliser",
+      "default": "Comment utiliser"
+    },
+    {
+      "type": "text",
+      "id": "label_composition",
+      "label": "Onglet Composition",
+      "default": "Composition complète"
+    },
+    {
+      "type": "header",
+      "content": "Section \"Adapté à\""
+    },
+    {
+      "type": "text",
+      "id": "skin_label",
+      "label": "Titre de la section",
+      "default": "Adapté à"
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent (onglet actif)",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Couleur des bordures",
+      "default": "#e8e2da"
+    },
+    {
+      "type": "color",
+      "id": "tab_bg",
+      "label": "Fond des onglets inactifs",
+      "default": "#f9f6f2"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_bg",
+      "label": "Fond de l'onglet actif",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Onglets produit"
+    }
+  ]
+}
+{% endschema %}

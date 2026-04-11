@@ -1,0 +1,313 @@
+/* =============================================================
+   custom-testimonials-carousel.css
+   Carrousel d'avis clients — scroll-snap, arrows, dots
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+.section-custom-testimonials-carousel {
+  padding-top:    var(--ctc-padding-top, 6rem);
+  padding-bottom: var(--ctc-padding-bottom, 6rem);
+  overflow: hidden;
+}
+
+/* ── En-tête ────────────────────────────────────────────────── */
+.ctc__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 3.2rem;
+}
+
+.ctc__header {
+  text-align: center;
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+.ctc__eyebrow {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ctc-accent, #C9A96E);
+  margin: 0 0 1rem;
+}
+
+.ctc__title {
+  font-size: clamp(2.4rem, 3.5vw, 3.6rem);
+  font-weight: 800;
+  margin: 0 0 1rem;
+  line-height: 1.15;
+}
+
+.ctc__subtitle {
+  font-size: 1.5rem;
+  opacity: 0.6;
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CARROUSEL
+   ══════════════════════════════════════════════════════════════ */
+
+.ctc__carousel {
+  position: relative;
+  width: 100%;
+  padding: 1.6rem 0 4rem; /* espace pour les dots */
+}
+
+/* ── Track (scroll-snap) ────────────────────────────────────── */
+.ctc__track {
+  display: flex;
+  gap: 2rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0.8rem 2rem 1.2rem;
+  /* Peek des slides adjacentes */
+  margin: 0 -2rem;
+}
+
+.ctc__track::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Slide ──────────────────────────────────────────────────── */
+.ctc__slide {
+  flex: 0 0 min(88vw, 40rem); /* mobile : 1 slide ~88% */
+  scroll-snap-align: start;
+  list-style: none;
+}
+
+/* Desktop : N slides selon setting */
+@media (min-width: 750px) {
+  .ctc__slide {
+    flex: 0 0 calc((100% - (var(--ctc-slides-desktop, 2) - 1) * 2rem) / var(--ctc-slides-desktop, 2));
+  }
+}
+
+/* ── Carte ──────────────────────────────────────────────────── */
+.ctc__card {
+  height: 100%;
+  background: var(--ctc-card-bg, #faf8f5);
+  border: 1px solid #f0ece6;
+  border-radius: 1.6rem;
+  padding: 2.8rem 2.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.ctc__slide:hover .ctc__card {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* ── Étoiles ────────────────────────────────────────────────── */
+.ctc__stars {
+  display: flex;
+  gap: 0.2rem;
+  flex-shrink: 0;
+}
+
+.ctc__star {
+  display: flex;
+  align-items: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  color: var(--ctc-star, #C9A96E);
+}
+
+.ctc__star--empty {
+  opacity: 0.25;
+}
+
+.ctc__star svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Citation ───────────────────────────────────────────────── */
+.ctc__quote {
+  flex: 1;
+  margin: 0;
+}
+
+.ctc__quote p {
+  font-size: 1.5rem;
+  line-height: 1.65;
+  font-style: italic;
+  margin: 0;
+  quotes: "\AB" "\BB";
+}
+
+.ctc__quote p::before {
+  content: open-quote;
+  color: var(--ctc-accent, #C9A96E);
+  font-size: 2.4rem;
+  line-height: 0;
+  vertical-align: -0.6rem;
+  margin-right: 0.2rem;
+}
+
+/* ── Auteur ─────────────────────────────────────────────────── */
+.ctc__author {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-shrink: 0;
+}
+
+.ctc__author-avatar {
+  width: 5.2rem;
+  height: 5.2rem;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #e8e3dd;
+}
+
+.ctc__author-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ctc__author-initials {
+  width: 5.2rem;
+  height: 5.2rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--ctc-accent, #C9A96E);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.ctc__author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.ctc__author-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.ctc__author-location {
+  font-size: 1.25rem;
+  opacity: 0.5;
+  margin: 0;
+}
+
+.ctc__verified {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 1.15rem;
+  color: var(--ctc-accent, #C9A96E);
+  font-weight: 600;
+  margin: 0;
+}
+
+.ctc__verified svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FLÈCHES
+   ══════════════════════════════════════════════════════════════ */
+
+.ctc__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) translateY(-2rem); /* compenser dots */
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.4rem;
+  height: 4.4rem;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #e8e2da;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  color: inherit;
+}
+
+.ctc__arrow:hover {
+  background: var(--ctc-accent, #C9A96E);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.ctc__arrow:disabled,
+.ctc__arrow[aria-disabled="true"] {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.ctc__arrow--prev { left: 0; }
+.ctc__arrow--next { right: 0; }
+
+.ctc__arrow svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Masquer les flèches sur mobile (swipe naturel) */
+@media (max-width: 749px) {
+  .ctc__arrow { display: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DOTS
+   ══════════════════════════════════════════════════════════════ */
+
+.ctc__dots {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.ctc__dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.2s ease, width 0.25s ease;
+  flex-shrink: 0;
+}
+
+.ctc__dot.is-active {
+  background: var(--ctc-accent, #C9A96E);
+  width: 2.4rem;
+  border-radius: 99px;
+}
+
+/* ── Réduction mouvement ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ctc__track { scroll-behavior: auto; }
+  .ctc__card, .ctc__arrow, .ctc__dot { transition: none; }
+}

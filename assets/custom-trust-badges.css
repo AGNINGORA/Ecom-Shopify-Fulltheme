@@ -1,0 +1,92 @@
+/* =============================================================
+   custom-trust-badges.css
+   Barre de réassurance – Mobile-first (2×2) → Desktop (ligne)
+   Dawn 15.x
+   ============================================================= */
+
+/* ── Variables ─────────────────────────────────────────────── */
+.custom-trust-badges {
+  --ctb-gap:         2.4rem;
+  --ctb-icon-size:   2.8rem;
+  --ctb-font-size:   1.35rem;
+  --ctb-transition:  0.22s ease;
+}
+
+/* ── Wrapper ────────────────────────────────────────────────── */
+.custom-trust-badges {
+  background-color: var(--ctb-bg, transparent);
+  border-top:    1px solid var(--ctb-border-color, transparent);
+  border-bottom: 1px solid var(--ctb-border-color, transparent);
+  padding-block: var(--ctb-padding-top, 2.8rem) var(--ctb-padding-bottom, 2.8rem);
+}
+
+.ctb__inner {
+  width: 100%;
+}
+
+/* ── Liste ──────────────────────────────────────────────────── */
+.ctb__list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;   /* Mobile : 2 colonnes */
+  gap: var(--ctb-gap);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Desktop : une seule ligne, autant de colonnes que de badges */
+@media (min-width: 750px) {
+  .ctb__list {
+    grid-template-columns: repeat(var(--ctb-count, 4), 1fr);
+    gap: 0;
+  }
+}
+
+/* ── Item ───────────────────────────────────────────────────── */
+.ctb__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  text-align: center;
+  padding: 0.4rem 1.2rem;
+  transition: transform var(--ctb-transition);
+}
+
+.ctb__item:hover {
+  transform: translateY(-2px);
+}
+
+/* Séparateurs verticaux entre items sur desktop */
+@media (min-width: 750px) {
+  .ctb__item + .ctb__item {
+    border-left: 1px solid var(--ctb-border-color, #e8e2da);
+  }
+}
+
+/* ── Icône ──────────────────────────────────────────────────── */
+.ctb__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ctb-icon-size);
+  height: var(--ctb-icon-size);
+  color: var(--ctb-icon-color, currentColor);
+  flex-shrink: 0;
+  transition: color var(--ctb-transition);
+}
+
+.ctb__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Texte ──────────────────────────────────────────────────── */
+.ctb__text {
+  font-size: var(--ctb-font-size);
+  font-weight: 600;
+  line-height: 1.35;
+  color: currentColor;
+  letter-spacing: 0.01em;
+}

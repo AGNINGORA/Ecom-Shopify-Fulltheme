@@ -1,0 +1,16 @@
+{
+  "sections": {
+    "wishlist": {
+      "type": "custom-wishlist-page",
+      "settings": {
+        "title": "Ma liste de souhaits",
+        "empty_title": "Votre liste de souhaits est vide",
+        "empty_text": "Explorez notre catalogue et ajoutez les produits qui vous font envie.",
+        "empty_btn_label": "Découvrir nos produits",
+        "padding_top": 64,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["wishlist"]
+}

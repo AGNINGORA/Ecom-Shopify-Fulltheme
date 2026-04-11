@@ -1,0 +1,631 @@
+/* =============================================================
+   custom-reviews.css
+   Avis clients – Mobile-first
+   Dawn 15.x
+   ============================================================= */
+
+/* ── Variables ─────────────────────────────────────────────── */
+.custom-reviews {
+  --crv-transition:  0.24s ease;
+  --crv-radius:      1.2rem;
+  --crv-radius-sm:   0.8rem;
+}
+
+/* ── Section ────────────────────────────────────────────────── */
+.custom-reviews {
+  padding-block: var(--crv-padding-top, 4.8rem) var(--crv-padding-bottom, 4.8rem);
+}
+
+.crv__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 3.2rem;
+}
+
+/* ── Titre ──────────────────────────────────────────────────── */
+.crv__heading {
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RÉSUMÉ GLOBAL
+   ══════════════════════════════════════════════════════════════ */
+
+.crv__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  padding: 2.4rem;
+  border: 1px solid var(--crv-border, #e8e2da);
+  border-radius: var(--crv-radius);
+  background: #fafaf8;
+}
+
+@media (min-width: 600px) {
+  .crv__summary {
+    flex-direction: row;
+    align-items: center;
+    gap: 4rem;
+  }
+}
+
+/* ── Note globale ───────────────────────────────────────────── */
+.crv__global-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  flex-shrink: 0;
+  min-width: 12rem;
+}
+
+.crv__avg-number {
+  font-size: 5rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--crv-accent, #C9A96E);
+}
+
+.crv__avg-dec {
+  font-size: 3rem;
+}
+
+.crv__avg-stars {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.crv__total-count {
+  font-size: 1.35rem;
+  opacity: 0.6;
+  font-weight: 500;
+}
+
+/* ── Étoiles génériques ─────────────────────────────────────── */
+.crv__star {
+  display: inline-flex;
+  color: var(--crv-star-color, #F4B942);
+}
+
+.crv__star--empty {
+  color: #ddd;
+}
+
+.crv__star svg,
+.crv__review-stars .crv__star svg {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+.crv__avg-stars .crv__star svg {
+  width: 2.2rem;
+  height: 2.2rem;
+}
+
+/* ── Barres de répartition ──────────────────────────────────── */
+.crv__breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.crv__breakdown-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: none;
+  background: transparent;
+  padding: 0.3rem 0;
+  cursor: pointer;
+  border-radius: 0.4rem;
+  transition: opacity var(--crv-transition);
+  text-align: left;
+  width: 100%;
+}
+
+.crv__breakdown-row:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.crv__breakdown-row:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.crv__breakdown-row.is-active {
+  font-weight: 700;
+}
+
+.crv__breakdown-row:focus-visible {
+  outline: 2px solid var(--crv-accent, #C9A96E);
+  outline-offset: 2px;
+}
+
+.crv__breakdown-label {
+  font-size: 1.3rem;
+  white-space: nowrap;
+  min-width: 2.4rem;
+  color: var(--crv-star-color, #F4B942);
+  font-weight: 600;
+}
+
+.crv__breakdown-bar-wrap {
+  flex: 1;
+  height: 0.8rem;
+  background: #eee;
+  border-radius: 10rem;
+  overflow: hidden;
+}
+
+.crv__breakdown-bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--crv-star-color, #F4B942);
+  border-radius: 10rem;
+  transition: width 0.6s ease;
+}
+
+.crv__breakdown-count {
+  font-size: 1.25rem;
+  min-width: 2rem;
+  text-align: right;
+  opacity: 0.6;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CONTRÔLES
+   ══════════════════════════════════════════════════════════════ */
+
+.crv__controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+
+/* Filtre actif */
+.crv__active-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4em 0.9em;
+  background: color-mix(in srgb, var(--crv-accent, #C9A96E) 12%, transparent);
+  border: 1.5px solid var(--crv-accent, #C9A96E);
+  border-radius: 10rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--crv-accent, #C9A96E);
+}
+
+.crv__clear-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: currentColor;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 0.2rem;
+  line-height: 1;
+}
+
+/* Tri */
+.crv__sort-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-left: auto;
+}
+
+.crv__sort-label {
+  font-size: 1.3rem;
+  opacity: 0.65;
+  white-space: nowrap;
+}
+
+.crv__select-wrap {
+  position: relative;
+}
+
+.crv__select {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 3.6rem;
+  padding: 0 3rem 0 1.2rem;
+  border: 1.5px solid var(--crv-border, #e8e2da);
+  border-radius: 10rem;
+  background: #fff;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: currentColor;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--crv-transition);
+}
+
+.crv__select:focus-visible {
+  border-color: var(--crv-accent, #C9A96E);
+}
+
+.crv__select-caret {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #888;
+  display: flex;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   AVIS
+   ══════════════════════════════════════════════════════════════ */
+
+.crv__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Article avis ───────────────────────────────────────────── */
+.crv__review {
+  padding: 2.4rem 0;
+  border-bottom: 1px solid var(--crv-border, #e8e2da);
+  animation: crv-fadein 0.3s ease both;
+}
+
+.crv__review:first-child {
+  border-top: 1px solid var(--crv-border, #e8e2da);
+}
+
+@keyframes crv-fadein {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── En-tête de l'avis ──────────────────────────────────────── */
+.crv__review-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  margin-bottom: 0.8rem;
+}
+
+.crv__reviewer-info {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.crv__reviewer-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.crv__verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--crv-accent, #C9A96E);
+  background: color-mix(in srgb, var(--crv-accent, #C9A96E) 10%, transparent);
+  padding: 0.2em 0.7em;
+  border-radius: 10rem;
+}
+
+.crv__review-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.crv__skin-type {
+  font-size: 1.2rem;
+  padding: 0.2em 0.7em;
+  border: 1px solid var(--crv-border, #e8e2da);
+  border-radius: 10rem;
+  opacity: 0.75;
+}
+
+.crv__review-date {
+  font-size: 1.25rem;
+  opacity: 0.5;
+}
+
+/* ── Étoiles de l'avis ──────────────────────────────────────── */
+.crv__review-stars {
+  display: flex;
+  gap: 0.2rem;
+  margin-bottom: 0.8rem;
+}
+
+/* ── Texte ──────────────────────────────────────────────────── */
+.crv__review-text {
+  font-size: 1.5rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── Photo ──────────────────────────────────────────────────── */
+.crv__review-photo-wrap {
+  margin-top: 1.2rem;
+}
+
+.crv__review-photo {
+  width: 8rem;
+  height: 8rem;
+  object-fit: cover;
+  border-radius: var(--crv-radius-sm);
+  border: 1px solid var(--crv-border, #e8e2da);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   VOIR PLUS
+   ══════════════════════════════════════════════════════════════ */
+
+.crv__load-more-wrap {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.8rem;
+}
+
+.crv__load-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.2rem 2.8rem;
+  border: 2px solid var(--crv-accent, #C9A96E);
+  border-radius: 10rem;
+  background: transparent;
+  color: var(--crv-accent, #C9A96E);
+  font-size: 1.45rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background var(--crv-transition),
+    color      var(--crv-transition);
+}
+
+.crv__load-more-btn:hover {
+  background: var(--crv-accent, #C9A96E);
+  color: #fff;
+}
+
+.crv__load-more-btn:focus-visible {
+  outline: 2px solid var(--crv-accent, #C9A96E);
+  outline-offset: 3px;
+}
+
+.crv__load-more-btn[hidden] {
+  display: none;
+}
+
+.crv__load-more-count {
+  font-size: 1.25rem;
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+/* ── Vide ────────────────────────────────────────────────────── */
+.crv__empty {
+  text-align: center;
+  opacity: 0.5;
+  font-size: 1.5rem;
+  padding: 3.2rem;
+  border: 2px dashed var(--crv-border, #e8e2da);
+  border-radius: var(--crv-radius);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LAYOUT : GRILLE
+   ══════════════════════════════════════════════════════════════ */
+
+.crv__list--grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 600px) {
+  .crv__list--grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 990px) {
+  .crv__list--grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.crv__list--grid .crv__review {
+  padding: 2.4rem;
+  border: 1px solid var(--crv-border, #e8e2da);
+  border-radius: var(--crv-radius);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: box-shadow var(--crv-transition), transform var(--crv-transition);
+}
+
+.crv__list--grid .crv__review:first-child {
+  border-top: 1px solid var(--crv-border, #e8e2da);
+}
+
+.crv__list--grid .crv__review:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LAYOUT : LISTE
+   ══════════════════════════════════════════════════════════════ */
+
+.crv__list--list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Identique au style par défaut hors layout — séparateurs */
+.crv__list--list .crv__review {
+  padding: 2.4rem 0;
+  border-bottom: 1px solid var(--crv-border, #e8e2da);
+}
+
+.crv__list--list .crv__review:first-child {
+  border-top: 1px solid var(--crv-border, #e8e2da);
+}
+
+/* Desktop : disposition horizontale (étoiles | texte | méta) */
+@media (min-width: 750px) {
+  .crv__list--list .crv__review {
+    display: grid;
+    grid-template-columns: 14rem 1fr 16rem;
+    grid-template-rows: auto auto;
+    column-gap: 2.4rem;
+    align-items: start;
+  }
+
+  .crv__list--list .crv__review-header {
+    grid-column: 1;
+    grid-row: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+    margin-bottom: 0;
+  }
+
+  .crv__list--list .crv__review-stars {
+    grid-column: 1;
+    grid-row: 2;
+    margin-bottom: 0;
+  }
+
+  .crv__list--list .crv__review-text {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+
+  .crv__list--list .crv__review-photo-wrap {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LAYOUT : CARROUSEL
+   ══════════════════════════════════════════════════════════════ */
+
+.crv__list--carousel {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  /* Masquer la scrollbar tout en permettant le scroll */
+  scrollbar-width: none;
+  padding-bottom: 0.4rem; /* espace pour l'ombre */
+}
+
+.crv__list--carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.crv__list--carousel .crv__review {
+  flex-shrink: 0;
+  width: calc(100% - 2rem);
+  scroll-snap-align: start;
+  padding: 2.4rem;
+  border: 1px solid var(--crv-border, #e8e2da);
+  border-radius: var(--crv-radius);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Réinitialiser les border-top/bottom du style par défaut */
+.crv__list--carousel .crv__review:first-child {
+  border-top: 1px solid var(--crv-border, #e8e2da);
+}
+
+@media (min-width: 600px) {
+  .crv__list--carousel .crv__review {
+    width: calc(50% - 1.5rem);
+  }
+}
+
+@media (min-width: 990px) {
+  .crv__list--carousel .crv__review {
+    width: calc(33.333% - 1.5rem);
+  }
+}
+
+/* ── Navigation carrousel ───────────────────────────────────── */
+.crv__carousel-nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  margin-bottom: -1.2rem; /* chevauchement visuel avec la liste */
+}
+
+.crv__carousel-btn {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--crv-border, #e8e2da);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #333;
+  transition: background var(--crv-transition), border-color var(--crv-transition), color var(--crv-transition);
+}
+
+.crv__carousel-btn svg {
+  width: 2rem;
+  height: 2rem;
+  pointer-events: none;
+}
+
+.crv__carousel-btn:hover {
+  background: var(--crv-accent, #C9A96E);
+  border-color: var(--crv-accent, #C9A96E);
+  color: #fff;
+}
+
+.crv__carousel-btn:focus-visible {
+  outline: 2px solid var(--crv-accent, #C9A96E);
+  outline-offset: 2px;
+}
+
+.crv__carousel-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* En mode non-carrousel, la nav est absente donc pas besoin de la cacher */
+
+/* ── Avis masqués en carrousel (tous visibles, scroll) ──────── */
+.crv__list--carousel .crv__review[hidden] {
+  display: block !important;
+  visibility: visible;
+}

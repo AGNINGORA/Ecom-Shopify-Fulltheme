@@ -1,0 +1,424 @@
+{% comment %}
+  custom-mega-menu.liquid
+  Mega menu — nav desktop avec panneaux + drawer accordéon mobile
+  Dawn 15.x · Vanilla JS
+
+  Intégration :
+  → Dans le theme editor : Thème > Personnaliser > En-tête > Ajouter une section > Mega Menu
+  → OU ajouter dans layout/theme.liquid avant {% sections 'header-group' %}
+
+  Structure menu Shopify (Navigation) attendue :
+    Niveau 1 → onglets du mega menu (ex: "Soins", "Maquillage")
+    Niveau 2 → titres de colonnes (ex: "Visage", "Corps")
+    Niveau 3 → sous-liens (ex: "Crèmes", "Sérums")
+{% endcomment %}
+
+{{ 'custom-mega-menu.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign cmm_menu = section.settings.menu
+  assign has_logo  = false
+  if settings.logo != blank and section.settings.show_logo
+    assign has_logo = true
+  endif
+-%}
+
+{%- comment %} ── Overlay (fixe, partagé panels + drawer) ── {% endcomment %}
+<div class="cmm__overlay" data-cmm-overlay aria-hidden="true"></div>
+
+<section
+  class="section-custom-mega-menu{% if section.settings.sticky %} cmm--sticky{% endif %}"
+  data-cmm-section
+  data-section-id="{{ section.id }}"
+  style="
+    --cmm-bg:         {{ section.settings.bg_color }};
+    --cmm-link-color: {{ section.settings.link_color }};
+    --cmm-accent:     {{ section.settings.accent_color }};
+    --cmm-bar-height: {{ section.settings.bar_height }}px;
+  "
+>
+  {%- comment %} ══════════════════════════════════════════════
+      BARRE PRINCIPALE
+  ══════════════════════════════════════════════ {% endcomment %}
+  <div class="cmm__bar page-width" data-cmm-bar>
+
+    {%- comment %} Hamburger mobile {% endcomment %}
+    <button
+      class="cmm__hamburger"
+      type="button"
+      data-cmm-hamburger
+      aria-expanded="false"
+      aria-controls="cmm-drawer-{{ section.id }}"
+      aria-label="Ouvrir le menu"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <line x1="3" y1="6"  x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+
+    {%- comment %} Logo optionnel {% endcomment %}
+    {%- if has_logo -%}
+      {%- assign logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
+      <a href="{{ routes.root_url }}" class="cmm__logo">
+        <img
+          class="cmm__logo-img"
+          src="{{ settings.logo | image_url: width: 400 }}"
+          width="{{ settings.logo_width }}"
+          height="{{ logo_height }}"
+          alt="{{ settings.logo.alt | default: shop.name | escape }}"
+          loading="eager"
+        >
+      </a>
+    {%- elsif section.settings.show_logo -%}
+      <a href="{{ routes.root_url }}" class="cmm__logo">{{ shop.name }}</a>
+    {%- endif -%}
+
+    {%- comment %} Navigation desktop {% endcomment %}
+    <nav class="cmm__nav" aria-label="Navigation principale">
+      <ul class="cmm__list" role="list">
+        {%- for link in cmm_menu.links -%}
+          <li class="cmm__item">
+            {%- if link.links.size > 0 -%}
+              <button
+                class="cmm__trigger"
+                type="button"
+                data-cmm-trigger="{{ forloop.index }}"
+                aria-expanded="false"
+                aria-controls="cmm-panel-{{ section.id }}-{{ forloop.index }}"
+                aria-haspopup="true"
+              >
+                {{- link.title | escape -}}
+                <svg class="cmm__trigger-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                  <path d="M3 6l5 5 5-5"/>
+                </svg>
+              </button>
+            {%- else -%}
+              <a
+                href="{{ link.url }}"
+                class="cmm__link{% if link.active %} cmm__link--active{% endif %}"
+                {% if link.current %}aria-current="page"{% endif %}
+              >
+                {{- link.title | escape -}}
+              </a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+  </div>
+  {%- comment %} fin bar {% endcomment %}
+
+  {%- comment %} ══════════════════════════════════════════════
+      PANNEAUX MEGA MENU (desktop — position: fixed via JS)
+  ══════════════════════════════════════════════ {% endcomment %}
+  {%- for link in cmm_menu.links -%}
+    {%- if link.links.size > 0 -%}
+
+      {%- comment %} Chercher un bloc promo correspondant à ce lien {% endcomment %}
+      {%- assign promo = nil -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'promo_image' and block.settings.menu_item_title == link.title -%}
+          {%- assign promo = block -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      <div
+        class="cmm__panel"
+        id="cmm-panel-{{ section.id }}-{{ forloop.index }}"
+        data-cmm-panel="{{ forloop.index }}"
+        aria-hidden="true"
+        role="region"
+        aria-label="{{ link.title | escape }}"
+      >
+        <div class="cmm__panel-inner page-width">
+
+          {%- comment %} Colonnes niveau 2 (max 3) {% endcomment %}
+          {%- for col in link.links limit: 3 -%}
+            <div class="cmm__col">
+              <a href="{{ col.url }}" class="cmm__col-title">{{ col.title | escape }}</a>
+
+              {%- if col.links.size > 0 -%}
+                <ul class="cmm__col-links" role="list">
+                  {%- for sub in col.links -%}
+                    <li>
+                      <a
+                        href="{{ sub.url }}"
+                        class="cmm__col-link{% if sub.active %} cmm__col-link--active{% endif %}"
+                        {% if sub.current %}aria-current="page"{% endif %}
+                      >
+                        {{ sub.title | escape }}
+                      </a>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+
+          {%- comment %} Colonne image promo (bloc optionnel) {% endcomment %}
+          {%- if promo != nil and promo.settings.image != blank -%}
+            <div class="cmm__col cmm__col--promo" {{ promo.shopify_attributes }}>
+              <a
+                href="{{ promo.settings.promo_link | default: '#' }}"
+                class="cmm__promo"
+              >
+                <div class="cmm__promo-img-wrap">
+                  <img
+                    class="cmm__promo-img"
+                    src="{{ promo.settings.image | image_url: width: 480, format: 'webp' }}"
+                    srcset="
+                      {{ promo.settings.image | image_url: width: 240, format: 'webp' }} 240w,
+                      {{ promo.settings.image | image_url: width: 480, format: 'webp' }} 480w
+                    "
+                    sizes="(min-width: 990px) 22rem, 50vw"
+                    alt="{{ promo.settings.image.alt | default: promo.settings.promo_title | escape }}"
+                    width="{{ promo.settings.image.width }}"
+                    height="{{ promo.settings.image.height }}"
+                    loading="lazy"
+                  >
+                </div>
+                {%- if promo.settings.promo_label != blank -%}
+                  <p class="cmm__promo-label">{{ promo.settings.promo_label | escape }}</p>
+                {%- endif -%}
+                {%- if promo.settings.promo_title != blank -%}
+                  <p class="cmm__promo-title">{{ promo.settings.promo_title | escape }}</p>
+                {%- endif -%}
+                {%- if promo.settings.promo_subtitle != blank -%}
+                  <p class="cmm__promo-subtitle">{{ promo.settings.promo_subtitle | escape }}</p>
+                {%- endif -%}
+                {%- if promo.settings.promo_cta != blank -%}
+                  <span class="cmm__promo-cta" aria-hidden="true">{{ promo.settings.promo_cta | escape }} →</span>
+                {%- endif -%}
+              </a>
+            </div>
+          {%- endif -%}
+
+        </div>
+      </div>
+
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- comment %} ══════════════════════════════════════════════
+      DRAWER MOBILE
+  ══════════════════════════════════════════════ {% endcomment %}
+  <div
+    class="cmm__drawer"
+    id="cmm-drawer-{{ section.id }}"
+    data-cmm-drawer
+    aria-hidden="true"
+    aria-label="Menu principal"
+    role="dialog"
+  >
+    <div class="cmm__drawer-header">
+      {%- if has_logo -%}
+        <a href="{{ routes.root_url }}" class="cmm__drawer-logo">
+          <img
+            class="cmm__drawer-logo-img"
+            src="{{ settings.logo | image_url: width: 200 }}"
+            alt="{{ settings.logo.alt | default: shop.name | escape }}"
+            loading="lazy"
+          >
+        </a>
+      {%- elsif section.settings.show_logo -%}
+        <a href="{{ routes.root_url }}" class="cmm__drawer-logo">{{ shop.name }}</a>
+      {%- else -%}
+        <span class="cmm__drawer-logo">{{ 'general.navigation.menu' | t | default: 'Menu' }}</span>
+      {%- endif -%}
+
+      <button
+        class="cmm__drawer-close"
+        type="button"
+        data-cmm-drawer-close
+        aria-label="Fermer le menu"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </button>
+    </div>
+
+    <nav aria-label="Navigation mobile">
+      <ul class="cmm__drawer-list" role="list">
+        {%- for link in cmm_menu.links -%}
+          <li class="cmm__drawer-item">
+            {%- if link.links.size > 0 -%}
+              <button
+                class="cmm__accordion-trigger"
+                type="button"
+                data-cmm-accordion-trigger
+                aria-expanded="false"
+                aria-controls="cmm-acc-{{ section.id }}-{{ forloop.index }}"
+              >
+                {{ link.title | escape }}
+                <svg class="cmm__accordion-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                  <path d="M3 6l5 5 5-5"/>
+                </svg>
+              </button>
+
+              <div
+                class="cmm__accordion-body"
+                id="cmm-acc-{{ section.id }}-{{ forloop.index }}"
+              >
+                <div class="cmm__accordion-inner">
+                  {%- for col in link.links -%}
+                    <div class="cmm__accordion-group">
+                      <a href="{{ col.url }}" class="cmm__accordion-group-title">{{ col.title | escape }}</a>
+                      {%- if col.links.size > 0 -%}
+                        <ul class="cmm__accordion-sublist" role="list">
+                          {%- for sub in col.links -%}
+                            <li>
+                              <a
+                                href="{{ sub.url }}"
+                                class="cmm__accordion-link"
+                                {% if sub.current %}aria-current="page"{% endif %}
+                              >
+                                {{ sub.title | escape }}
+                              </a>
+                            </li>
+                          {%- endfor -%}
+                        </ul>
+                      {%- endif -%}
+                    </div>
+                  {%- endfor -%}
+                </div>
+              </div>
+
+            {%- else -%}
+              <a
+                href="{{ link.url }}"
+                class="cmm__drawer-link"
+                {% if link.current %}aria-current="page"{% endif %}
+              >
+                {{ link.title | escape }}
+              </a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  </div>
+  {%- comment %} fin drawer {% endcomment %}
+
+</section>
+
+<script src="{{ 'custom-mega-menu.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Mega Menu",
+  "tag": "div",
+  "class": "custom-mega-menu-wrapper",
+  "max_blocks": 10,
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu principal",
+      "default": "main-menu",
+      "info": "Niveau 1 = onglets, Niveau 2 = colonnes, Niveau 3 = sous-liens"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_logo",
+      "label": "Afficher le logo dans la barre",
+      "default": false,
+      "info": "Utilise le logo configuré dans les paramètres du thème."
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Barre de navigation collante",
+      "default": true,
+      "info": "La barre reste visible lors du défilement."
+    },
+    {
+      "type": "range",
+      "id": "bar_height",
+      "label": "Hauteur de la barre (px)",
+      "min": 44,
+      "max": 88,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Fond de la barre",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Couleur des liens",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur accent (titres colonnes)",
+      "default": "#C9A96E"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "promo_image",
+      "name": "Image promo",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item_title",
+          "label": "Onglet parent (titre exact)",
+          "info": "Doit correspondre exactement au libellé du lien de niveau 1 dans votre menu."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image promotionnelle"
+        },
+        {
+          "type": "text",
+          "id": "promo_label",
+          "label": "Label au-dessus (ex: Nouveauté)",
+          "placeholder": "Nouvelle collection"
+        },
+        {
+          "type": "text",
+          "id": "promo_title",
+          "label": "Titre"
+        },
+        {
+          "type": "text",
+          "id": "promo_subtitle",
+          "label": "Sous-titre"
+        },
+        {
+          "type": "url",
+          "id": "promo_link",
+          "label": "Lien de l'image"
+        },
+        {
+          "type": "text",
+          "id": "promo_cta",
+          "label": "Texte du lien",
+          "default": "Découvrir"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mega Menu"
+    }
+  ]
+}
+{% endschema %}

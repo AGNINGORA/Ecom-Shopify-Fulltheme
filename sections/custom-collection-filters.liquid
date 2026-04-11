@@ -1,0 +1,510 @@
+{% comment %}
+  custom-collection-filters.liquid
+  Filtres AJAX pour page collection — sidebar desktop + drawer mobile
+  Dawn 15.x · Vanilla JS · history.pushState · Mobile-first
+
+  Remplace la section main-collection-product-grid.liquid de Dawn
+  ou s'utilise en remplacement dans le template collection.json
+
+  CSS : assets/custom-collection-filters.css
+  JS  : assets/custom-collection-filters.js
+{% endcomment %}
+
+{{ 'custom-collection-filters.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign sort_by       = collection.sort_by | default: collection.default_sort_by
+  assign products_per  = section.settings.products_per_page
+  assign show_filters  = section.settings.show_filters
+  assign filter_layout = section.settings.filter_layout
+  assign show_sort     = section.settings.show_sort
+  assign active_count  = 0
+  for filter in collection.filters
+    for value in filter.active_values
+      assign active_count = active_count | plus: 1
+    endfor
+    if filter.type == 'price_range'
+      if filter.min_value.value or filter.max_value.value
+        assign active_count = active_count | plus: 1
+      endif
+    endif
+  endfor
+-%}
+
+<section
+  class="ccf__section"
+  data-ccf
+  data-section-id="{{ section.id }}"
+  style="--ccf-accent: {{ section.settings.accent_color }};"
+>
+  <div class="ccf__wrap page-width">
+
+    {%- comment %} ══════════════════════════════════════════
+        TOOLBAR (tri + compteur + bouton filtres mobile)
+    ══════════════════════════════════════════════ {% endcomment %}
+    <div class="ccf__toolbar" data-ccf-toolbar>
+
+      {%- comment %} Bouton filtres mobile ──────────────── {% endcomment %}
+      {%- if show_filters -%}
+        <button
+          class="ccf__filter-btn"
+          type="button"
+          data-ccf-open-filters
+          aria-expanded="false"
+          aria-controls="ccf-filters-drawer"
+        >
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M3 5H17M6 10H14M9 15H11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Filtres
+          {%- if active_count > 0 -%}
+            <span class="ccf__filter-badge" data-ccf-active-count>{{ active_count }}</span>
+          {%- endif -%}
+        </button>
+      {%- endif -%}
+
+      {%- comment %} Compteur de produits ─────────────── {% endcomment %}
+      <p class="ccf__count" data-ccf-count aria-live="polite">
+        <span data-ccf-count-num>{{ collection.products_count }}</span>
+        produit{% if collection.products_count != 1 %}s{% endif %}
+      </p>
+
+      {%- comment %} Tri ──────────────────────────────── {% endcomment %}
+      {%- if show_sort -%}
+        <div class="ccf__sort-wrap">
+          <label class="ccf__sort-label" for="ccf-sort-{{ section.id }}">Trier par</label>
+          <div class="ccf__sort-select-wrap">
+            <select
+              id="ccf-sort-{{ section.id }}"
+              class="ccf__sort-select"
+              data-ccf-sort
+              aria-label="Trier les produits"
+            >
+              {%- for option in collection.sort_options -%}
+                <option
+                  value="{{ option.value | escape }}"
+                  {% if option.value == sort_by %}selected{% endif %}
+                >
+                  {{ option.name | escape }}
+                </option>
+              {%- endfor -%}
+            </select>
+            <svg class="ccf__sort-chevron" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      {%- endif -%}
+
+    </div>
+    {%- comment %} fin toolbar {% endcomment %}
+
+    {%- comment %} ── Filtres actifs (tags) ──────────── {% endcomment %}
+    {%- if active_count > 0 -%}
+      <div class="ccf__active-filters" data-ccf-active-filters>
+        {%- for filter in collection.filters -%}
+          {%- for value in filter.active_values -%}
+            <a
+              class="ccf__active-tag"
+              href="{{ value.url_to_remove }}"
+              data-ccf-filter-link
+              aria-label="Supprimer le filtre {{ filter.label }}: {{ value.label }}"
+            >
+              {{ filter.label }}: {{ value.label }}
+              <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M9 3L3 9M3 3L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </a>
+          {%- endfor -%}
+          {%- if filter.type == 'price_range' -%}
+            {%- if filter.min_value.value or filter.max_value.value -%}
+              <a
+                class="ccf__active-tag"
+                href="{{ filter.url_to_remove }}"
+                data-ccf-filter-link
+                aria-label="Supprimer le filtre prix"
+              >
+                Prix :
+                {%- if filter.min_value.value -%}{{ filter.min_value.value | money }}{%- else -%}0{%- endif -%}
+                &nbsp;–&nbsp;
+                {%- if filter.max_value.value -%}{{ filter.max_value.value | money }}{%- else -%}{{ filter.range_max | money }}{%- endif -%}
+                <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <path d="M9 3L3 9M3 3L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </a>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+        <a class="ccf__clear-all" href="{{ collection.url }}" data-ccf-filter-link>
+          Tout effacer
+        </a>
+      </div>
+    {%- endif -%}
+
+    <div class="ccf__layout ccf__layout--{{ filter_layout }}">
+
+      {%- comment %} ══════════════════════════════════════
+          SIDEBAR FILTRES (desktop)
+      ══════════════════════════════════════ {% endcomment %}
+      {%- if show_filters and filter_layout == 'sidebar' -%}
+        <aside
+          class="ccf__sidebar"
+          id="ccf-filters-sidebar"
+          aria-label="Filtres produits"
+        >
+          {%- render 'custom-collection-filter-panel',
+              filters: collection.filters,
+              context: 'sidebar'
+          -%}
+        </aside>
+      {%- endif -%}
+
+      {%- comment %} ══════════════════════════════════════
+          GRILLE PRODUITS
+      ══════════════════════════════════════ {% endcomment %}
+      <div class="ccf__main">
+
+        {%- comment %} Filtres horizontal (au-dessus de la grille) {% endcomment %}
+        {%- if show_filters and filter_layout == 'horizontal' -%}
+          <div class="ccf__horizontal-filters" id="ccf-filters-horizontal">
+            {%- render 'custom-collection-filter-panel',
+                filters: collection.filters,
+                context: 'horizontal'
+            -%}
+          </div>
+        {%- endif -%}
+
+        {%- comment %} Grille produits ─────────────────── {% endcomment %}
+        {%- paginate collection.products by products_per -%}
+        <div
+          class="ccf__grid"
+          data-ccf-grid
+          id="ccf-product-grid"
+          style="--ccf-cols: {{ section.settings.columns_desktop }};"
+          aria-live="polite"
+        >
+          {%- if collection.products.size > 0 -%}
+            {%- for product in collection.products -%}
+              {%- render 'custom-collection-product-card',
+                  product: product,
+                  card_style: section.settings.card_style,
+                  show_vendor: section.settings.show_vendor,
+                  show_price: section.settings.show_price,
+                  show_rating: section.settings.show_rating,
+                  show_tags: section.settings.show_feature_tags,
+                  tag_prefix: section.settings.tag_prefix,
+                  show_badges: section.settings.show_badges,
+                  show_hover_img: section.settings.show_hover_image,
+                  show_swatches: section.settings.show_swatches,
+                  show_atc: section.settings.show_atc_button,
+                  atc_label: section.settings.atc_label,
+                  image_ratio: section.settings.image_ratio,
+                  card_bg: section.settings.card_bg_color,
+                  card_radius: section.settings.card_radius,
+                  accent: section.settings.accent_color
+              -%}
+            {%- endfor -%}
+          {%- else -%}
+            <div class="ccf__empty" data-ccf-empty>
+              <p class="ccf__empty-msg">Aucun produit ne correspond à ces filtres.</p>
+              {%- if active_count > 0 -%}
+                <a class="ccf__empty-cta" href="{{ collection.url }}" data-ccf-filter-link>
+                  Effacer les filtres
+                </a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+
+        {%- comment %} ── Pagination / Load more ────────── {% endcomment %}
+        {%- if section.settings.pagination_type == 'load_more' -%}
+          {%- if collection.products_count > products_per -%}
+            <div class="ccf__load-more" data-ccf-load-more>
+              <button
+                class="ccf__load-btn"
+                type="button"
+                data-ccf-load-btn
+                data-page="2"
+                data-total="{{ collection.products_count }}"
+                data-per="{{ products_per }}"
+              >
+                Voir plus
+                <span class="ccf__load-remaining">
+                  (encore {{ collection.products_count | minus: products_per }})
+                </span>
+              </button>
+            </div>
+          {%- endif -%}
+        {%- else -%}
+          {%- if paginate.pages > 1 -%}
+            <div class="ccf__pagination" data-ccf-pagination>
+              {%- if paginate.previous -%}
+                <a class="ccf__page-btn" href="{{ paginate.previous.url }}" data-ccf-filter-link aria-label="Page précédente">
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </a>
+              {%- endif -%}
+              {%- for part in paginate.parts -%}
+                {%- if part.is_link -%}
+                  <a class="ccf__page-btn" href="{{ part.url }}" data-ccf-filter-link>{{ part.title }}</a>
+                {%- else -%}
+                  {%- if part.title == paginate.current_page -%}
+                    <span class="ccf__page-btn is-active" aria-current="page">{{ part.title }}</span>
+                  {%- else -%}
+                    <span class="ccf__page-btn ccf__page-gap">…</span>
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {%- if paginate.next -%}
+                <a class="ccf__page-btn" href="{{ paginate.next.url }}" data-ccf-filter-link aria-label="Page suivante">
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+        {%- endpaginate -%}
+
+      </div>
+      {%- comment %} fin main {% endcomment %}
+
+    </div>
+    {%- comment %} fin layout {% endcomment %}
+
+  </div>
+</section>
+
+{%- comment %} ══════════════════════════════════════════════
+    DRAWER FILTRES MOBILE
+══════════════════════════════════════════════ {% endcomment %}
+{%- if show_filters -%}
+<div class="ccf__overlay" data-ccf-overlay aria-hidden="true"></div>
+<div
+  class="ccf__drawer"
+  id="ccf-filters-drawer"
+  data-ccf-drawer
+  role="dialog"
+  aria-modal="true"
+  aria-label="Filtres"
+  tabindex="-1"
+  hidden
+>
+  <div class="ccf__drawer-header">
+    <h2 class="ccf__drawer-title">Filtres</h2>
+    <button class="ccf__drawer-close" type="button" data-ccf-close-filters aria-label="Fermer les filtres">
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+  <div class="ccf__drawer-body">
+    {%- render 'custom-collection-filter-panel',
+        filters: collection.filters,
+        context: 'drawer'
+    -%}
+  </div>
+  <div class="ccf__drawer-footer">
+    <a class="ccf__drawer-clear" href="{{ collection.url }}" data-ccf-filter-link>
+      Tout effacer
+    </a>
+    <button class="ccf__drawer-apply" type="button" data-ccf-close-filters>
+      Voir les résultats
+      <span data-ccf-drawer-count>({{ collection.products_count }})</span>
+    </button>
+  </div>
+</div>
+{%- endif -%}
+
+{%- comment %} ── Spinner AJAX ────────────────────────────── {% endcomment %}
+<div class="ccf__ajax-spinner" data-ccf-spinner aria-hidden="true" hidden>
+  <div class="ccf__spinner-dot"></div>
+</div>
+
+<script src="{{ 'custom-collection-filters.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Collection — Filtres",
+  "tag": "section",
+  "class": "section-custom-collection-filters",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Produits par page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "Colonnes (desktop)",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" },
+        { "value": "5", "label": "5" }
+      ],
+      "default": "4"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Afficher les filtres",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "filter_layout",
+      "label": "Disposition des filtres",
+      "options": [
+        { "value": "sidebar", "label": "Sidebar gauche" },
+        { "value": "horizontal", "label": "Horizontal (au-dessus)" }
+      ],
+      "default": "sidebar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Afficher le tri",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "pagination_type",
+      "label": "Pagination",
+      "options": [
+        { "value": "paginate", "label": "Pages numérotées" },
+        { "value": "load_more", "label": "Bouton Voir plus" }
+      ],
+      "default": "load_more"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "header",
+      "content": "──── Carte produit ────"
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Style de carte",
+      "options": [
+        { "value": "classic", "label": "Classique (image, titre, prix)" },
+        { "value": "showcase", "label": "Vitrine (titre en haut, tags, bouton)" }
+      ],
+      "default": "showcase",
+      "info": "Vitrine = design inspiré des grandes marques (titre en haut, badges, bouton)"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Format d'image",
+      "options": [
+        { "value": "square", "label": "Carré (1:1)" },
+        { "value": "portrait", "label": "Portrait (3:4)" },
+        { "value": "landscape", "label": "Paysage (4:3)" },
+        { "value": "auto", "label": "Adaptatif (ratio original)" }
+      ],
+      "default": "square"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Arrondi des cartes",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Fond de carte",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "header",
+      "content": "Éléments visibles"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Afficher le vendeur",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Afficher le prix",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Afficher les étoiles",
+      "default": true,
+      "info": "Affiche des étoiles fictives (remplacez par votre app d'avis)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_feature_tags",
+      "label": "Afficher les tags caractéristiques",
+      "default": true,
+      "info": "Affiche les tags produit commençant par le préfixe ci-dessous"
+    },
+    {
+      "type": "text",
+      "id": "tag_prefix",
+      "label": "Préfixe des tags à afficher",
+      "default": "feat:",
+      "info": "Ex: 'feat:Ultra-léger' → affichera 'Ultra-léger'"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badges",
+      "label": "Afficher les badges (Promo, Épuisé)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_hover_image",
+      "label": "Image au survol",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Afficher les swatches couleur",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_atc_button",
+      "label": "Afficher le bouton Acheter",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "atc_label",
+      "label": "Texte du bouton",
+      "default": "Acheter"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection — Filtres"
+    }
+  ]
+}
+{% endschema %}

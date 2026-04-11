@@ -1,0 +1,172 @@
+{% comment %}
+  custom-urgency.liquid
+  Éléments d'urgence pour page produit :
+    1. Stock bas avec barre de progression
+    2. Compteur de visiteurs (aléatoire)
+    3. Timer de promotion
+  Rendu depuis main-product.liquid avec : product, block
+{% endcomment %}
+
+{%- liquid
+  assign show_stock    = block.settings.show_stock
+  assign show_visitors = block.settings.show_visitors
+  assign show_timer    = block.settings.show_timer
+
+  assign any_visible = false
+  if show_stock or show_visitors or show_timer
+    assign any_visible = true
+  endif
+-%}
+
+{%- if any_visible -%}
+
+{{ 'custom-urgency.css' | asset_url | stylesheet_tag }}
+
+<div
+  class="curg__wrap"
+  data-curg
+  {{ block.shopify_attributes }}
+  style="
+    --curg-accent:    {{ block.settings.accent_color }};
+    --curg-low:       {{ block.settings.low_stock_color }};
+    --curg-timer-bg:  {{ block.settings.timer_bg }};
+    --curg-timer-txt: {{ block.settings.timer_text_color }};
+  "
+>
+
+  {%- comment %} ── 1. STOCK BAS ─────────────────────────────── {% endcomment %}
+  {%- if show_stock -%}
+    {%- assign threshold = block.settings.stock_threshold -%}
+
+    {%- comment %} Données de stock par variante (JSON pour JS) {% endcomment %}
+    <script type="application/json" data-curg-variants>
+      {
+        {%- for variant in product.variants -%}
+          "{{ variant.id }}": {
+            "qty":     {{ variant.inventory_quantity | default: 0 }},
+            "managed": {{ variant.inventory_management | json }},
+            "policy":  {{ variant.inventory_policy | json }}
+          }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      }
+    </script>
+
+    {%- assign first_variant = product.selected_or_first_available_variant -%}
+    {%- assign init_qty = first_variant.inventory_quantity | default: 0 -%}
+    {%- assign managed = first_variant.inventory_management -%}
+
+    {%- if managed == 'shopify' and init_qty < threshold -%}
+      <div
+        class="curg__stock"
+        data-curg-stock
+        data-threshold="{{ threshold }}"
+        data-variant-id="{{ first_variant.id }}"
+        {% if init_qty < 3 %}data-critical{% endif %}
+      >
+        <p class="curg__stock-text">
+          <span class="curg__stock-icon" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 2L9.5 6H14L10.5 8.5L11.8 13L8 10.5L4.2 13L5.5 8.5L2 6H6.5L8 2Z" fill="currentColor"/>
+            </svg>
+          </span>
+          <span data-curg-stock-msg>
+            {%- if init_qty < 3 -%}
+              Plus que {{ init_qty }} en stock !
+            {%- else -%}
+              Plus que {{ init_qty }} en stock
+            {%- endif -%}
+          </span>
+        </p>
+        <div class="curg__bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="{{ threshold }}" aria-valuenow="{{ init_qty }}">
+          <div
+            class="curg__bar-fill"
+            data-curg-bar
+            style="width: {{ init_qty | times: 100 | divided_by: threshold | at_most: 100 }}%"
+          ></div>
+        </div>
+      </div>
+    {%- elsif managed == 'shopify' -%}
+      {%- comment %} Placeholder masqué, JS l'affichera si la variante a un stock bas {% endcomment %}
+      <div class="curg__stock" data-curg-stock data-threshold="{{ threshold }}" data-variant-id="{{ first_variant.id }}" hidden>
+        <script type="application/json" data-curg-variants></script>
+        <p class="curg__stock-text">
+          <span class="curg__stock-icon" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 2L9.5 6H14L10.5 8.5L11.8 13L8 10.5L4.2 13L5.5 8.5L2 6H6.5L8 2Z" fill="currentColor"/>
+            </svg>
+          </span>
+          <span data-curg-stock-msg></span>
+        </p>
+        <div class="curg__bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="{{ threshold }}" aria-valuenow="0">
+          <div class="curg__bar-fill" data-curg-bar style="width:0%"></div>
+        </div>
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- comment %} ── 2. VISITEURS ─────────────────────────────── {% endcomment %}
+  {%- if show_visitors -%}
+    <p
+      class="curg__visitors"
+      data-curg-visitors
+      data-min="{{ block.settings.visitors_min }}"
+      data-max="{{ block.settings.visitors_max }}"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      <span class="curg__visitors-dot" aria-hidden="true"></span>
+      <span class="curg__visitors-count" data-curg-count>{{ block.settings.visitors_min }}</span>
+      <span class="curg__visitors-label"> {{ block.settings.visitors_label | default: 'personnes regardent ce produit' | escape }}</span>
+    </p>
+  {%- endif -%}
+
+  {%- comment %} ── 3. TIMER PROMO ───────────────────────────── {% endcomment %}
+  {%- if show_timer and block.settings.timer_end != blank -%}
+    <div
+      class="curg__timer"
+      data-curg-timer
+      data-end="{{ block.settings.timer_end | escape }}"
+      data-expired="{{ block.settings.timer_expired_behavior }}"
+      data-expired-msg="{{ block.settings.timer_expired_message | default: 'Offre expirée' | escape }}"
+    >
+      {%- if block.settings.timer_label != blank -%}
+        <p class="curg__timer-label">
+          <span class="curg__timer-icon" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="8" cy="9" r="6" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M8 6V9L10 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M6 1.5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </span>
+          {{ block.settings.timer_label | escape }}
+        </p>
+      {%- endif -%}
+      <div class="curg__timer-units" data-curg-timer-display aria-live="off">
+        <div class="curg__timer-unit">
+          <span class="curg__timer-num" data-curg-days>00</span>
+          <span class="curg__timer-unit-label">j</span>
+        </div>
+        <span class="curg__timer-sep" aria-hidden="true">:</span>
+        <div class="curg__timer-unit">
+          <span class="curg__timer-num" data-curg-hours>00</span>
+          <span class="curg__timer-unit-label">h</span>
+        </div>
+        <span class="curg__timer-sep" aria-hidden="true">:</span>
+        <div class="curg__timer-unit">
+          <span class="curg__timer-num" data-curg-mins>00</span>
+          <span class="curg__timer-unit-label">m</span>
+        </div>
+        <span class="curg__timer-sep" aria-hidden="true">:</span>
+        <div class="curg__timer-unit">
+          <span class="curg__timer-num" data-curg-secs>00</span>
+          <span class="curg__timer-unit-label">s</span>
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+
+</div>
+
+<script src="{{ 'custom-urgency.js' | asset_url }}" defer></script>
+
+{%- endif -%}

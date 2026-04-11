@@ -1,0 +1,104 @@
+{% comment %}
+  custom-cart-drawer-item.liquid
+  Ligne d'article dans le drawer panier
+  Variable reçue : item (objet cart line_item)
+  Structure identique à celle générée par custom-cart-drawer.js
+{% endcomment %}
+
+<div
+  class="ccd-item"
+  data-ccd-item
+  data-key="{{ item.key }}"
+>
+  {%- comment %} Image ─────────────────────────────────────── {% endcomment %}
+  <a class="ccd-item__img-wrap" href="{{ item.url }}" tabindex="-1" aria-hidden="true">
+    {%- if item.image != blank -%}
+      <img
+        class="ccd-item__img"
+        src="{{ item.image | image_url: width: 160 }}"
+        alt="{{ item.image.alt | default: item.product.title | escape }}"
+        width="80"
+        height="80"
+        loading="lazy"
+        draggable="false"
+      >
+    {%- else -%}
+      <div class="ccd-item__img-placeholder">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="40" height="40" fill="#f0f0f0"/>
+          <path d="M10 28L18 18L24 24L28 20L34 28H10Z" fill="#d0d0d0"/>
+          <circle cx="15" cy="16" r="3" fill="#d0d0d0"/>
+        </svg>
+      </div>
+    {%- endif -%}
+  </a>
+
+  {%- comment %} Informations ──────────────────────────────── {% endcomment %}
+  <div class="ccd-item__info">
+    <div class="ccd-item__top">
+      <a class="ccd-item__name" href="{{ item.url }}">{{ item.product.title | escape }}</a>
+      <button
+        class="ccd-item__remove"
+        data-ccd-remove="{{ item.key }}"
+        type="button"
+        aria-label="Supprimer {{ item.product.title | escape }}"
+      >
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    {%- unless item.variant.title == 'Default Title' -%}
+      <p class="ccd-item__variant">{{ item.variant.title | escape }}</p>
+    {%- endunless -%}
+
+    {%- if item.selling_plan_allocation.selling_plan.name != blank -%}
+      <p class="ccd-item__plan">{{ item.selling_plan_allocation.selling_plan.name | escape }}</p>
+    {%- endif -%}
+
+    <div class="ccd-item__bottom">
+      {%- comment %} Quantité ─────────────────────────────── {% endcomment %}
+      <div class="ccd-item__qty" data-ccd-qty-wrap>
+        <button
+          class="ccd-item__qty-btn"
+          data-ccd-dec="{{ item.key }}"
+          type="button"
+          aria-label="Diminuer la quantité"
+          {% if item.quantity <= 1 %}data-remove{% endif %}
+        >
+          {%- if item.quantity <= 1 -%}
+            <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M2 7H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          {%- else -%}
+            <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M2 7H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          {%- endif -%}
+        </button>
+        <span class="ccd-item__qty-num" aria-live="polite" aria-atomic="true">{{ item.quantity }}</span>
+        <button
+          class="ccd-item__qty-btn"
+          data-ccd-inc="{{ item.key }}"
+          type="button"
+          aria-label="Augmenter la quantité"
+        >
+          <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M7 2V12M2 7H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      {%- comment %} Prix ────────────────────────────────── {% endcomment %}
+      <div class="ccd-item__prices">
+        {%- if item.original_line_price != item.final_line_price -%}
+          <span class="ccd-item__price ccd-item__price--original">{{ item.original_line_price | money }}</span>
+        {%- endif -%}
+        <span class="ccd-item__price {% if item.original_line_price != item.final_line_price %}ccd-item__price--sale{% endif %}">
+          {{ item.final_line_price | money }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

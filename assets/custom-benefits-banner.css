@@ -1,0 +1,134 @@
+/* =============================================================
+   custom-benefits-banner.css
+   Bénéfices produit / marque — grille de cartes
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+/* ── Section ────────────────────────────────────────────────── */
+.section-custom-benefits-banner {
+  padding-top:    var(--cbb-padding-top, 6.4rem);
+  padding-bottom: var(--cbb-padding-bottom, 6.4rem);
+  background:     var(--cbb-section-bg, #F7F5F2);
+}
+
+/* ── En-tête centré ─────────────────────────────────────────── */
+.cbb__header {
+  text-align: center;
+  margin-bottom: 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cbb__title {
+  font-size: clamp(2.4rem, 4vw, 3.6rem);
+  font-weight: 800;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.cbb__subtitle {
+  font-size: clamp(1.4rem, 2vw, 1.65rem);
+  line-height: 1.6;
+  opacity: 0.65;
+  margin: 0;
+  max-width: 60ch;
+  margin-inline: auto;
+}
+
+/* ── Grille de cartes ───────────────────────────────────────── */
+.cbb__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.6rem;
+}
+
+@media (min-width: 600px) {
+  .cbb__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 990px) {
+  .cbb__grid {
+    grid-template-columns: repeat(var(--cbb-cols, 3), 1fr);
+  }
+}
+
+/* ── Carte ──────────────────────────────────────────────────── */
+.cbb__card {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1.6rem;
+  background: var(--cbb-card-bg, #FFFFFF);
+  border-radius: 1.4rem;
+  padding: 2.4rem 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.cbb__card:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* ── Icône ──────────────────────────────────────────────────── */
+.cbb__icon {
+  flex-shrink: 0;
+  width: 4.4rem;
+  height: 4.4rem;
+  border-radius: 0.9rem;
+  background: var(--cbb-icon-bg, #F0EDE8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cbb-accent, #C9A96E);
+}
+
+.cbb__icon svg {
+  width: 2.2rem;
+  height: 2.2rem;
+  display: block;
+}
+
+/* ── Texte ──────────────────────────────────────────────────── */
+.cbb__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.cbb__card-title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.cbb__card-desc {
+  font-size: 1.35rem;
+  line-height: 1.6;
+  opacity: 0.7;
+  margin: 0;
+}
+
+/* ── Placeholder éditeur ─────────────────────────────────────── */
+.cbb__placeholder {
+  padding: 4rem 2rem;
+  text-align: center;
+  border: 2px dashed #ddd;
+  border-radius: 1.2rem;
+  font-size: 1.4rem;
+  opacity: 0.45;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RÉDUCTION DES MOUVEMENTS
+   ══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .cbb__card {
+    transition: none;
+  }
+}

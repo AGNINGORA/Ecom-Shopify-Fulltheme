@@ -1,0 +1,226 @@
+{% comment %}
+  Custom Trust Badges – Barre de réassurance
+  Dawn 15.x · SVG inline · Mobile-first (2×2) → Desktop (ligne)
+{% endcomment %}
+
+{{ 'custom-trust-badges.css' | asset_url | stylesheet_tag }}
+
+{%- assign badge_count = section.blocks | size -%}
+
+<div
+  class="custom-trust-badges color-{{ section.settings.color_scheme }}"
+  style="
+    --ctb-bg:           {{ section.settings.background_color }};
+    --ctb-border-color: {{ section.settings.border_color }};
+  "
+>
+  <div class="ctb__inner page-width">
+    <ul
+      class="ctb__list"
+      role="list"
+      style="--ctb-count: {{ badge_count }};"
+    >
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'badge' -%}
+          <li
+            class="ctb__item"
+            style="--ctb-icon-color: {{ block.settings.icon_color }};"
+            {{ block.shopify_attributes }}
+          >
+            <span class="ctb__icon" aria-hidden="true">
+              {%- case block.settings.icon -%}
+
+                {%- when 'truck' -%}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 3h13v13H1zM14 8h4l3 3v5h-7V8z"/>
+                    <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                  </svg>
+
+                {%- when 'return' -%}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="1 4 1 10 7 10"/>
+                    <path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
+                  </svg>
+
+                {%- when 'shield' -%}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <polyline points="9 12 11 14 15 10"/>
+                  </svg>
+
+                {%- when 'heart' -%}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+
+                {%- when 'star' -%}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+
+                {%- when 'leaf' -%}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 8C8 10 5.9 16.17 3.82 19.34A12 12 0 0 0 17 8z"/>
+                    <path d="M3.82 19.34C4 17 5 13 10 11"/>
+                  </svg>
+
+                {%- when 'gift' -%}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 12 20 22 4 22 4 12"/>
+                    <rect x="2" y="7" width="20" height="5"/>
+                    <line x1="12" y1="22" x2="12" y2="7"/>
+                    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+                    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+                  </svg>
+
+                {%- when 'lock' -%}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+
+                {%- when 'check' -%}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+
+              {%- endcase -%}
+            </span>
+
+            <span class="ctb__text">{{ block.settings.text | escape }}</span>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Barre de réassurance",
+  "tag": "section",
+  "class": "section-custom-trust-badges",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Palette de couleurs",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Couleur de fond",
+      "default": "#f9f6f2"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Couleur des séparateurs",
+      "default": "#e8e2da"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 28
+    }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Badge",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icône",
+          "options": [
+            { "value": "truck",   "label": "Camion (livraison)" },
+            { "value": "return",  "label": "Flèche retour" },
+            { "value": "shield",  "label": "Bouclier (sécurité)" },
+            { "value": "heart",   "label": "Cœur (satisfaction)" },
+            { "value": "star",    "label": "Étoile (qualité)" },
+            { "value": "leaf",    "label": "Feuille (éco / naturel)" },
+            { "value": "gift",    "label": "Cadeau (offre)" },
+            { "value": "lock",    "label": "Cadenas (paiement)" },
+            { "value": "check",   "label": "Coche (garantie)" }
+          ],
+          "default": "shield"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texte",
+          "default": "Paiement 100% sécurisé"
+        },
+        {
+          "type": "color",
+          "id": "icon_color",
+          "label": "Couleur de l'icône",
+          "default": "#C9A96E"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Barre de réassurance",
+      "blocks": [
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "truck",
+            "text": "Livraison gratuite dès 50€",
+            "icon_color": "#C9A96E"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "return",
+            "text": "Retours gratuits 30 jours",
+            "icon_color": "#C9A96E"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "lock",
+            "text": "Paiement 100% sécurisé",
+            "icon_color": "#C9A96E"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "heart",
+            "text": "Satisfaite ou remboursée",
+            "icon_color": "#C9A96E"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

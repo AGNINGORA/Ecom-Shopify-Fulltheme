@@ -1,0 +1,321 @@
+/* =============================================================
+   custom-recently-viewed.css
+   Carrousel produits récemment consultés
+   Dawn 15.x · Mobile-first · Préfixe : crv__
+   ============================================================= */
+
+/* ── Section ────────────────────────────────────────────────── */
+.crv__section {
+  padding: var(--spacing-sections-mobile, 3.6rem) 0;
+}
+
+@media (min-width: 750px) {
+  .crv__section {
+    padding: var(--spacing-sections-desktop, 5.4rem) 0;
+  }
+}
+
+.crv__section[hidden] {
+  display: none !important;
+}
+
+/* ── Titre ──────────────────────────────────────────────────── */
+.crv__title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 2.8rem;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 750px) {
+  .crv__title {
+    font-size: 2.4rem;
+  }
+}
+
+/* ── Wrapper carrousel ────────────────────────────────────── */
+.crv__carousel-wrap {
+  position: relative;
+}
+
+/* ── Grille → Carrousel scroll-snap ─────────────────────────── */
+.crv__grid {
+  display: flex;
+  gap: 1.2rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.crv__grid::-webkit-scrollbar {
+  display: none;
+}
+
+.crv__grid > * {
+  scroll-snap-align: start;
+  flex: 0 0 44%;
+  min-width: 150px;
+  max-width: 200px;
+}
+
+@media (min-width: 750px) {
+  .crv__grid > * {
+    flex: 0 0 22%;
+    min-width: 180px;
+    max-width: 220px;
+  }
+}
+
+@media (min-width: 990px) {
+  .crv__grid > * {
+    flex: 0 0 18%;
+    max-width: 210px;
+  }
+}
+
+/* ── Flèches de navigation ───────────────────────────────── */
+.crv__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-60%);
+  z-index: 3;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity .2s, box-shadow .2s;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.crv__carousel-wrap:hover .crv__arrow {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.crv__arrow:hover {
+  box-shadow: 0 4px 14px rgba(0,0,0,.15);
+}
+
+.crv__arrow--prev { left: -12px; }
+.crv__arrow--next { right: -12px; }
+
+.crv__arrow:disabled {
+  opacity: 0.3 !important;
+  cursor: default;
+}
+
+.crv__arrow svg {
+  width: 16px;
+  height: 16px;
+  stroke: #333;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 749px) {
+  .crv__arrow { display: none; }
+}
+
+/* ── Card produit ───────────────────────────────────────────── */
+.crv__card {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  background: #fff;
+}
+
+.crv__card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.crv__card-link {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  flex: 1;
+}
+
+/* ── Image ──────────────────────────────────────────────────── */
+.crv__card-img-wrap {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #f5f5f5;
+  flex-shrink: 0;
+}
+
+.crv__card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.crv__card:hover .crv__card-img {
+  transform: scale(1.04);
+}
+
+/* Badge sold-out ──────── */
+.crv__card-badge {
+  position: absolute;
+  top: 0.8rem;
+  left: 0.8rem;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 0.3rem 0.8rem;
+  border-radius: 99px;
+  pointer-events: none;
+}
+
+/* ── Infos ──────────────────────────────────────────────────── */
+.crv__card-info {
+  padding: 0.8rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+}
+
+.crv__card-vendor {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.5;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.crv__card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.crv__card-price {
+  margin: 0.4rem 0 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.crv__card-price-sale {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #e53935;
+}
+
+.crv__card-price-regular {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.crv__card-price-compare {
+  font-size: 1.05rem;
+  font-weight: 400;
+  text-decoration: line-through;
+  opacity: 0.45;
+}
+
+/* ── Bouton ATC rapide ──────────────────────────────────────── */
+.crv__card-atc {
+  margin: 0.6rem 1rem 1rem;
+  display: block;
+  width: calc(100% - 2rem);
+  padding: 0.7rem;
+  background: var(--crv-accent, #C9A96E);
+  color: #fff;
+  border: none;
+  border-radius: 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.crv__card-atc:hover {
+  opacity: 0.88;
+}
+
+.crv__card-atc:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* ── Skeleton loader ────────────────────────────────────────── */
+.crv__skeleton {
+  border-radius: 0.8rem;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.crv__skeleton-img {
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: crv-shimmer 1.4s infinite;
+}
+
+.crv__skeleton-line {
+  height: 1.4rem;
+  margin: 1.2rem 1.4rem 0.6rem;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: crv-shimmer 1.4s infinite;
+}
+
+.crv__skeleton-line--short {
+  width: 60%;
+  height: 1.2rem;
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+}
+
+@keyframes crv-shimmer {
+  to { background-position: -200% 0; }
+}
+
+/* ── Réduction mouvement ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .crv__card,
+  .crv__card-img {
+    transition: none;
+  }
+
+  .crv__skeleton-img,
+  .crv__skeleton-line {
+    animation: none;
+  }
+}

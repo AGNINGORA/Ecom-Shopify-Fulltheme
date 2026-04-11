@@ -1,0 +1,406 @@
+/* =============================================================
+   custom-bundle-offer.css
+   Offre bundle – Mobile-first
+   Dawn 15.x
+   ============================================================= */
+
+/* ── Variables ─────────────────────────────────────────────── */
+.custom-bundle-offer {
+  --cbo-transition: 0.24s ease;
+  --cbo-radius:     1.2rem;
+  --cbo-radius-sm:  0.8rem;
+  --cbo-img-size:   13rem;
+}
+
+/* ── Section ────────────────────────────────────────────────── */
+.custom-bundle-offer {
+  padding-block: var(--cbo-padding-top, 4.8rem) var(--cbo-padding-bottom, 4.8rem);
+}
+
+.cbo__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 3.2rem;
+}
+
+/* ── En-tête ────────────────────────────────────────────────── */
+.cbo__heading {
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 0.8rem;
+  line-height: 1.2;
+}
+
+.cbo__subtitle {
+  text-align: center;
+  font-size: 1.5rem;
+  opacity: 0.65;
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SÉLECTEUR DE TIERS
+   ══════════════════════════════════════════════════════════════ */
+
+.cbo__tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 600px) {
+  .cbo__tiers {
+    flex-direction: row;
+    gap: 1.2rem;
+  }
+}
+
+/* ── Carte tier ─────────────────────────────────────────────── */
+.cbo__tier {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  padding: 1.6rem 1.2rem 1.4rem;
+  border: 2px solid var(--cbo-border, #e8e2da);
+  border-radius: var(--cbo-radius);
+  background: #fff;
+  cursor: pointer;
+  transition:
+    border-color var(--cbo-transition),
+    background   var(--cbo-transition),
+    box-shadow   var(--cbo-transition);
+  text-align: center;
+}
+
+.cbo__tier:hover {
+  border-color: var(--cbo-accent, #C9A96E);
+}
+
+.cbo__tier.is-selected {
+  border-color: var(--cbo-accent, #C9A96E);
+  background: color-mix(in srgb, var(--cbo-accent, #C9A96E) 6%, #fff);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Radio caché */
+.cbo__tier-radio {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Badge meilleure offre */
+.cbo__best-badge {
+  position: absolute;
+  top: -1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--cbo-badge-bg, #C9A96E);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 0.3em 1em;
+  border-radius: 10rem;
+  white-space: nowrap;
+}
+
+.cbo__tier.is-best {
+  padding-top: 2.4rem;
+}
+
+/* Contenu tier */
+.cbo__tier-qty {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.cbo__tier-discount {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25em 0.8em;
+  background: var(--cbo-accent, #C9A96E);
+  color: #fff;
+  border-radius: 10rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.cbo__tier-discount--none {
+  background: #eee;
+  color: #888;
+  font-weight: 500;
+}
+
+.cbo__tier-custom-label {
+  font-size: 1.2rem;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GRILLE PRODUITS
+   ══════════════════════════════════════════════════════════════ */
+
+.cbo__products {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+}
+
+@media (min-width: 750px) {
+  .cbo__products {
+    flex-wrap: nowrap;
+    gap: 0.8rem;
+  }
+}
+
+/* ── Produit ────────────────────────────────────────────────── */
+.cbo__product {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.6rem;
+  border: 1.5px solid var(--cbo-border, #e8e2da);
+  border-radius: var(--cbo-radius);
+  background: #fff;
+  text-align: center;
+  width: 14rem;
+  flex-shrink: 0;
+  transition:
+    opacity      var(--cbo-transition),
+    border-color var(--cbo-transition);
+}
+
+.cbo__product.is-hidden {
+  display: none;
+}
+
+/* ── Image produit ──────────────────────────────────────────── */
+.cbo__product-img-wrap {
+  position: relative;
+  width: var(--cbo-img-size);
+  height: var(--cbo-img-size);
+  flex-shrink: 0;
+}
+
+.cbo__product-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--cbo-radius-sm);
+}
+
+.cbo__product-img--placeholder {
+  width: 100%;
+  height: 100%;
+  background: #f5f5f5;
+  border-radius: var(--cbo-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cbo__product-img--placeholder svg {
+  width: 3.2rem;
+  height: 3.2rem;
+  opacity: 0.3;
+}
+
+.cbo__product-sold-out {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: var(--cbo-radius-sm);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #888;
+}
+
+/* ── Infos produit ──────────────────────────────────────────── */
+.cbo__product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.cbo__product-name {
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cbo__product-price {
+  font-size: 1.3rem;
+  font-weight: 500;
+  opacity: 0.65;
+  margin: 0;
+}
+
+/* ── Connecteurs + et = ─────────────────────────────────────── */
+.cbo__connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-weight: 300;
+  color: var(--cbo-border, #e8e2da);
+  flex-shrink: 0;
+  width: 2.4rem;
+  line-height: 1;
+  user-select: none;
+}
+
+.cbo__connector--equals {
+  color: var(--cbo-accent, #C9A96E);
+  font-weight: 700;
+}
+
+/* ── Colonne prix total ─────────────────────────────────────── */
+.cbo__total-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.6rem;
+  min-width: 12rem;
+}
+
+.cbo__total-prices {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.cbo__total-original {
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.cbo__total-discounted {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--cbo-accent, #C9A96E);
+  line-height: 1;
+}
+
+.cbo__savings-line {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #c0392b;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CTA
+   ══════════════════════════════════════════════════════════════ */
+
+.cbo__cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.cbo__add-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 4rem;
+  border: none;
+  border-radius: 10rem;
+  background: var(--cbo-btn-bg, #111);
+  color: var(--cbo-btn-color, #fff);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    opacity   var(--cbo-transition),
+    transform var(--cbo-transition);
+  min-width: 28rem;
+}
+
+.cbo__add-btn:hover:not(:disabled) {
+  opacity: 0.87;
+  transform: translateY(-1px);
+}
+
+.cbo__add-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.cbo__add-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.cbo__add-btn:focus-visible {
+  outline: 2px solid var(--cbo-btn-bg, #111);
+  outline-offset: 3px;
+}
+
+/* Spinner */
+.cbo__btn-spinner {
+  display: none;
+  position: absolute;
+}
+
+.cbo__add-btn.is-loading .cbo__btn-label { opacity: 0; }
+.cbo__add-btn.is-loading .cbo__btn-spinner { display: flex; }
+
+.cbo__btn-spinner svg {
+  width: 2.2rem;
+  height: 2.2rem;
+  animation: cbo-spin 0.75s linear infinite;
+}
+
+@keyframes cbo-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Notice ─────────────────────────────────────────────────── */
+.cbo__notice {
+  font-size: 1.35rem;
+  text-align: center;
+  margin: 0;
+  min-height: 1.8rem;
+}
+
+.cbo__notice--success { color: #2e7d32; }
+.cbo__notice--error   { color: #c0392b; }
+
+/* ── Vide (design mode) ─────────────────────────────────────── */
+.cbo__empty {
+  text-align: center;
+  opacity: 0.5;
+  font-size: 1.5rem;
+  padding: 3.2rem;
+  border: 2px dashed var(--cbo-border, #e8e2da);
+  border-radius: var(--cbo-radius);
+}

@@ -1,0 +1,155 @@
+{% comment %}
+  custom-collection-filter-panel.liquid
+  Panneau de filtres réutilisable (sidebar / horizontal / drawer)
+
+  Accepte :
+  - filters : collection.filters
+  - context : 'sidebar' | 'horizontal' | 'drawer'
+{% endcomment %}
+
+{%- for filter in filters -%}
+  <details
+    class="ccf__filter-group"
+    data-ccf-filter-group
+    {% if filter.active_values.size > 0 %}open{% endif %}
+  >
+    <summary class="ccf__filter-summary">
+      <span class="ccf__filter-name">{{ filter.label | escape }}</span>
+      {%- if filter.active_values.size > 0 -%}
+        <span class="ccf__filter-active-dot" aria-hidden="true"></span>
+      {%- endif -%}
+      <svg class="ccf__filter-chevron" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </summary>
+
+    <div class="ccf__filter-body">
+
+      {%- case filter.type -%}
+
+        {%- comment %} ── Liste de valeurs (checkbox) ───────────────────── {% endcomment %}
+        {%- when 'list' -%}
+          <ul class="ccf__filter-list" role="list">
+            {%- for value in filter.values -%}
+              {%- liquid
+                assign is_color = false
+                assign fl = filter.label | downcase
+                if fl contains 'couleur' or fl contains 'color' or fl contains 'teinte' or fl contains 'nuance' or fl contains 'shade'
+                  assign is_color = true
+                endif
+              -%}
+              <li class="ccf__filter-item">
+                <label
+                  class="ccf__filter-label{% if value.count == 0 and value.active == false %} ccf__filter-label--unavailable{% endif %}"
+                  for="ccf-{{ context }}-{{ filter.param_name }}-{{ forloop.index }}"
+                >
+                  <input
+                    type="checkbox"
+                    id="ccf-{{ context }}-{{ filter.param_name }}-{{ forloop.index }}"
+                    name="{{ filter.param_name }}"
+                    value="{{ value.value | escape }}"
+                    class="ccf__filter-checkbox"
+                    data-ccf-filter-checkbox
+                    {% if value.active %}checked{% endif %}
+                    {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                    data-url-active="{{ value.url_to_add }}"
+                    data-url-remove="{{ value.url_to_remove }}"
+                  >
+                  <span class="ccf__filter-checkbox-custom" aria-hidden="true">
+                    {%- if is_color -%}
+                      <span
+                        class="ccf__color-swatch"
+                        style="background-color: {{ value.swatch.color | default: value.value | downcase | replace: ' ', '' }};"
+                        aria-hidden="true"
+                      ></span>
+                    {%- endif -%}
+                  </span>
+                  <span class="ccf__filter-value-text">
+                    {%- if is_color -%}
+                      <span
+                        class="ccf__color-swatch ccf__color-swatch--inline"
+                        style="background-color: {{ value.swatch.color | default: value.value | downcase | replace: ' ', '' }};"
+                        aria-hidden="true"
+                      ></span>
+                    {%- endif -%}
+                    {{ value.label | escape }}
+                  </span>
+                  <span class="ccf__filter-count">({{ value.count }})</span>
+                </label>
+              </li>
+            {%- endfor -%}
+          </ul>
+
+        {%- comment %} ── Plage de prix ─────────────────────────────────── {% endcomment %}
+        {%- when 'price_range' -%}
+          {%- liquid
+            assign min_price = filter.min_value.value | default: 0 | money_without_currency
+            assign max_price = filter.max_value.value | default: filter.range_max | money_without_currency
+            assign range_max = filter.range_max | money_without_currency
+          -%}
+          <div class="ccf__price-range" data-ccf-price-range>
+            {%- comment %} Slider double ─────────────── {% endcomment %}
+            <div class="ccf__price-slider" data-ccf-price-slider>
+              <div class="ccf__price-track">
+                <div class="ccf__price-fill" data-ccf-price-fill></div>
+              </div>
+              <input
+                type="range"
+                class="ccf__range ccf__range--min"
+                data-ccf-range-min
+                min="0"
+                max="{{ filter.range_max | money_without_currency | remove: ',' | remove: ' ' }}"
+                value="{{ filter.min_value.value | default: 0 | money_without_currency | remove: ',' | remove: ' ' }}"
+                step="1"
+                aria-label="Prix minimum"
+              >
+              <input
+                type="range"
+                class="ccf__range ccf__range--max"
+                data-ccf-range-max
+                min="0"
+                max="{{ filter.range_max | money_without_currency | remove: ',' | remove: ' ' }}"
+                value="{{ filter.max_value.value | default: filter.range_max | money_without_currency | remove: ',' | remove: ' ' }}"
+                step="1"
+                aria-label="Prix maximum"
+              >
+            </div>
+
+            {%- comment %} Inputs texte ──────────────── {% endcomment %}
+            <div class="ccf__price-inputs">
+              <div class="ccf__price-input-wrap">
+                <span class="ccf__price-currency">€</span>
+                <input
+                  type="number"
+                  class="ccf__price-input"
+                  data-ccf-price-min-input
+                  name="{{ filter.min_value.param_name }}"
+                  placeholder="0"
+                  min="0"
+                  max="{{ filter.range_max | money_without_currency }}"
+                  value="{{ filter.min_value.value | default: '' | money_without_currency }}"
+                  aria-label="Prix minimum"
+                >
+              </div>
+              <span class="ccf__price-sep">—</span>
+              <div class="ccf__price-input-wrap">
+                <span class="ccf__price-currency">€</span>
+                <input
+                  type="number"
+                  class="ccf__price-input"
+                  data-ccf-price-max-input
+                  name="{{ filter.max_value.param_name }}"
+                  placeholder="{{ filter.range_max | money_without_currency }}"
+                  min="0"
+                  max="{{ filter.range_max | money_without_currency }}"
+                  value="{{ filter.max_value.value | default: '' | money_without_currency }}"
+                  aria-label="Prix maximum"
+                >
+              </div>
+            </div>
+          </div>
+
+      {%- endcase -%}
+    </div>
+  </details>
+{%- endfor -%}

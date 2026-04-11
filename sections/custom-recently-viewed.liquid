@@ -1,0 +1,103 @@
+{% comment %}
+  custom-recently-viewed.liquid
+  Carrousel "Produits récemment consultés"
+  Dawn 15.x · Vanilla JS · localStorage
+  CSS : assets/custom-recently-viewed.css
+  JS  : assets/custom-recently-viewed.js
+
+  Le JS enregistre les visites dans localStorage et injecte les cards via fetch /products.json.
+  La section est un container vide côté Liquid — tout le rendu est client-side.
+{% endcomment %}
+
+{{ 'custom-recently-viewed.css' | asset_url | stylesheet_tag }}
+
+<section
+  class="crv__section"
+  data-crv
+  data-section-id="{{ section.id }}"
+  data-max="{{ section.settings.max_products }}"
+  data-current="{{ product.id | default: '' }}"
+  data-title="{{ section.settings.title | escape }}"
+  data-columns="{{ section.settings.columns }}"
+  style="--crv-accent: {{ section.settings.accent_color }};"
+  aria-label="{{ section.settings.title | escape }}"
+  hidden
+>
+  <div class="crv__inner page-width">
+
+    <h2 class="crv__title" data-crv-title>{{ section.settings.title | escape }}</h2>
+
+    {%- comment %} Grille injectée par JS ─────────────────────── {% endcomment %}
+    <div class="crv__grid" data-crv-grid></div>
+
+  </div>
+</section>
+
+<script src="{{ 'custom-recently-viewed.js' | asset_url }}" defer></script>
+
+{%- comment %}
+  Enregistrement du produit courant dans localStorage (si page produit)
+{% endcomment %}
+{%- if product -%}
+<script>
+(function () {
+  try {
+    const KEY   = 'crv_products';
+    const MAX   = 20;
+    const data  = { id: {{ product.id }}, handle: {{ product.handle | json }}, ts: Date.now() };
+    let list    = JSON.parse(localStorage.getItem(KEY) || '[]');
+    list        = list.filter(p => p.id !== data.id);
+    list.unshift(data);
+    if (list.length > MAX) list = list.slice(0, MAX);
+    localStorage.setItem(KEY, JSON.stringify(list));
+  } catch(_) {}
+})();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Récemment consultés",
+  "tag": "section",
+  "class": "section-custom-recently-viewed",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Récemment consultés"
+    },
+    {
+      "type": "range",
+      "id": "max_products",
+      "label": "Nombre max de produits",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Colonnes (desktop)",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ],
+      "default": "4"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent",
+      "default": "#C9A96E"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Récemment consultés"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,165 @@
+/* =============================================================
+   custom-faq.css
+   FAQ Accordéon produit – Mobile-first
+   Dawn 15.x
+   ============================================================= */
+
+/* ── Variables ─────────────────────────────────────────────── */
+.custom-product-faq {
+  --cfaq-transition:  0.3s ease;
+  --cfaq-radius:      0.8rem;
+}
+
+/* ── Section ────────────────────────────────────────────────── */
+.custom-product-faq {
+  padding-block: var(--cfaq-padding-top, 4.8rem) var(--cfaq-padding-bottom, 4.8rem);
+}
+
+.cfaq__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 3.2rem;
+  max-width: 76rem;
+  margin-inline: auto;
+}
+
+/* ── Titre ──────────────────────────────────────────────────── */
+.cfaq__heading {
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* ── Liste ──────────────────────────────────────────────────── */
+.cfaq__list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--cfaq-border, #e8e2da);
+  border-radius: var(--cfaq-radius);
+  overflow: hidden;
+}
+
+/* ── Item ───────────────────────────────────────────────────── */
+.cfaq__item {
+  border-bottom: 1px solid var(--cfaq-border, #e8e2da);
+}
+
+.cfaq__item:last-child {
+  border-bottom: none;
+}
+
+/* ── Bouton question ────────────────────────────────────────── */
+.cfaq__question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  width: 100%;
+  padding: 1.8rem 2.4rem;
+  border: none;
+  background: transparent;
+  color: var(--cfaq-q-color, #111);
+  font-size: 1.55rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background  var(--cfaq-transition),
+    color       var(--cfaq-transition);
+  outline: none;
+}
+
+.cfaq__question:hover {
+  background: color-mix(in srgb, var(--cfaq-accent, #C9A96E) 6%, transparent);
+  color: var(--cfaq-accent, #C9A96E);
+}
+
+.cfaq__question[aria-expanded="true"] {
+  color: var(--cfaq-accent, #C9A96E);
+}
+
+.cfaq__question:focus-visible {
+  outline: 2px solid var(--cfaq-accent, #C9A96E);
+  outline-offset: -2px;
+}
+
+.cfaq__question-text {
+  flex: 1;
+}
+
+/* ── Icône +/- ──────────────────────────────────────────────── */
+.cfaq__icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  transition:
+    transform         var(--cfaq-transition),
+    background        var(--cfaq-transition),
+    border-color      var(--cfaq-transition);
+  color: var(--cfaq-accent, #C9A96E);
+}
+
+/* Barre horizontale (toujours visible) */
+.cfaq__icon::before {
+  content: '';
+  position: absolute;
+  width: 1rem;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 1px;
+}
+
+/* Barre verticale (le + qui disparaît) */
+.cfaq__icon::after {
+  content: '';
+  position: absolute;
+  width: 1.5px;
+  height: 1rem;
+  background: currentColor;
+  border-radius: 1px;
+  transition: transform var(--cfaq-transition), opacity var(--cfaq-transition);
+}
+
+/* Ouvert : rotation 45° → croix → puis disparaît = reste – */
+.cfaq__question[aria-expanded="true"] .cfaq__icon {
+  background: var(--cfaq-accent, #C9A96E);
+  border-color: var(--cfaq-accent, #C9A96E);
+  transform: rotate(45deg);
+  color: #fff;
+}
+
+/* ── Réponse ────────────────────────────────────────────────── */
+.cfaq__answer {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height var(--cfaq-transition);
+}
+
+.cfaq__answer:not([hidden]) {
+  /* max-height géré par JS */
+}
+
+.cfaq__answer-inner {
+  padding: 0 2.4rem 2rem;
+  color: var(--cfaq-a-color, #444);
+  font-size: 1.5rem;
+  line-height: 1.7;
+}
+
+.cfaq__answer-inner > *:first-child { margin-top: 0; }
+.cfaq__answer-inner > *:last-child  { margin-bottom: 0; }
+
+/* ── Message vide ───────────────────────────────────────────── */
+.cfaq__empty {
+  text-align: center;
+  opacity: 0.5;
+  font-size: 1.5rem;
+}

@@ -1,0 +1,475 @@
+{% comment %}
+  Custom Reviews – Avis clients avec filtres et tri
+  Dawn 15.x · Vanilla JS · Mobile-first
+{% endcomment %}
+
+{{ 'custom-reviews.css' | asset_url | stylesheet_tag }}
+
+{%- assign review_blocks  = section.blocks | where: 'type', 'review' -%}
+{%- assign review_count   = review_blocks | size -%}
+{%- assign review_layout  = section.settings.review_layout | default: 'grid' -%}
+
+{%- comment %} ── Calculs globaux ───────────────────────────── {% endcomment %}
+{%- assign total_rating = 0 -%}
+{%- assign count_5 = 0 -%}
+{%- assign count_4 = 0 -%}
+{%- assign count_3 = 0 -%}
+{%- assign count_2 = 0 -%}
+{%- assign count_1 = 0 -%}
+
+{%- for block in review_blocks -%}
+  {%- assign r = block.settings.rating | times: 1 -%}
+  {%- assign total_rating = total_rating | plus: r -%}
+  {%- if r == 5 -%}{%- assign count_5 = count_5 | plus: 1 -%}
+  {%- elsif r == 4 -%}{%- assign count_4 = count_4 | plus: 1 -%}
+  {%- elsif r == 3 -%}{%- assign count_3 = count_3 | plus: 1 -%}
+  {%- elsif r == 2 -%}{%- assign count_2 = count_2 | plus: 1 -%}
+  {%- elsif r == 1 -%}{%- assign count_1 = count_1 | plus: 1 -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- assign avg_rating    = 0.0 -%}
+{%- assign avg_int       = 0 -%}
+{%- assign avg_dec       = 0 -%}
+{%- if review_count > 0 -%}
+  {%- assign avg_rating  = total_rating | times: 10 | divided_by: review_count -%}
+  {%- assign avg_int     = avg_rating | divided_by: 10 -%}
+  {%- assign avg_dec     = avg_rating | modulo: 10 -%}
+{%- endif -%}
+
+<section
+  class="custom-reviews"
+  data-section-id="{{ section.id }}"
+  style="
+    --crv-accent:    {{ section.settings.accent_color }};
+    --crv-star-color:{{ section.settings.star_color }};
+    --crv-border:    {{ section.settings.border_color }};
+  "
+>
+  <div class="crv__inner page-width">
+
+    {%- comment %} ── Titre ─────────────────────────────────── {% endcomment %}
+    {%- if section.settings.title != blank -%}
+      <h2 class="crv__heading">{{ section.settings.title | escape }}</h2>
+    {%- endif -%}
+
+    {%- if review_count > 0 -%}
+
+      {%- comment %} ══════════════════════════════
+          RÉSUMÉ GLOBAL
+      ══════════════════════════════ {% endcomment %}
+      <div class="crv__summary">
+
+        {%- comment %} Note globale ─────────────────────────── {% endcomment %}
+        <div class="crv__global-score">
+          <span class="crv__avg-number">{{ avg_int }}<span class="crv__avg-dec">,{{ avg_dec }}</span></span>
+          {%- assign avg_int_next = avg_int | plus: 1 -%}
+          <div class="crv__avg-stars" aria-label="Note moyenne : {{ avg_int }},{{ avg_dec }} sur 5">
+            {%- for i in (1..5) -%}
+              {%- if i <= avg_int -%}
+                <span class="crv__star crv__star--full" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78z"/></svg>
+                </span>
+              {%- elsif i == avg_int_next and avg_dec >= 5 -%}
+                <span class="crv__star crv__star--half" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><defs><linearGradient id="crv-half-{{ section.id }}"><stop offset="50%" stop-color="currentColor"/><stop offset="50%" stop-color="transparent"/></linearGradient></defs><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78z" fill="url(#crv-half-{{ section.id }})" stroke="currentColor" stroke-width="0.5"/></svg>
+                </span>
+              {%- else -%}
+                <span class="crv__star crv__star--empty" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78z"/></svg>
+                </span>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          <span class="crv__total-count">{{ review_count }} avis</span>
+        </div>
+
+        {%- comment %} Barres de répartition ────────────────── {% endcomment %}
+        <div class="crv__breakdown" role="list" aria-label="Répartition des notes">
+          {%- assign breakdown_counts = count_5 | append: ',' | append: count_4 | append: ',' | append: count_3 | append: ',' | append: count_2 | append: ',' | append: count_1 -%}
+          {%- assign breakdown_array  = breakdown_counts | split: ',' -%}
+
+          {%- for i in (1..5) -%}
+            {%- assign star_val = 6 | minus: i -%}
+            {%- assign star_count = breakdown_array[forloop.index0] | times: 1 -%}
+            {%- assign bar_pct = 0 -%}
+            {%- if review_count > 0 -%}
+              {%- assign bar_pct = star_count | times: 100 | divided_by: review_count -%}
+            {%- endif -%}
+
+            <button
+              class="crv__breakdown-row"
+              role="listitem"
+              data-filter-star="{{ star_val }}"
+              aria-label="Filtrer les avis {{ star_val }} étoiles ({{ star_count }} avis)"
+              {% if star_count == 0 %}disabled{% endif %}
+            >
+              <span class="crv__breakdown-label">{{ star_val }}★</span>
+              <span class="crv__breakdown-bar-wrap" aria-hidden="true">
+                <span
+                  class="crv__breakdown-bar-fill"
+                  style="width: {{ bar_pct }}%"
+                ></span>
+              </span>
+              <span class="crv__breakdown-count">{{ star_count }}</span>
+            </button>
+          {%- endfor -%}
+        </div>
+
+      </div>
+      {%- comment %} fin summary {% endcomment %}
+
+      {%- comment %} ══════════════════════════════
+          CONTRÔLES : filtre actif + tri
+      ══════════════════════════════ {% endcomment %}
+      <div class="crv__controls">
+        <div class="crv__active-filter" data-crv-filter-label hidden>
+          <span data-crv-filter-text></span>
+          <button class="crv__clear-filter" data-crv-clear-filter aria-label="Supprimer le filtre">✕</button>
+        </div>
+
+        <div class="crv__sort-wrap">
+          <label for="crv-sort-{{ section.id }}" class="crv__sort-label">Trier par</label>
+          <div class="crv__select-wrap">
+            <select id="crv-sort-{{ section.id }}" class="crv__select" data-crv-sort>
+              <option value="date-desc">Date (récent)</option>
+              <option value="date-asc">Date (ancien)</option>
+              <option value="rating-desc">Note (haute)</option>
+              <option value="rating-asc">Note (basse)</option>
+            </select>
+            <span class="crv__select-caret" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {%- comment %} ══════════════════════════════
+          LISTE DES AVIS
+      ══════════════════════════════ {% endcomment %}
+      {%- comment %} ── Navigation carrousel ──────────────────── {% endcomment %}
+      {%- if review_layout == 'carousel' -%}
+        <div class="crv__carousel-nav" aria-label="Navigation carrousel">
+          <button class="crv__carousel-btn crv__carousel-btn--prev" data-crv-prev aria-label="Avis précédents">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
+          <button class="crv__carousel-btn crv__carousel-btn--next" data-crv-next aria-label="Avis suivants">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </button>
+        </div>
+      {%- endif -%}
+
+      <div
+        class="crv__list crv__list--{{ review_layout }}"
+        data-crv-list
+        data-crv-layout="{{ review_layout }}"
+        data-per-page="{{ section.settings.per_page }}"
+        aria-live="polite"
+        aria-atomic="false"
+      >
+        {%- for block in review_blocks -%}
+          {%- assign r = block.settings.rating | times: 1 -%}
+          <article
+            class="crv__review"
+            data-crv-review
+            data-rating="{{ r }}"
+            data-date="{{ block.settings.date | escape }}"
+            data-index="{{ forloop.index0 }}"
+            {% if forloop.index > section.settings.per_page %}hidden{% endif %}
+            {{ block.shopify_attributes }}
+          >
+            {%- comment %} En-tête de l'avis ───────────────── {% endcomment %}
+            <div class="crv__review-header">
+              <div class="crv__reviewer-info">
+                <span class="crv__reviewer-name">{{ block.settings.name | escape | default: 'Anonyme' }}</span>
+                {%- if block.settings.verified -%}
+                  <span class="crv__verified-badge" title="Achat vérifié">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M6 1L7.5 3.5L10.5 4L8.5 6L9 9L6 7.5L3 9L3.5 6L1.5 4L4.5 3.5Z" fill="currentColor"/>
+                    </svg>
+                    Achat vérifié
+                  </span>
+                {%- endif -%}
+              </div>
+              <div class="crv__review-meta">
+                {%- if block.settings.skin_type != 'none' -%}
+                  <span class="crv__skin-type">Peau {{ block.settings.skin_type }}</span>
+                {%- endif -%}
+                {%- if block.settings.date != blank -%}
+                  <time class="crv__review-date">{{ block.settings.date | escape }}</time>
+                {%- endif -%}
+              </div>
+            </div>
+
+            {%- comment %} Étoiles ─────────────────────────── {% endcomment %}
+            <div class="crv__review-stars" aria-label="Note : {{ r }} sur 5">
+              {%- for i in (1..5) -%}
+                <span class="crv__star{% if i <= r %} crv__star--full{% else %} crv__star--empty{% endif %}" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="{% if i <= r %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="1" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78z"/>
+                  </svg>
+                </span>
+              {%- endfor -%}
+            </div>
+
+            {%- comment %} Texte ───────────────────────────── {% endcomment %}
+            {%- if block.settings.review_text != blank -%}
+              <p class="crv__review-text">{{ block.settings.review_text | escape }}</p>
+            {%- endif -%}
+
+            {%- comment %} Photo optionnelle ───────────────── {% endcomment %}
+            {%- if block.settings.photo != blank -%}
+              <div class="crv__review-photo-wrap">
+                <img
+                  class="crv__review-photo"
+                  src="{{ block.settings.photo | image_url: width: 200 }}"
+                  srcset="{{ block.settings.photo | image_url: width: 120 }} 120w, {{ block.settings.photo | image_url: width: 200 }} 200w"
+                  sizes="100px"
+                  alt="Photo de l'avis de {{ block.settings.name | escape | default: 'un client' }}"
+                  loading="lazy"
+                  width="100"
+                  height="100"
+                >
+              </div>
+            {%- endif -%}
+          </article>
+        {%- endfor -%}
+      </div>
+
+      {%- comment %} ── Bouton Voir plus (masqué en carrousel) ─── {% endcomment %}
+      {%- if review_count > section.settings.per_page and review_layout != 'carousel' -%}
+        <div class="crv__load-more-wrap" data-crv-load-more-wrap>
+          <button class="crv__load-more-btn" data-crv-load-more>
+            Voir plus d'avis
+            <span class="crv__load-more-count" data-crv-remaining>
+              ({{ review_count | minus: section.settings.per_page }} restants)
+            </span>
+          </button>
+        </div>
+      {%- endif -%}
+
+    {%- else -%}
+      {%- if request.design_mode -%}
+        <p class="crv__empty">Ajoutez des avis via les blocks dans le theme editor.</p>
+      {%- else -%}
+        <p class="crv__empty">Soyez le premier à laisser un avis !</p>
+      {%- endif -%}
+    {%- endif -%}
+
+  </div>
+</section>
+
+<script src="{{ 'custom-reviews.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Avis clients",
+  "tag": "section",
+  "class": "section-custom-reviews",
+  "max_blocks": 50,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Ce que disent nos clientes"
+    },
+    {
+      "type": "range",
+      "id": "per_page",
+      "label": "Avis affichés par défaut",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "select",
+      "id": "review_layout",
+      "label": "Style d'affichage",
+      "options": [
+        { "value": "grid",     "label": "Grille" },
+        { "value": "list",     "label": "Liste" },
+        { "value": "carousel", "label": "Carrousel" }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Couleur des étoiles",
+      "default": "#F4B942"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Couleur des séparateurs",
+      "default": "#e8e2da"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Avis client",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Nom du client",
+          "default": "Marie L."
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Note",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "review_text",
+          "label": "Texte de l'avis",
+          "default": "Excellent produit ! Ma peau est transformée après seulement 2 semaines d'utilisation. Je recommande vivement."
+        },
+        {
+          "type": "text",
+          "id": "date",
+          "label": "Date",
+          "default": "12 mars 2025",
+          "info": "Format libre : ex. 12 mars 2025"
+        },
+        {
+          "type": "select",
+          "id": "skin_type",
+          "label": "Type de peau",
+          "options": [
+            { "value": "none",      "label": "Non précisé" },
+            { "value": "sèche",     "label": "Sèche" },
+            { "value": "grasse",    "label": "Grasse" },
+            { "value": "mixte",     "label": "Mixte" },
+            { "value": "sensible",  "label": "Sensible" },
+            { "value": "normale",   "label": "Normale" },
+            { "value": "mature",    "label": "Mature" }
+          ],
+          "default": "none"
+        },
+        {
+          "type": "image_picker",
+          "id": "photo",
+          "label": "Photo du client (optionnelle)"
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Achat vérifié",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Avis clients",
+      "blocks": [
+        {
+          "type": "review",
+          "settings": {
+            "name": "Sophie M.",
+            "rating": 5,
+            "review_text": "Ma peau est tellement plus lumineuse depuis que j'utilise ce produit ! Je l'utilise matin et soir depuis 3 semaines et les résultats sont bluffants.",
+            "date": "15 mars 2025",
+            "skin_type": "mixte",
+            "verified": true
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "name": "Camille R.",
+            "rating": 5,
+            "review_text": "Texture légère, odeur agréable et efficacité au rendez-vous. Ma peau sensible a très bien réagi, aucune rougeur.",
+            "date": "8 mars 2025",
+            "skin_type": "sensible",
+            "verified": true
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "name": "Lucie T.",
+            "rating": 4,
+            "review_text": "Très bon produit, je le recommande ! J'aurais juste aimé un packaging plus éco-responsable, d'où 4 étoiles.",
+            "date": "1er mars 2025",
+            "skin_type": "sèche",
+            "verified": true
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "name": "Emma B.",
+            "rating": 5,
+            "review_text": "Commande reçue rapidement et produit conforme à la description. Résultats visibles dès la première semaine !",
+            "date": "22 février 2025",
+            "skin_type": "grasse",
+            "verified": false
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "name": "Julie P.",
+            "rating": 4,
+            "review_text": "Bonne formule, j'apprécie les ingrédients naturels. Je reviendrai commander dès que mon pot sera terminé.",
+            "date": "14 février 2025",
+            "skin_type": "normale",
+            "verified": true
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

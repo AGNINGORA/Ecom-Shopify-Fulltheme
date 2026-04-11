@@ -1,0 +1,298 @@
+/* =============================================================
+   custom-product-tabs.css
+   Onglets produit – Mobile (accordéon) → Desktop (onglets)
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+/* ── Variables ─────────────────────────────────────────────── */
+.custom-product-tabs {
+  --cpt-radius:       0.8rem;
+  --cpt-transition:   0.28s ease;
+  --cpt-font-size:    1.5rem;
+}
+
+/* ── Section ────────────────────────────────────────────────── */
+.custom-product-tabs {
+  padding-block: var(--cpt-padding-top, 4.8rem) var(--cpt-padding-bottom, 4.8rem);
+}
+
+.cpt__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 3.2rem;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BARRE D'ONGLETS — masquée sur mobile
+   ══════════════════════════════════════════════════════════════ */
+
+.cpt__tab-bar {
+  display: none;
+}
+
+.cpt__tab-indicator {
+  display: none;
+}
+
+/* ── Desktop : onglets visibles ─────────────────────────────── */
+@media (min-width: 750px) {
+  .cpt__tab-bar {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 2px solid var(--cpt-border, #e8e2da);
+    position: relative;
+    gap: 0;
+  }
+
+  /* Indicateur glissant */
+  .cpt__tab-indicator {
+    display: block;
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    height: 2px;
+    background: var(--cpt-accent, #C9A96E);
+    transition: width var(--cpt-transition), transform var(--cpt-transition);
+    will-change: transform, width;
+  }
+}
+
+/* ── Bouton onglet ──────────────────────────────────────────── */
+.cpt__tab {
+  display: none;
+}
+
+@media (min-width: 750px) {
+  .cpt__tab {
+    display: inline-flex;
+    align-items: center;
+    padding: 1.2rem 2.2rem;
+    border: none;
+    background: var(--cpt-tab-bg, #f9f6f2);
+    color: currentColor;
+    font-size: var(--cpt-font-size);
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background     var(--cpt-transition),
+      color          var(--cpt-transition);
+    white-space: nowrap;
+    opacity: 0.6;
+    outline: none;
+  }
+
+  .cpt__tab:first-child {
+    border-radius: var(--cpt-radius) 0 0 0;
+  }
+
+  .cpt__tab:last-child {
+    border-radius: 0 var(--cpt-radius) 0 0;
+  }
+
+  .cpt__tab:hover {
+    opacity: 0.85;
+    background: var(--cpt-tab-active, #fff);
+  }
+
+  .cpt__tab.is-active {
+    background: var(--cpt-tab-active, #fff);
+    color: var(--cpt-accent, #C9A96E);
+    font-weight: 700;
+    opacity: 1;
+  }
+
+  .cpt__tab:focus-visible {
+    outline: 2px solid var(--cpt-accent, #C9A96E);
+    outline-offset: -2px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PANNEAUX
+   ══════════════════════════════════════════════════════════════ */
+
+.cpt__panels {
+  border: 1px solid var(--cpt-border, #e8e2da);
+  border-radius: var(--cpt-radius);
+  overflow: hidden;
+}
+
+@media (min-width: 750px) {
+  .cpt__panels {
+    border-top-left-radius: 0;
+    border-top: none;
+  }
+}
+
+/* ── Panneau individuel ─────────────────────────────────────── */
+.cpt__panel {
+  /* Mobile : toujours visible (accordéon gère la hauteur) */
+}
+
+@media (min-width: 750px) {
+  /* Desktop : masqué par défaut, affiché si actif */
+  .cpt__panel {
+    display: none;
+  }
+
+  .cpt__panel.is-active {
+    display: block;
+    animation: cpt-fade-in var(--cpt-transition) both;
+  }
+}
+
+@keyframes cpt-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ACCORDÉON (mobile uniquement)
+   ══════════════════════════════════════════════════════════════ */
+
+.cpt__accordion-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1.6rem 2rem;
+  border: none;
+  border-bottom: 1px solid var(--cpt-border, #e8e2da);
+  background: var(--cpt-tab-bg, #f9f6f2);
+  color: currentColor;
+  font-size: var(--cpt-font-size);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--cpt-transition);
+  outline: none;
+}
+
+.cpt__accordion-trigger:hover {
+  background: var(--cpt-tab-active, #fff);
+}
+
+.cpt__accordion-trigger:focus-visible {
+  outline: 2px solid var(--cpt-accent, #C9A96E);
+  outline-offset: -2px;
+}
+
+/* Icône chevron */
+.cpt__accordion-icon {
+  display: block;
+  width: 1.6rem;
+  height: 1.6rem;
+  flex-shrink: 0;
+  position: relative;
+  transition: transform var(--cpt-transition);
+}
+
+.cpt__accordion-icon::before,
+.cpt__accordion-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 0.9rem;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: transform var(--cpt-transition);
+}
+
+.cpt__accordion-icon::before {
+  right: 50%;
+  transform: translateY(-50%) rotate(-45deg);
+  transform-origin: right center;
+}
+
+.cpt__accordion-icon::after {
+  left: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  transform-origin: left center;
+}
+
+/* Ouvert */
+.cpt__accordion-trigger[aria-expanded="true"] .cpt__accordion-icon::before {
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.cpt__accordion-trigger[aria-expanded="true"] .cpt__accordion-icon::after {
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+/* Masquer le trigger sur desktop (les vrais onglets prennent le relais) */
+@media (min-width: 750px) {
+  .cpt__accordion-trigger {
+    display: none;
+  }
+}
+
+/* ── Corps de l'accordéon ───────────────────────────────────── */
+.cpt__accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+
+@media (min-width: 750px) {
+  /* Desktop : corps toujours visible, pas d'animation max-height */
+  .cpt__accordion-body {
+    max-height: none !important;
+    overflow: visible;
+  }
+}
+
+/* ── Contenu RTE ────────────────────────────────────────────── */
+.cpt__content {
+  padding: 2.4rem 2.4rem;
+  font-size: var(--cpt-font-size);
+  line-height: 1.7;
+}
+
+.cpt__content > *:first-child { margin-top: 0; }
+.cpt__content > *:last-child  { margin-bottom: 0; }
+
+/* ══════════════════════════════════════════════════════════════
+   SECTION "ADAPTÉ À"
+   ══════════════════════════════════════════════════════════════ */
+
+.cpt__skin-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.2rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--cpt-border, #e8e2da);
+}
+
+.cpt__skin-label {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.cpt__skin-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cpt__skin-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4em 1em;
+  border: 1.5px solid var(--cpt-accent, #C9A96E);
+  border-radius: 10rem;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--cpt-accent, #C9A96E);
+  background: transparent;
+  line-height: 1;
+  white-space: nowrap;
+}

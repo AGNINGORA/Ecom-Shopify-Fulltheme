@@ -1,0 +1,203 @@
+/* =============================================================
+   custom-buy-x-get-y.css
+   Offre "Achetez X, obtenez Y gratuit" — 2 cartes cliquables
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+/* ── Conteneur ───────────────────────────────────────────────── */
+.cbxgy__wrap {
+  margin-bottom: 2rem;
+}
+
+/* ── Titre ───────────────────────────────────────────────────── */
+.cbxgy__heading {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  letter-spacing: 0.01em;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GRILLE — 2 colonnes égales
+   ══════════════════════════════════════════════════════════════ */
+.cbxgy__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CARTE
+   ══════════════════════════════════════════════════════════════ */
+.cbxgy__card {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 1.4rem 1.2rem;
+  background: #fff;
+  border: 1.5px solid #e8e2da;
+  border-radius: 1.2rem;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  width: 100%;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.cbxgy__card:hover {
+  border-color: #aaa;
+  background: #fafafa;
+}
+
+/* ── État actif — bordure noire ──────────────────────────────── */
+.cbxgy__card.is-active {
+  border-color: #111;
+  /* Épaisseur visuelle doublée sans layout shift */
+  box-shadow: inset 0 0 0 1px #111;
+  background: #fafafa;
+}
+
+.cbxgy__card:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BADGE — coin supérieur droit
+   ══════════════════════════════════════════════════════════════ */
+.cbxgy__badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--cbxgy-badge-bg, #111);
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 0.35rem 0.7rem;
+  border-radius: 0 1.2rem 0 0.9rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INDICATEUR (radio circle)
+   ══════════════════════════════════════════════════════════════ */
+.cbxgy__check {
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  border: 1.5px solid #ccc5bb;
+  background: #fff;
+  background-image: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 11px 11px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.cbxgy__card.is-active .cbxgy__check {
+  border-color: #111;
+  background-color: #111;
+  /* Coche blanche SVG inline */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2 6l3 3 5-5' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CORPS
+   ══════════════════════════════════════════════════════════════ */
+.cbxgy__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+  padding-top: 0.1rem;
+}
+
+/* ── Label quantité ──────────────────────────────────────────── */
+.cbxgy__qty-label {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  /* Laisser de la place pour le badge sur la carte 2 */
+  padding-right: 0.5rem;
+}
+
+/* ── Prix ────────────────────────────────────────────────────── */
+.cbxgy__price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.5rem;
+}
+
+.cbxgy__price-unit,
+.cbxgy__price-offer {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.cbxgy__price-normal {
+  font-size: 1.2rem;
+  opacity: 0.4;
+  text-decoration: line-through;
+  white-space: nowrap;
+}
+
+/* ── Texte de l'offre (ex: "2 achetés = 1 offert") ──────────── */
+.cbxgy__offer-text {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--cbxgy-badge-bg, #111);
+  line-height: 1.3;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SPAN INJECTÉ DANS LE BOUTON ATC
+   ══════════════════════════════════════════════════════════════ */
+.cbxgy__atc-total {
+  opacity: 0.75;
+  font-weight: 600;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE — petits écrans
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 400px) {
+  .cbxgy__grid {
+    gap: 0.6rem;
+  }
+
+  .cbxgy__card {
+    padding: 1.1rem 0.8rem;
+    gap: 0.6rem;
+  }
+
+  .cbxgy__qty-label {
+    font-size: 1.1rem;
+  }
+
+  .cbxgy__price-unit,
+  .cbxgy__price-offer {
+    font-size: 1.35rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RÉDUCTION DES MOUVEMENTS
+   ══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .cbxgy__card,
+  .cbxgy__check {
+    transition: none;
+  }
+}

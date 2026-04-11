@@ -1,0 +1,147 @@
+{%- comment -%}
+  custom-meta-tags.liquid
+  Meta title, description, Open Graph, Twitter Card, preload hints
+  Rendered in <head> via layout/theme.liquid (après {% render 'meta-tags' %})
+{%- endcomment -%}
+
+{%- liquid
+  # ── TITLE — format: "Produit | Collection | Boutique" ──
+
+  if template.name == 'product' and product != blank
+    if collection != blank
+      assign custom_title = product.title | append: ' | ' | append: collection.title | append: ' | ' | append: shop.name
+    else
+      assign custom_title = product.title | append: ' | ' | append: shop.name
+    endif
+
+  elsif template.name == 'collection' and collection != blank
+    assign custom_title = collection.title | append: ' | ' | append: shop.name
+
+  elsif template.name == 'article' and article != blank
+    if blog != blank
+      assign custom_title = article.title | append: ' | ' | append: blog.title | append: ' | ' | append: shop.name
+    else
+      assign custom_title = article.title | append: ' | ' | append: shop.name
+    endif
+
+  elsif template.name == 'blog' and blog != blank
+    assign custom_title = blog.title | append: ' | ' | append: shop.name
+
+  elsif template.name == 'page' and page != blank
+    assign custom_title = page.title | append: ' | ' | append: shop.name
+
+  elsif template.name == 'index'
+    assign custom_title = shop.name
+
+  else
+    assign custom_title = page_title | append: ' | ' | append: shop.name
+  endif
+
+  # Pagination
+  if current_page > 1
+    assign custom_title = custom_title | append: ' — Page ' | append: current_page
+  endif
+
+  # ── DESCRIPTION — tronquée à 155 caractères ──
+
+  if page_description != blank
+    assign custom_desc = page_description | strip_html | truncate: 155
+  elsif template.name == 'product' and product != blank
+    assign custom_desc = product.description | strip_html | truncate: 155
+  elsif template.name == 'collection' and collection != blank
+    assign custom_desc = collection.description | strip_html | truncate: 155
+  elsif template.name == 'article' and article != blank
+    assign custom_desc = article.excerpt_or_content | strip_html | truncate: 155
+  elsif template.name == 'page' and page != blank
+    assign custom_desc = page.content | strip_html | truncate: 155
+  else
+    assign custom_desc = shop.description | strip_html | truncate: 155
+  endif
+
+  # ── OG IMAGE — image principale selon contexte ──
+
+  if template.name == 'product' and product.featured_image != blank
+    assign og_image = product.featured_image | image_url: width: 1200
+  elsif template.name == 'collection' and collection.featured_image != blank
+    assign og_image = collection.featured_image | image_url: width: 1200
+  elsif template.name == 'article' and article.image != blank
+    assign og_image = article.image | image_url: width: 1200
+  elsif settings.share_image != blank
+    assign og_image = settings.share_image | image_url: width: 1200
+  else
+    assign og_image = nil
+  endif
+
+  if og_image != nil
+    assign og_image_url = og_image | prepend: 'https:'
+  else
+    assign og_image_url = nil
+  endif
+
+  # ── OG TYPE ──
+
+  if template.name == 'product'
+    assign og_type = 'product'
+  elsif template.name == 'article'
+    assign og_type = 'article'
+  else
+    assign og_type = 'website'
+  endif
+
+  # ── HERO IMAGE PRELOAD (au-dessus du fold) ──
+
+  if template.name == 'product' and product.featured_image != blank
+    assign preload_img = product.featured_image | image_url: width: 1200, format: 'webp'
+  elsif template.name == 'collection' and collection.featured_image != blank
+    assign preload_img = collection.featured_image | image_url: width: 1200, format: 'webp'
+  else
+    assign preload_img = nil
+  endif
+-%}
+
+<!-- ── Title ──────────────────────────────────────────── -->
+<title>{{ custom_title | escape }}</title>
+
+<!-- ── Description ───────────────────────────────────── -->
+{%- if custom_desc != blank -%}
+  <meta name="description" content="{{ custom_desc | escape }}">
+{%- endif -%}
+
+<!-- ── Open Graph ────────────────────────────────────── -->
+<meta property="og:site_name"   content="{{ shop.name | escape }}">
+<meta property="og:url"         content="{{ canonical_url }}">
+<meta property="og:title"       content="{{ custom_title | escape }}">
+<meta property="og:type"        content="{{ og_type }}">
+{%- if custom_desc != blank -%}
+  <meta property="og:description" content="{{ custom_desc | escape }}">
+{%- endif -%}
+{%- if og_image_url != nil -%}
+  <meta property="og:image"        content="{{ og_image_url }}">
+  <meta property="og:image:width"  content="1200">
+  <meta property="og:image:height" content="630">
+{%- endif -%}
+
+{%- if template.name == 'article' and article != blank -%}
+  <meta property="article:published_time" content="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%S%z' }}">
+  {%- for tag in article.tags limit: 6 -%}
+    <meta property="article:tag" content="{{ tag | escape }}">
+  {%- endfor -%}
+{%- endif -%}
+
+<!-- ── Twitter Card ───────────────────────────────────── -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="{{ custom_title | escape }}">
+{%- if custom_desc != blank -%}
+  <meta name="twitter:description" content="{{ custom_desc | escape }}">
+{%- endif -%}
+{%- if og_image_url != nil -%}
+  <meta name="twitter:image"       content="{{ og_image_url }}">
+{%- endif -%}
+
+<!-- ── Preload image critique ─────────────────────────── -->
+{%- if preload_img != nil -%}
+  <link rel="preload" as="image" href="{{ preload_img }}" fetchpriority="high">
+{%- endif -%}
+
+<!-- ── Preconnect CDN Shopify images ──────────────────── -->
+<link rel="preconnect" href="https://cdn.shopify.com" crossorigin>

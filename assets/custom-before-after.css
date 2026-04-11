@@ -1,0 +1,408 @@
+/* =============================================================
+   custom-before-after.css
+   Mode Single : Slider Avant/Après + Statistiques animées
+   Mode Galerie : Grille de témoignages avec mini-sliders
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+/* ── Variables ─────────────────────────────────────────────── */
+.custom-before-after {
+  --cba-transition:    0s;
+  --cba-radius:        1.6rem;
+  --cba-handle-size:   4.8rem;
+  --cba-line-width:    3px;
+  --cba-label-radius:  0.5rem;
+}
+
+/* ── Section ────────────────────────────────────────────────── */
+.custom-before-after {
+  padding-block: var(--cba-padding-top, 4.8rem) var(--cba-padding-bottom, 4.8rem);
+}
+
+.cba__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+/* ── En-tête ────────────────────────────────────────────────── */
+.cba__header {
+  text-align: center;
+}
+
+.cba__title {
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  font-weight: 700;
+  margin: 0 0 0.8rem;
+  line-height: 1.2;
+}
+
+.cba__subtitle {
+  font-size: 1.5rem;
+  opacity: 0.65;
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SLIDER — commun aux deux modes
+   ══════════════════════════════════════════════════════════════ */
+
+.cba__slider {
+  position: relative;
+  border-radius: var(--cba-radius);
+  overflow: hidden;
+  cursor: col-resize;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  background: #f5f5f5;
+}
+
+/* Mode Single : grand ratio 4/3 */
+.cba__sliders .cba__slider {
+  aspect-ratio: 4 / 3;
+}
+
+/* Mode Galerie : carré dans les cartes */
+.cba__slider--gallery {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--cba-radius) var(--cba-radius) 0 0;
+}
+
+/* ── Images ─────────────────────────────────────────────────── */
+.cba__img-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.cba__img-wrap--after {
+  width: 100%;
+}
+
+.cba__img-wrap--before {
+  right: auto;
+}
+
+.cba__img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  display: block;
+}
+
+.cba__img-wrap--before .cba__img {
+  width: var(--cba-img-natural-width, 100%);
+  max-width: none;
+}
+
+/* ── Labels Avant / Après ────────────────────────────────────── */
+.cba__label {
+  position: absolute;
+  bottom: 1.2rem;
+  padding: 0.4em 1em;
+  background: var(--cba-label-bg, #111);
+  color: var(--cba-label-color, #fff);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: var(--cba-label-radius);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Labels plus compacts dans les mini-sliders galerie */
+.cba__slider--gallery .cba__label {
+  font-size: 1rem;
+  padding: 0.3em 0.75em;
+  bottom: 0.8rem;
+}
+
+.cba__label--before { left: 1.2rem; }
+.cba__label--after  { right: 1.2rem; }
+
+.cba__slider--gallery .cba__label--before { left: 0.8rem; }
+.cba__slider--gallery .cba__label--after  { right: 0.8rem; }
+
+/* ── Ligne + poignée ────────────────────────────────────────── */
+.cba__divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--cba-line-width);
+  background: var(--cba-handle-bg, #fff);
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.cba__handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--cba-handle-size);
+  height: var(--cba-handle-size);
+  border-radius: 50%;
+  background: var(--cba-handle-bg, #fff);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: #555;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* Poignée plus petite dans les mini-sliders */
+.cba__slider--gallery .cba__handle {
+  width: 3.6rem;
+  height: 3.6rem;
+}
+
+.cba__slider[data-dragging] .cba__handle {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.cba__handle-arrows {
+  width: 60%;
+  height: 60%;
+}
+
+/* ── Placeholder design mode ─────────────────────────────────── */
+.cba__slider-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  border: 2px dashed #ddd;
+  border-radius: var(--cba-radius);
+  padding: 2.4rem;
+  font-size: 1.4rem;
+  opacity: 0.5;
+  text-align: center;
+}
+
+.cba__slider-placeholder--gallery {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--cba-radius) var(--cba-radius) 0 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODE SINGLE — grille de sliders + stats
+   ══════════════════════════════════════════════════════════════ */
+
+.cba__sliders {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3.2rem;
+}
+
+@media (min-width: 750px) {
+  .cba__sliders:not(.cba__sliders--single) {
+    grid-template-columns: repeat(auto-fit, minmax(36rem, 1fr));
+  }
+}
+
+.cba__slider-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.cba__slider-caption {
+  text-align: center;
+  font-size: 1.4rem;
+  font-style: italic;
+  opacity: 0.65;
+  margin: 0;
+}
+
+/* ── Statistiques ────────────────────────────────────────────── */
+.cba__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 2.4rem;
+  padding: 3.2rem 2.4rem;
+  border-radius: var(--cba-radius);
+  background: #faf8f5;
+  border: 1px solid #f0ece6;
+  text-align: center;
+}
+
+.cba__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.cba__stat-number {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.1em;
+  line-height: 1;
+  color: var(--cba-stat-color, #C9A96E);
+}
+
+.cba__stat-value {
+  font-size: clamp(3.6rem, 5vw, 5.6rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.cba__stat-prefix,
+.cba__stat-suffix {
+  font-size: clamp(1.8rem, 2.5vw, 2.8rem);
+  font-weight: 700;
+}
+
+.cba__stat-label {
+  font-size: 1.45rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0;
+  max-width: 18rem;
+}
+
+.cba__stat-sublabel {
+  font-size: 1.25rem;
+  opacity: 0.5;
+  margin: 0;
+}
+
+@media (min-width: 600px) {
+  .cba__stat + .cba__stat {
+    border-left: 1px solid #e8e2da;
+    padding-left: 2.4rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODE GALERIE — grille de cartes témoignages
+   ══════════════════════════════════════════════════════════════ */
+
+.cba__gallery {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 750px) {
+  .cba__gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 990px) {
+  .cba__gallery {
+    grid-template-columns: repeat(var(--cba-gallery-cols, 3), 1fr);
+  }
+}
+
+/* ── Carte témoignage ────────────────────────────────────────── */
+.cba__testi-card {
+  border-radius: var(--cba-radius);
+  overflow: hidden;
+  border: 1px solid #f0ece6;
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.cba__testi-card:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* ── Contenu témoignage ──────────────────────────────────────── */
+.cba__testi-content {
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  flex: 1;
+}
+
+.cba__testi-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* ── Texte tronqué 3 lignes ──────────────────────────────────── */
+.cba__testi-text {
+  font-size: 1.35rem;
+  line-height: 1.55;
+  margin: 0;
+  color: inherit;
+  opacity: 0.75;
+  /* Troncature 3 lignes */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cba__testi-text.is-expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+/* ── Bouton "Voir plus / Voir moins" ─────────────────────────── */
+.cba__testi-more {
+  display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--cba-accent, #C9A96E);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-align: left;
+  align-self: flex-start;
+}
+
+.cba__testi-more:hover {
+  opacity: 0.75;
+}
+
+.cba__testi-more[hidden] {
+  display: none;
+}
+
+/* ── Placeholder galerie vide (design mode) ──────────────────── */
+.cba__gallery-empty {
+  text-align: center;
+  font-size: 1.4rem;
+  opacity: 0.45;
+  padding: 4rem 2rem;
+  border: 2px dashed #ddd;
+  border-radius: var(--cba-radius);
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RÉDUCTION DES MOUVEMENTS
+   ══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .cba__handle,
+  .cba__testi-card {
+    transition: none;
+  }
+}

@@ -1,0 +1,348 @@
+{% comment %}
+  custom-cart-drawer.liquid
+  Drawer panier complet — slide-in droite
+  Dawn 15.x · Vanilla JS · fetch API
+  CSS : assets/custom-cart-drawer.css
+  JS  : assets/custom-cart-drawer.js
+{% endcomment %}
+
+{{ 'custom-cart-drawer.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign threshold_cents = section.settings.free_shipping_threshold | times: 100
+  assign up1 = section.settings.upsell_product_1
+  assign up2 = section.settings.upsell_product_2
+  assign has_upsell = false
+  if section.settings.show_upsell
+    if up1 != blank or up2 != blank
+      assign has_upsell = true
+    endif
+  endif
+  if threshold_cents > 0
+    assign shipping_pct = cart.total_price | times: 100 | divided_by: threshold_cents | at_most: 100
+  else
+    assign shipping_pct = 100
+  endif
+-%}
+
+{%- comment %} ── Overlay sombre ──────────────────────────────── {% endcomment %}
+<div
+  class="ccd__overlay"
+  data-ccd-overlay
+  aria-hidden="true"
+  style="--ccd-accent: {{ section.settings.accent_color }}; --ccd-btn-txt: {{ section.settings.btn_text_color }};"
+></div>
+
+{%- comment %} ── Drawer ─────────────────────────────────────── {% endcomment %}
+<div
+  class="ccd__drawer"
+  id="custom-cart-drawer"
+  data-ccd-drawer
+  data-threshold="{{ threshold_cents }}"
+  data-show-shipping="{{ section.settings.show_shipping_bar }}"
+  data-free-msg="{{ section.settings.shipping_free_msg | default: 'Félicitations ! Livraison gratuite !' | escape }}"
+  role="dialog"
+  aria-modal="true"
+  aria-label="{{ section.settings.title | default: 'Votre panier' | escape }}"
+  tabindex="-1"
+  style="--ccd-accent: {{ section.settings.accent_color }}; --ccd-btn-txt: {{ section.settings.btn_text_color }};"
+>
+
+  {%- comment %} ── Header ──────────────────────────────────── {% endcomment %}
+  <div class="ccd__header">
+    <h2 class="ccd__title">
+      {{ section.settings.title | default: 'Votre panier' | escape }}
+      <span class="ccd__header-count" data-ccd-count>({{ cart.item_count }})</span>
+    </h2>
+    <button class="ccd__close" data-ccd-close type="button" aria-label="Fermer le panier">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  {%- comment %} ── Body (défilable) ─────────────────────────── {% endcomment %}
+  <div class="ccd__body">
+
+    {%- comment %} Barre livraison gratuite {% endcomment %}
+    {%- if section.settings.show_shipping_bar and threshold_cents > 0 -%}
+      <div class="ccd__shipping" data-ccd-shipping>
+        <p class="ccd__shipping-msg" data-ccd-shipping-msg>
+          {%- if cart.total_price >= threshold_cents -%}
+            {{ section.settings.shipping_free_msg | default: 'Félicitations ! Livraison gratuite !' | escape }}
+          {%- else -%}
+            {%- assign remaining = threshold_cents | minus: cart.total_price -%}
+            Plus que {{ remaining | money_without_trailing_zeros }} pour la livraison gratuite !
+          {%- endif -%}
+        </p>
+        <div class="ccd__shipping-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ shipping_pct }}">
+          <div class="ccd__shipping-fill" data-ccd-shipping-bar style="width: {{ shipping_pct }}%"></div>
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- comment %} Liste d'articles {% endcomment %}
+    <div class="ccd__items" data-ccd-items>
+      {%- for item in cart.items -%}
+        {%- render 'custom-cart-drawer-item', item: item -%}
+      {%- endfor -%}
+    </div>
+
+    {%- comment %} Panier vide {% endcomment %}
+    <div class="ccd__empty" data-ccd-empty {% if cart.item_count > 0 %}hidden{% endif %}>
+      <svg class="ccd__empty-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="40" cy="40" r="38" stroke="currentColor" stroke-width="1.5" opacity="0.12"/>
+        <path d="M24 36H56L51 56H29L24 36Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" opacity="0.35"/>
+        <path d="M18 28H26L30 36" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+        <circle cx="33" cy="61" r="3" fill="currentColor" opacity="0.35"/>
+        <circle cx="47" cy="61" r="3" fill="currentColor" opacity="0.35"/>
+      </svg>
+      <p class="ccd__empty-msg">{{ section.settings.empty_message | default: 'Votre panier est vide' | escape }}</p>
+      <a class="ccd__empty-cta" href="{{ routes.all_products_collection_url }}">
+        {{ section.settings.empty_cta | default: 'Continuer mes achats' | escape }}
+      </a>
+    </div>
+
+    {%- comment %} Upsell {% endcomment %}
+    {%- if has_upsell -%}
+      <div class="ccd__upsell" data-ccd-upsell {% if cart.item_count == 0 %}hidden{% endif %}>
+        <p class="ccd__upsell-title">{{ section.settings.upsell_title | default: 'Vous aimerez peut-être' | escape }}</p>
+        <div class="ccd__upsell-list">
+          {%- if up1 != blank and up1.available -%}
+            <div class="ccd__upsell-item" data-ccd-upsell-product data-product-id="{{ up1.id }}">
+              {%- if up1.featured_image != blank -%}
+                <img class="ccd__upsell-img" src="{{ up1.featured_image | image_url: width: 120 }}" alt="{{ up1.featured_image.alt | default: up1.title | escape }}" width="60" height="60" loading="lazy">
+              {%- endif -%}
+              <div class="ccd__upsell-info">
+                <p class="ccd__upsell-name">{{ up1.title | truncatewords: 5 | escape }}</p>
+                <p class="ccd__upsell-price">{{ up1.price | money }}</p>
+              </div>
+              <button class="ccd__upsell-add" data-ccd-upsell-add="{{ up1.first_available_variant.id }}" type="button" aria-label="Ajouter {{ up1.title | escape }}">
+                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+          {%- endif -%}
+          {%- if up2 != blank and up2.available -%}
+            <div class="ccd__upsell-item" data-ccd-upsell-product data-product-id="{{ up2.id }}">
+              {%- if up2.featured_image != blank -%}
+                <img class="ccd__upsell-img" src="{{ up2.featured_image | image_url: width: 120 }}" alt="{{ up2.featured_image.alt | default: up2.title | escape }}" width="60" height="60" loading="lazy">
+              {%- endif -%}
+              <div class="ccd__upsell-info">
+                <p class="ccd__upsell-name">{{ up2.title | truncatewords: 5 | escape }}</p>
+                <p class="ccd__upsell-price">{{ up2.price | money }}</p>
+              </div>
+              <button class="ccd__upsell-add" data-ccd-upsell-add="{{ up2.first_available_variant.id }}" type="button" aria-label="Ajouter {{ up2.title | escape }}">
+                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+  </div>
+  {%- comment %} fin body {% endcomment %}
+
+  {%- comment %} ── Options cadeau ───────────────────────────── {% endcomment %}
+  {%- if section.settings.show_gift_options and cart.item_count > 0 -%}
+    {%- render 'custom-gift-options',
+        accent_color:   section.settings.accent_color,
+        wrapping_price: section.settings.gift_wrapping_price
+    -%}
+  {%- endif -%}
+
+  {%- comment %} ── Footer ──────────────────────────────────── {% endcomment %}
+  <div class="ccd__footer" data-ccd-footer {% if cart.item_count == 0 %}hidden{% endif %}>
+    <div class="ccd__subtotal">
+      <span class="ccd__subtotal-label">Sous-total</span>
+      <span class="ccd__subtotal-price" data-ccd-total>{{ cart.total_price | money }}</span>
+    </div>
+    {%- if section.settings.tax_note != blank -%}
+      <p class="ccd__tax-note">{{ section.settings.tax_note | escape }}</p>
+    {%- endif -%}
+    <a class="ccd__checkout" href="{{ routes.cart_url }}/checkout">
+      {{ section.settings.checkout_label | default: 'Commander' | escape }}
+    </a>
+    {%- if section.settings.show_payment_icons -%}
+      <div class="ccd__payment" aria-label="Paiements sécurisés acceptés">
+        {%- comment %} Visa {% endcomment %}
+        <svg class="ccd__pay-icon" viewBox="0 0 50 32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Visa">
+          <rect width="50" height="32" rx="4" fill="#1A1F71"/>
+          <path d="M21 21H18.5L20.1 11H22.6L21 21ZM28 11.4C27.4 11.1 26.5 10.9 25.4 10.9C22.8 10.9 21 12.3 21 14.2C20.9 15.7 22.3 16.5 23.3 17C24.3 17.5 24.7 17.8 24.7 18.3C24.6 19 23.8 19.4 22.9 19.4C21.7 19.4 21 19.2 20 18.7L19.6 18.5L19.2 21.2C19.9 21.5 21.3 21.8 22.6 21.8C25.5 21.8 27.3 20.5 27.3 18.4C27.3 17.3 26.6 16.4 25.2 15.7C24.3 15.2 23.7 14.8 23.7 14.3C23.8 13.8 24.4 13.3 25.6 13.3C26.6 13.3 27.3 13.5 27.9 13.8L28.2 13.9L28.6 11.5L28 11.4ZM35.4 11H33.3C32.7 11 32.3 11.2 32 11.8L28.4 21H31.2L31.8 19.4H35.2L35.6 21H38L35.4 11ZM32.6 17.3C32.8 16.7 33.6 14.6 33.6 14.6L34.3 17.3H32.6ZM16.8 11L14.2 18.2L13.9 16.7C13.4 15 12 13.3 10.3 12.4L12.7 21H15.5L19.7 11H16.8Z" fill="white"/>
+        </svg>
+        {%- comment %} Mastercard {% endcomment %}
+        <svg class="ccd__pay-icon" viewBox="0 0 50 32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mastercard">
+          <rect width="50" height="32" rx="4" fill="#252525"/>
+          <circle cx="20" cy="16" r="8" fill="#EB001B"/>
+          <circle cx="30" cy="16" r="8" fill="#F79E1B"/>
+          <path d="M25 10.2C26.6 11.5 27.6 13.6 27.6 16C27.6 18.4 26.6 20.5 25 21.8C23.4 20.5 22.4 18.4 22.4 16C22.4 13.6 23.4 11.5 25 10.2Z" fill="#FF5F00"/>
+        </svg>
+        {%- comment %} PayPal {% endcomment %}
+        <svg class="ccd__pay-icon" viewBox="0 0 50 32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PayPal">
+          <rect width="50" height="32" rx="4" fill="#F5F5F5" stroke="#E0E0E0" stroke-width="0.5"/>
+          <path d="M19 22L21 10H26C28.8 10 30 11.5 29.5 14C29 16.5 27 18 24.5 18H22.5L22 22H19Z" fill="#009CDE"/>
+          <path d="M22 20L23.8 9H29C31.8 9 33 10.5 32.5 13C32 15.5 30 17 27.5 17H25.5L25 20H22Z" fill="#003087"/>
+        </svg>
+        {%- comment %} CB / Paiement sécurisé {% endcomment %}
+        <svg class="ccd__pay-icon" viewBox="0 0 50 32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Paiement sécurisé">
+          <rect width="50" height="32" rx="4" fill="#F5F5F5" stroke="#E0E0E0" stroke-width="0.5"/>
+          <rect x="8" y="9" width="34" height="14" rx="2" stroke="#555" stroke-width="1.2" fill="none"/>
+          <rect x="8" y="13" width="34" height="4" fill="#555" opacity="0.4"/>
+          <rect x="12" y="19" width="6" height="2" rx="1" fill="#555" opacity="0.5"/>
+          <path d="M34 17L35.5 15.5L37 17L35.5 18.5L34 17Z" fill="#C9A96E"/>
+        </svg>
+      </div>
+    {%- endif -%}
+  </div>
+
+</div>
+
+<script src="{{ 'custom-cart-drawer.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Panier - Drawer",
+  "tag": "div",
+  "class": "ccd-section",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre du panier",
+      "default": "Votre panier"
+    },
+    {
+      "type": "text",
+      "id": "empty_message",
+      "label": "Message panier vide",
+      "default": "Votre panier est vide"
+    },
+    {
+      "type": "text",
+      "id": "empty_cta",
+      "label": "Bouton panier vide",
+      "default": "Continuer mes achats"
+    },
+    {
+      "type": "text",
+      "id": "tax_note",
+      "label": "Note taxes & livraison",
+      "default": "Taxes et livraison calculées à l'étape suivante"
+    },
+    {
+      "type": "text",
+      "id": "checkout_label",
+      "label": "Texte du bouton commander",
+      "default": "Commander"
+    },
+    {
+      "type": "header",
+      "content": "Livraison gratuite"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shipping_bar",
+      "label": "Afficher la barre de livraison gratuite",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "free_shipping_threshold",
+      "label": "Seuil livraison gratuite",
+      "min": 0,
+      "max": 500,
+      "step": 5,
+      "unit": "€",
+      "default": 50
+    },
+    {
+      "type": "text",
+      "id": "shipping_free_msg",
+      "label": "Message livraison gratuite atteinte",
+      "default": "Félicitations ! Livraison gratuite !"
+    },
+    {
+      "type": "header",
+      "content": "Upsell"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_upsell",
+      "label": "Afficher les produits recommandés",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "upsell_title",
+      "label": "Titre de la section upsell",
+      "default": "Vous aimerez peut-être"
+    },
+    {
+      "type": "product",
+      "id": "upsell_product_1",
+      "label": "Produit recommandé 1"
+    },
+    {
+      "type": "product",
+      "id": "upsell_product_2",
+      "label": "Produit recommandé 2"
+    },
+    {
+      "type": "header",
+      "content": "Options cadeau"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gift_options",
+      "label": "Afficher les options cadeau",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "gift_wrapping_price",
+      "label": "Prix emballage cadeau (0 = gratuit)",
+      "min": 0,
+      "max": 1000,
+      "step": 50,
+      "default": 0,
+      "unit": "cts"
+    },
+    {
+      "type": "header",
+      "content": "Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Afficher les icônes de paiement",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent (barre, boutons)",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Texte du bouton Commander",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Panier - Drawer"
+    }
+  ]
+}
+{% endschema %}

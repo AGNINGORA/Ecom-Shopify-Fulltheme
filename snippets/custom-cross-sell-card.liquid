@@ -1,0 +1,81 @@
+{% comment %}
+  custom-cross-sell-card.liquid
+  Carte produit pour le fallback Liquid du cross-sell
+  Accepte : product, section
+{% endcomment %}
+
+{%- liquid
+  assign img = product.featured_media
+  assign second_img = nil
+  if product.media.size > 1
+    assign second_img = product.media[1]
+  endif
+  assign price = product.price
+  assign compare = product.compare_at_price
+  assign on_sale = false
+  if compare > price
+    assign on_sale = true
+  endif
+  assign first_variant = product.variants.first
+-%}
+
+<div class="ccs__card" role="listitem" data-ccs-card>
+  <div class="ccs__img-wrap">
+    <a class="ccs__img-link" href="{{ product.url }}">
+      {%- if img -%}
+        <img
+          class="ccs__img ccs__img--primary"
+          src="{{ img | image_url: width: 400 }}"
+          alt="{{ img.alt | escape | default: product.title | escape }}"
+          loading="lazy"
+          width="400"
+          height="400"
+        >
+        {%- if second_img -%}
+          <img
+            class="ccs__img ccs__img--secondary"
+            src="{{ second_img | image_url: width: 400 }}"
+            alt="{{ second_img.alt | escape | default: product.title | escape }}"
+            loading="lazy"
+            width="400"
+            height="400"
+            aria-hidden="true"
+          >
+        {%- endif -%}
+      {%- else -%}
+        <div class="ccs__img-placeholder"></div>
+      {%- endif -%}
+    </a>
+  </div>
+  <div class="ccs__card-body">
+    <a class="ccs__product-name" href="{{ product.url }}">{{ product.title | escape }}</a>
+    <div class="ccs__price-row">
+      {%- if on_sale -%}
+        <span class="ccs__price">{{ price | money }}</span>
+        <s class="ccs__price-compare">{{ compare | money }}</s>
+      {%- else -%}
+        <span class="ccs__price">{{ price | money }}</span>
+      {%- endif -%}
+    </div>
+    {%- if product.available -%}
+      <button
+        class="ccs__atc-btn"
+        data-ccs-atc
+        data-variant-id="{{ first_variant.id }}"
+        type="button"
+      >
+        <span class="ccs__atc-label">Ajouter</span>
+        <span class="ccs__atc-spinner" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5"
+              stroke-dasharray="28" stroke-dashoffset="10" stroke-linecap="round"/>
+          </svg>
+        </span>
+      </button>
+    {%- else -%}
+      <button class="ccs__atc-btn" disabled type="button">
+        <span class="ccs__atc-label">Épuisé</span>
+      </button>
+    {%- endif -%}
+  </div>
+</div>

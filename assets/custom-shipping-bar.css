@@ -1,0 +1,304 @@
+/* =============================================================
+   custom-shipping-bar.css
+   Barre de livraison gratuite — redesign moderne
+   Dawn 15.x · Mobile-first · Variables CSS
+   ============================================================= */
+
+/* ── Section wrapper ────────────────────────────────────────── */
+.csb-section {
+  width: 100%;
+}
+
+/* ── Barre principale ───────────────────────────────────────── */
+.csb__wrap {
+  width: 100%;
+  background: var(--csb-bg, #faf8f5);
+  color: var(--csb-text, #111111);
+  font-size: var(--csb-font-size, 1.3rem);
+  border-top: var(--csb-border-width, 0px) solid var(--csb-border-color, rgba(0,0,0,.08));
+  border-bottom: var(--csb-border-width, 0px) solid var(--csb-border-color, rgba(0,0,0,.08));
+  transition: background 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+}
+
+.csb__wrap[hidden] {
+  display: none !important;
+}
+
+/* ── Styles de barre ─────────────────────────────────────────── */
+.csb__wrap--style-minimal {
+  border: none;
+  background: transparent;
+}
+
+.csb__wrap--style-banner {
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+
+.csb__wrap--style-floating {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99;
+  width: auto;
+  min-width: 320px;
+  max-width: min(92vw, 560px);
+  border-radius: var(--csb-radius, 12px);
+  box-shadow: 0 4px 24px rgba(0,0,0,.12);
+  border: none;
+}
+
+.csb__wrap--style-floating.csb__wrap--pos-top {
+  top: 12px;
+}
+
+.csb__wrap--style-floating.csb__wrap--pos-bottom {
+  bottom: 12px;
+  top: auto;
+}
+
+@media (min-width: 750px) {
+  .csb__wrap--style-floating {
+    min-width: 400px;
+  }
+}
+
+/* ── Position ──────────────────────────────────────────────── */
+.csb__wrap--pos-bottom:not(.csb__wrap--style-floating) {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 99;
+}
+
+/* Mode sticky */
+.csb__wrap--sticky {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* ── Contenu centré ─────────────────────────────────────────── */
+.csb__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: var(--csb-padding-y, 0.8rem) var(--csb-padding-x, 1.5rem);
+}
+
+@media (min-width: 750px) {
+  .csb__inner--layout-inline {
+    flex-direction: row;
+    gap: 1.6rem;
+  }
+
+  .csb__inner--layout-stacked {
+    flex-direction: column;
+  }
+}
+
+/* ── Icône ──────────────────────────────────────────────────── */
+.csb__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--csb-icon-size, 22px);
+  height: var(--csb-icon-size, 22px);
+  color: var(--csb-fill, #C9A96E);
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.csb__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.csb__wrap--free .csb__icon {
+  color: var(--csb-fill-free, #22c55e);
+  animation: csb-icon-bounce 0.5s ease;
+}
+
+@keyframes csb-icon-bounce {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.2); }
+  60%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+/* ── Contenu texte + barre ────────────────────────────────── */
+.csb__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.csb__inner--layout-inline .csb__content {
+  align-items: flex-start;
+}
+
+/* ── Message ────────────────────────────────────────────────── */
+.csb__msg {
+  margin: 0;
+  font-size: inherit;
+  font-weight: var(--csb-font-weight, 400);
+  text-align: center;
+  transition: opacity 0.25s ease;
+  line-height: 1.4;
+}
+
+.csb__msg strong {
+  font-weight: 700;
+  color: var(--csb-highlight, var(--csb-fill, #C9A96E));
+}
+
+.csb__inner--layout-inline .csb__msg {
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Message quand livraison gratuite atteinte */
+.csb__wrap--free .csb__msg {
+  text-align: center;
+  width: 100%;
+  font-weight: 600;
+}
+
+.csb__wrap--free .csb__msg strong {
+  color: var(--csb-fill-free, #22c55e);
+}
+
+/* ── Barre de progression ───────────────────────────────────── */
+.csb__track {
+  width: 100%;
+  height: var(--csb-bar-height, 6px);
+  background: var(--csb-track-bg, rgba(0,0,0,.07));
+  border-radius: var(--csb-bar-radius, 99px);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.csb__inner--layout-inline .csb__track {
+  flex: 1;
+}
+
+/* Masquer la track quand livraison atteinte */
+.csb__wrap--free .csb__track {
+  display: none;
+}
+
+/* ── Remplissage ────────────────────────────────────────────── */
+.csb__fill {
+  height: 100%;
+  background: var(--csb-fill, #C9A96E);
+  border-radius: var(--csb-bar-radius, 99px);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.4s ease;
+  min-width: 0;
+  will-change: width;
+  position: relative;
+}
+
+/* Shimmer animé sur la progression */
+.csb__fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.3) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: csb-shimmer 2s ease infinite;
+  border-radius: inherit;
+}
+
+@keyframes csb-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.csb__wrap--no-shimmer .csb__fill::after {
+  display: none;
+}
+
+/* Couleur quand livraison gratuite atteinte */
+.csb__fill[data-free] {
+  background: var(--csb-fill-free, #22c55e);
+}
+
+/* ── Animation message "gratuit" ─────────────────────────────── */
+@keyframes csb-celebrate {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+.csb__wrap--free .csb__msg {
+  animation: csb-celebrate 0.4s ease;
+}
+
+/* ── Pourcentage badge ──────────────────────────────────────── */
+.csb__pct {
+  font-size: 0.85em;
+  font-weight: 700;
+  color: var(--csb-fill, #C9A96E);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.csb__wrap--free .csb__pct {
+  color: var(--csb-fill-free, #22c55e);
+}
+
+/* ── Bouton fermer (floating) ───────────────────────────────── */
+.csb__close {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--csb-text, #111);
+  opacity: 0.4;
+  padding: 4px;
+  line-height: 0;
+  transition: opacity 0.2s;
+}
+
+.csb__close:hover {
+  opacity: 1;
+}
+
+.csb__close svg {
+  width: 14px;
+  height: 14px;
+}
+
+.csb__wrap:not(.csb__wrap--style-floating) .csb__close {
+  display: none;
+}
+
+/* ── Réduction mouvement ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .csb__fill,
+  .csb__icon,
+  .csb__wrap {
+    transition: none;
+  }
+
+  .csb__fill::after {
+    animation: none;
+  }
+
+  .csb__wrap--free .csb__msg {
+    animation: none;
+  }
+
+  .csb__wrap--free .csb__icon {
+    animation: none;
+  }
+}

@@ -1,0 +1,143 @@
+/* ═══════════════════════════════════════════════
+   Custom A/B Testing – Dashboard & variant toggling
+   Dawn 15.x · Mobile-first
+   ═══════════════════════════════════════════════ */
+
+/* ── Hidden variants ── */
+[data-ab-variant] {
+  display: none !important;
+}
+
+[data-ab-variant].ab-active {
+  display: revert !important;
+}
+
+/* ── Floating admin badge (visible only with ?ab_debug=1) ── */
+.ab-debug-badge {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 9998;
+  background: #111;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: .8rem;
+  font-family: system-ui, sans-serif;
+  box-shadow: 0 4px 20px rgba(0,0,0,.25);
+  cursor: pointer;
+  display: none;
+}
+
+.ab-debug-badge.is-visible {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ab-debug-badge__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: ab-pulse 2s infinite;
+}
+
+@keyframes ab-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+
+/* ── Debug panel ── */
+.ab-debug-panel {
+  position: fixed;
+  bottom: 60px;
+  right: 16px;
+  z-index: 9999;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.18);
+  width: 320px;
+  max-height: 70vh;
+  overflow-y: auto;
+  display: none;
+  font-family: system-ui, sans-serif;
+}
+
+.ab-debug-panel.is-open {
+  display: block;
+}
+
+.ab-debug-panel__header {
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+  font-weight: 700;
+  font-size: .95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ab-debug-panel__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  opacity: .5;
+}
+
+.ab-debug-panel__close:hover { opacity: 1; }
+
+.ab-debug-panel__list {
+  padding: 12px 16px;
+}
+
+.ab-debug-test {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ab-debug-test:last-child { border-bottom: none; }
+
+.ab-debug-test__name {
+  font-weight: 600;
+  font-size: .85rem;
+  margin-bottom: 6px;
+}
+
+.ab-debug-test__variants {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ab-debug-test__btn {
+  padding: 4px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  font-size: .78rem;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.ab-debug-test__btn.is-active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.ab-debug-test__btn:hover:not(.is-active) {
+  border-color: #999;
+}
+
+.ab-debug-test__stats {
+  font-size: .72rem;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* ── Section wrapper for A/B variants ── */
+.ab-section {
+  position: relative;
+}

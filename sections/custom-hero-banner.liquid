@@ -1,0 +1,500 @@
+{% comment %}
+  custom-hero-banner.liquid
+  Hero plein écran — image ou vidéo, parallax, mobile-first
+  Dawn 15.x · Parallax inline JS
+  CSS : assets/custom-hero-banner.css
+{% endcomment %}
+
+{{ 'custom-hero-banner.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign img_desktop = section.settings.image_desktop
+  assign img_mobile  = section.settings.image_mobile
+  assign has_image   = false
+  if img_desktop != blank
+    assign has_image = true
+  endif
+  assign has_video = false
+  if section.settings.content_type == 'video' and section.settings.video != blank
+    assign has_video = true
+  endif
+
+  assign overlay_opacity_dec = section.settings.overlay_opacity | divided_by: 100.0
+
+  assign txt_align = section.settings.text_alignment
+  assign txt_pos   = section.settings.text_position
+
+  assign cta_label = section.settings.cta_label
+  assign cta_url   = section.settings.cta_url
+  assign cta_style = section.settings.cta_style
+-%}
+
+<section
+  class="chb"
+  data-section-id="{{ section.id }}"
+  {% if section.settings.enable_parallax and has_image %}data-chb-parallax{% endif %}
+  style="
+    --chb-height-desktop: {{ section.settings.height_desktop }}vh;
+    --chb-height-mobile:  {{ section.settings.height_mobile }}vh;
+    --chb-overlay:        {{ section.settings.overlay_color }};
+    --chb-overlay-opacity:{{ overlay_opacity_dec }};
+    --chb-text:           {{ section.settings.text_color }};
+    --chb-cta-bg:         {{ section.settings.cta_bg }};
+    --chb-cta-txt:        {{ section.settings.cta_text_color }};
+  "
+  {{ section.shopify_attributes }}
+>
+
+  {%- comment %} ── Media (image ou vidéo) ────────────────────── {% endcomment %}
+  <div class="chb__media" data-chb-media>
+
+    {%- if has_video -%}
+      {%- comment %} Vidéo Shopify hébergée {% endcomment %}
+      <video
+        class="chb__video"
+        {% if section.settings.video_autoplay %}autoplay muted{% endif %}
+        loop
+        playsinline
+        preload="metadata"
+        poster="{{ section.settings.video.preview_image | image_url: width: 1920 }}"
+      >
+        {%- for source in section.settings.video.sources -%}
+          <source src="{{ source.url }}" type="{{ source.mime_type }}">
+        {%- endfor -%}
+      </video>
+
+    {%- elsif has_image -%}
+      {%- comment %} Image desktop + mobile via <picture> {% endcomment %}
+      <picture>
+        {%- if img_mobile != blank -%}
+          <source
+            media="(max-width: 749px)"
+            srcset="
+              {{ img_mobile | image_url: width: 375, format: 'webp' }} 375w,
+              {{ img_mobile | image_url: width: 750, format: 'webp' }} 750w
+            "
+            width="{{ img_mobile.width }}"
+            height="{{ img_mobile.height }}"
+          >
+        {%- elsif img_desktop != blank -%}
+          {%- comment %} Recadrer l'image desktop à ratio portrait sur mobile {% endcomment %}
+          <source
+            media="(max-width: 749px)"
+            srcset="
+              {{ img_desktop | image_url: width: 375, format: 'webp' }} 375w,
+              {{ img_desktop | image_url: width: 750, format: 'webp' }} 750w
+            "
+          >
+        {%- endif -%}
+        <img
+          class="chb__img"
+          data-chb-img
+          src="{{ img_desktop | image_url: width: 1920, format: 'webp' }}"
+          srcset="
+            {{ img_desktop | image_url: width: 750, format: 'webp' }}  750w,
+            {{ img_desktop | image_url: width: 1100, format: 'webp' }} 1100w,
+            {{ img_desktop | image_url: width: 1500, format: 'webp' }} 1500w,
+            {{ img_desktop | image_url: width: 1920, format: 'webp' }} 1920w
+          "
+          sizes="100vw"
+          alt="{{ img_desktop.alt | default: section.settings.title | escape }}"
+          width="{{ img_desktop.width }}"
+          height="{{ img_desktop.height }}"
+          loading="eager"
+          fetchpriority="high"
+          draggable="false"
+        >
+      </picture>
+
+    {%- elsif request.design_mode -%}
+      {%- comment %} Placeholder éditeur {% endcomment %}
+      <div class="chb__placeholder">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'chb__placeholder-svg' }}
+      </div>
+    {%- endif -%}
+
+  </div>
+
+  {%- comment %} ── Overlay ──────────────────────────────────── {% endcomment %}
+  <div class="chb__overlay" aria-hidden="true"></div>
+
+  {%- comment %} ── Contenu texte ─────────────────────────────── {% endcomment %}
+  <div class="chb__content chb__content--{{ txt_align }} chb__content--{{ txt_pos }}">
+    <div class="page-width">
+      <div class="chb__text">
+
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="chb__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.title != blank -%}
+          <h2 class="chb__title chb__title--{{ section.settings.title_size }}">
+            {{ section.settings.title | newline_to_br }}
+          </h2>
+        {%- endif -%}
+
+        {%- if section.settings.subtitle != blank -%}
+          <p class="chb__subtitle">{{ section.settings.subtitle | escape }}</p>
+        {%- endif -%}
+
+        {%- if cta_label != blank and cta_url != blank -%}
+          <div class="chb__ctas">
+            <a
+              class="chb__cta chb__cta--{{ cta_style }}"
+              href="{{ cta_url }}"
+            >
+              {{ cta_label | escape }}
+            </a>
+
+            {%- if section.settings.cta2_label != blank and section.settings.cta2_url != blank -%}
+              <a
+                class="chb__cta chb__cta--{{ section.settings.cta2_style }}"
+                href="{{ section.settings.cta2_url }}"
+              >
+                {{ section.settings.cta2_label | escape }}
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+      </div>
+    </div>
+  </div>
+
+  {%- comment %} ── Flèche de défilement (optionnelle) ───────── {% endcomment %}
+  {%- if section.settings.show_scroll_arrow -%}
+    <div class="chb__scroll-arrow" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  {%- endif -%}
+
+</section>
+
+{%- comment %} ── Parallax (inline, zéro dépendance) ────────── {% endcomment %}
+{%- if section.settings.enable_parallax and has_image -%}
+<script>
+(function () {
+  'use strict';
+
+  const section = document.querySelector('.chb[data-section-id="{{ section.id }}"]');
+  if (!section) return;
+
+  const media = section.querySelector('[data-chb-media]');
+  if (!media) return;
+
+  // N'appliquer que si pas de préférence pour réduire le mouvement
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) return;
+
+  // Facteur : 0 = immobile, 0.4 = parallax fort
+  const FACTOR = 0.3;
+  let ticking   = false;
+
+  function update() {
+    const rect  = section.getBoundingClientRect();
+    const vh    = window.innerHeight;
+
+    // Seulement quand la section est visible
+    if (rect.bottom < 0 || rect.top > vh) {
+      ticking = false;
+      return;
+    }
+
+    // Ratio de progression de la section dans le viewport (-1 → 1)
+    const progress = -(rect.top / (vh + rect.height));
+    const shift    = progress * rect.height * FACTOR;
+
+    media.style.transform = 'translateY(' + shift.toFixed(1) + 'px)';
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', function () {
+    if (!ticking) {
+      window.requestAnimationFrame(update);
+      ticking = true;
+    }
+  }, { passive: true });
+
+  // Init
+  update();
+})();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Hero Banner",
+  "tag": "div",
+  "class": "section-custom-hero-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Média"
+    },
+    {
+      "type": "select",
+      "id": "content_type",
+      "label": "Type de contenu",
+      "options": [
+        { "value": "image", "label": "Image" },
+        { "value": "video", "label": "Vidéo" }
+      ],
+      "default": "image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_desktop",
+      "label": "Image (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Image mobile (optionnelle)",
+      "info": "Si vide, l'image desktop est utilisée sur mobile"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Vidéo (hébergée sur Shopify)"
+    },
+    {
+      "type": "checkbox",
+      "id": "video_autoplay",
+      "label": "Lecture automatique (muette)",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Couleur de l'overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Opacité de l'overlay",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Hauteur"
+    },
+    {
+      "type": "range",
+      "id": "height_desktop",
+      "label": "Hauteur desktop",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "label": "Hauteur mobile",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Texte"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Alignement horizontal",
+      "options": [
+        { "value": "left",   "label": "Gauche" },
+        { "value": "center", "label": "Centre" },
+        { "value": "right",  "label": "Droite" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_position",
+      "label": "Position verticale",
+      "options": [
+        { "value": "top",    "label": "Haut" },
+        { "value": "middle", "label": "Milieu" },
+        { "value": "bottom", "label": "Bas" }
+      ],
+      "default": "middle"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Couleur du texte",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Accroche (au-dessus du titre)",
+      "placeholder": "ex : Nouveauté · Collection Printemps"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Titre",
+      "default": "Révélez votre beauté naturelle"
+    },
+    {
+      "type": "select",
+      "id": "title_size",
+      "label": "Taille du titre",
+      "options": [
+        { "value": "sm", "label": "Petite" },
+        { "value": "md", "label": "Moyenne" },
+        { "value": "lg", "label": "Grande" },
+        { "value": "xl", "label": "Très grande" }
+      ],
+      "default": "lg"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Sous-titre",
+      "default": "Des soins naturels conçus pour sublimer votre peau au quotidien."
+    },
+    {
+      "type": "header",
+      "content": "Bouton principal"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Texte du bouton",
+      "default": "Découvrir la collection"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Lien du bouton"
+    },
+    {
+      "type": "select",
+      "id": "cta_style",
+      "label": "Style du bouton",
+      "options": [
+        { "value": "filled",  "label": "Plein" },
+        { "value": "outline", "label": "Contour" },
+        { "value": "link",    "label": "Lien texte" }
+      ],
+      "default": "filled"
+    },
+    {
+      "type": "color",
+      "id": "cta_bg",
+      "label": "Fond du bouton",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "Texte du bouton",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Bouton secondaire (optionnel)"
+    },
+    {
+      "type": "text",
+      "id": "cta2_label",
+      "label": "Texte du 2e bouton",
+      "placeholder": "ex : En savoir plus"
+    },
+    {
+      "type": "url",
+      "id": "cta2_url",
+      "label": "Lien du 2e bouton"
+    },
+    {
+      "type": "select",
+      "id": "cta2_style",
+      "label": "Style du 2e bouton",
+      "options": [
+        { "value": "filled",  "label": "Plein" },
+        { "value": "outline", "label": "Contour" },
+        { "value": "link",    "label": "Lien texte" }
+      ],
+      "default": "outline"
+    },
+    {
+      "type": "header",
+      "content": "Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_parallax",
+      "label": "Effet parallax au défilement",
+      "default": true,
+      "info": "Désactivé automatiquement si l'utilisateur préfère réduire le mouvement"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scroll_arrow",
+      "label": "Afficher la flèche de défilement",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace au-dessus",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en-dessous",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Banner",
+      "settings": {
+        "content_type": "image",
+        "title": "Révélez votre beauté naturelle",
+        "subtitle": "Des soins naturels conçus pour sublimer votre peau au quotidien.",
+        "cta_label": "Découvrir la collection",
+        "cta_style": "filled",
+        "text_alignment": "center",
+        "text_position": "middle",
+        "height_desktop": 80,
+        "height_mobile": 60,
+        "overlay_opacity": 40,
+        "enable_parallax": true,
+        "show_scroll_arrow": true
+      }
+    }
+  ]
+}
+{% endschema %}
