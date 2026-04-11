@@ -1,15 +1,52 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "product-hero": {
       "type": "custom-product-hero",
       "settings": {
-        "padding_top": 40,
-        "padding_bottom": 0
+        "cqb_enabled": true,
+        "cqb_qty2": 2,
+        "cqb_disc2": 5,
+        "cqb_qty3": 3,
+        "cqb_disc3": 10,
+        "cbxgy_enabled": true,
+        "cbxgy_qty_buy": 2,
+        "cbxgy_qty_free": 1,
+        "cbxgy_discount_pct": 0,
+        "cbxgy_badge_text": "1 offert 🎉",
+        "cbxgy_offer_text": "2 achetés = 1 offert",
+        "cbxgy_badge_color": "#111111",
+        "show_badge_vegan": false,
+        "show_badge_cruelty_free": false,
+        "show_badge_made_in_france": false,
+        "badge_bestseller_bg": "#c9a96e",
+        "badge_bestseller_color": "#ffffff",
+        "badge_vegan_bg": "#4caf50",
+        "badge_vegan_color": "#ffffff",
+        "badge_cruelty_bg": "#e91e8c",
+        "badge_cruelty_color": "#ffffff",
+        "badge_mif_bg": "#002395",
+        "badge_mif_color": "#ffffff",
+        "badge_new_bg": "#9c27b0",
+        "badge_new_color": "#ffffff",
+        "badge_discount_bg": "#e53935",
+        "badge_discount_color": "#ffffff"
       }
     },
     "trust-badges": {
       "type": "custom-trust-badges",
       "settings": {
+        "color_scheme": "",
+        "background_color": "#f9f6f2",
+        "border_color": "#e8e2da",
         "padding_top": 24,
         "padding_bottom": 24
       }
@@ -17,6 +54,15 @@
     "product-tabs": {
       "type": "custom-product-tabs",
       "settings": {
+        "label_description": "Description",
+        "label_ingredients": "Ingrédients clés",
+        "label_how_to_use": "Comment utiliser",
+        "label_composition": "Composition complète",
+        "skin_label": "Adapté à",
+        "accent_color": "#c9a96e",
+        "border_color": "#e8e2da",
+        "tab_bg": "#f9f6f2",
+        "tab_active_bg": "#ffffff",
         "padding_top": 48,
         "padding_bottom": 48
       }
@@ -24,6 +70,15 @@
     "routine-builder": {
       "type": "custom-routine-builder",
       "settings": {
+        "title": "Complétez votre routine",
+        "subtitle": "Des produits sélectionnés pour vous",
+        "button_label": "Ajouter la routine au panier",
+        "discount_percent": 15,
+        "accent_color": "#c9a96e",
+        "border_color": "#e8e2da",
+        "checked_bg": "#fdf8f2",
+        "button_bg": "#111111",
+        "button_color": "#ffffff",
         "padding_top": 64,
         "padding_bottom": 64
       }
@@ -31,6 +86,15 @@
     "bundle-offer": {
       "type": "custom-bundle-offer",
       "settings": {
+        "title": "Offres spéciales",
+        "subtitle": "Plus vous achetez, plus vous économisez",
+        "button_label": "Ajouter le lot au panier",
+        "best_badge_label": "MEILLEURE OFFRE",
+        "accent_color": "#c9a96e",
+        "border_color": "#e8e2da",
+        "badge_bg": "#c9a96e",
+        "button_bg": "#111111",
+        "button_color": "#ffffff",
         "padding_top": 64,
         "padding_bottom": 64
       }
@@ -38,6 +102,15 @@
     "before-after": {
       "type": "custom-before-after",
       "settings": {
+        "mode": "single",
+        "title": "Des résultats prouvés",
+        "subtitle": "Constatez la différence avec nos clientes",
+        "gallery_columns": "3",
+        "accent_color": "#c9a96e",
+        "label_bg": "#111111",
+        "label_color": "#ffffff",
+        "handle_color": "#ffffff",
+        "stat_number_color": "#c9a96e",
         "padding_top": 64,
         "padding_bottom": 64
       }
@@ -45,6 +118,12 @@
     "reviews": {
       "type": "custom-reviews",
       "settings": {
+        "title": "Ce que disent nos clientes",
+        "per_page": 5,
+        "review_layout": "grid",
+        "accent_color": "#c9a96e",
+        "star_color": "#f4b942",
+        "border_color": "#e8e2da",
         "padding_top": 64,
         "padding_bottom": 64
       }
@@ -52,6 +131,11 @@
     "product-faq": {
       "type": "custom-product-faq",
       "settings": {
+        "title": "Questions fréquentes",
+        "accent_color": "#c9a96e",
+        "border_color": "#e8e2da",
+        "question_color": "#111111",
+        "answer_color": "#444444",
         "padding_top": 64,
         "padding_bottom": 64
       }
@@ -59,6 +143,12 @@
     "cross-sell": {
       "type": "custom-cross-sell",
       "settings": {
+        "title": "Vous aimerez aussi",
+        "products_count": 6,
+        "accent_color": "#c9a96e",
+        "star_color": "#f4b942",
+        "button_bg": "#111111",
+        "button_color": "#ffffff",
         "padding_top": 64,
         "padding_bottom": 64
       }
@@ -69,9 +159,7 @@
         "title": "Récemment consultés",
         "max_products": 8,
         "columns": "4",
-        "accent_color": "#C9A96E",
-        "padding_top": 48,
-        "padding_bottom": 80
+        "accent_color": "#c9a96e"
       }
     }
   },
