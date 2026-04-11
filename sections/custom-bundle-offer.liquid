@@ -95,147 +95,95 @@
       </div>
 
       {%- comment %} ══════════════════════════════
-          GRILLE DES PRODUITS
+          DONNÉES PRODUIT POUR LE JS
       ══════════════════════════════ {% endcomment %}
-      <div class="cbo__products" data-cbo-products>
+      {%- assign bp = product_blocks.first.settings.product -%}
+      {%- if bp != blank -%}
+        {%- assign bp_variant = bp.selected_or_first_available_variant -%}
 
-        {%- for block in product_blocks -%}
-          {%- assign bp = block.settings.product -%}
-          {%- if bp != blank -%}
-            {%- assign bp_variant = bp.selected_or_first_available_variant -%}
-
-            {%- comment %} ── Déterminer l'option couleur ──────────── {% endcomment %}
-            {%- assign color_option_index = nil -%}
-            {%- assign color_option_name  = '' -%}
-            {%- for opt in bp.options -%}
-              {%- assign opt_lower = opt | downcase -%}
-              {%- if opt_lower == 'color' or opt_lower == 'colour' or opt_lower == 'couleur' -%}
-                {%- assign color_option_index = forloop.index0 -%}
-                {%- assign color_option_name  = opt -%}
-                {%- break -%}
-              {%- endif -%}
-            {%- endfor -%}
-
-            {%- comment %} ── Construire le JSON des variantes ─────── {% endcomment %}
-            {%- capture variants_json -%}[
-              {%- for v in bp.variants -%}
-                {
-                  "id": {{ v.id }},
-                  "price": {{ v.price }},
-                  "available": {{ v.available }},
-                  "title": {{ v.title | json }},
-                  "options": {{ v.options | json }}
-                  {%- if v.featured_media -%}
-                  ,"image": {{ v.featured_media | image_url: width: 360 | json }}
-                  {%- endif -%}
-                }{% unless forloop.last %},{% endunless %}
-              {%- endfor -%}
-            ]{%- endcapture -%}
-
-            <div
-              class="cbo__product"
-              data-cbo-product
-              data-index="{{ forloop.index0 }}"
-              data-price="{{ bp_variant.price }}"
-              data-variant-id="{{ bp_variant.id }}"
-              data-available="{{ bp_variant.available }}"
-              data-product-handle="{{ bp.handle }}"
-              data-variants='{{ variants_json | strip_newlines }}'
-              {%- if color_option_index != nil %} data-color-option-index="{{ color_option_index }}"{% endif %}
-              {{ block.shopify_attributes }}
-            >
-              {%- comment %} Image ─────────────────────────── {% endcomment %}
-              <div class="cbo__product-img-wrap">
-                {%- if bp.featured_image -%}
-                  <img
-                    class="cbo__product-img"
-                    data-cbo-product-img
-                    src="{{ bp.featured_image | image_url: width: 240 }}"
-                    srcset="
-                      {{ bp.featured_image | image_url: width: 160 }} 160w,
-                      {{ bp.featured_image | image_url: width: 240 }} 240w,
-                      {{ bp.featured_image | image_url: width: 360 }} 360w
-                    "
-                    sizes="(min-width: 750px) 160px, 120px"
-                    alt="{{ bp.featured_image.alt | escape | default: bp.title | escape }}"
-                    loading="lazy"
-                    width="240"
-                    height="240"
-                  >
-                {%- else -%}
-                  <div class="cbo__product-img cbo__product-img--placeholder">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                      <rect x="3" y="3" width="18" height="18" rx="2"/>
-                      <circle cx="8.5" cy="8.5" r="1.5"/>
-                      <polyline points="21,15 16,10 5,21"/>
-                    </svg>
-                  </div>
-                {%- endif -%}
-
-                {%- unless bp_variant.available -%}
-                  <span class="cbo__product-sold-out" data-cbo-sold-out>Épuisé</span>
-                {%- endunless -%}
-              </div>
-
-              {%- comment %} Infos ───────────────────────────── {% endcomment %}
-              <div class="cbo__product-info">
-                <p class="cbo__product-name">{{ bp.title | escape }}</p>
-                <p class="cbo__product-price" data-cbo-unit-price>
-                  {{ bp_variant.price | money }}
-                </p>
-
-                {%- comment %} ── Swatches couleur ──────────── {% endcomment %}
-                {%- if color_option_index != nil and bp.variants.size > 1 -%}
-                  {%- assign seen_colors = '' -%}
-                  <div class="cbo__color-swatches" data-cbo-swatches>
-                    {%- for v in bp.variants -%}
-                      {%- assign color_val = v.options[color_option_index] -%}
-                      {%- unless seen_colors contains color_val -%}
-                        {%- assign seen_colors = seen_colors | append: color_val | append: '|' -%}
-                        {%- assign color_lower = color_val | downcase | replace: ' ', '' -%}
-                        {%- assign is_active = false -%}
-                        {%- if v.id == bp_variant.id -%}{%- assign is_active = true -%}{%- endif -%}
-                        <button
-                          type="button"
-                          class="cbo__swatch{% if is_active %} is-active{% endif %}"
-                          data-cbo-swatch
-                          data-color="{{ color_val }}"
-                          data-variant-id="{{ v.id }}"
-                          aria-label="{{ color_option_name }}: {{ color_val }}"
-                          title="{{ color_val }}"
-                          style="--swatch-color: {{ color_lower }}"
-                        >
-                          <span class="cbo__swatch-inner"></span>
-                        </button>
-                      {%- endunless -%}
-                    {%- endfor -%}
-                  </div>
-                {%- endif -%}
-              </div>
-            </div>
-
-            {%- comment %} Connecteur + (sauf dernier) ──────── {% endcomment %}
-            {%- unless forloop.last -%}
-              <div class="cbo__connector" aria-hidden="true" data-cbo-connector>+</div>
-            {%- endunless -%}
-
+        {%- comment %} ── Déterminer l'option couleur ──────────── {% endcomment %}
+        {%- assign has_color_option    = false -%}
+        {%- assign color_option_index  = 0 -%}
+        {%- assign color_option_name   = '' -%}
+        {%- assign size_option_index   = -1 -%}
+        {%- for opt in bp.options -%}
+          {%- assign opt_lower = opt | downcase -%}
+          {%- if opt_lower == 'color' or opt_lower == 'colour' or opt_lower == 'couleur' -%}
+            {%- assign has_color_option   = true -%}
+            {%- assign color_option_index = forloop.index0 -%}
+            {%- assign color_option_name  = opt -%}
+          {%- endif -%}
+          {%- if opt_lower == 'size' or opt_lower == 'taille' -%}
+            {%- assign size_option_index = forloop.index0 -%}
           {%- endif -%}
         {%- endfor -%}
 
-        {%- comment %} Connecteur = ───────────────────────── {% endcomment %}
-        <div class="cbo__connector cbo__connector--equals" aria-hidden="true">=</div>
+        {%- comment %} ── JSON des variantes ────────────────────── {% endcomment %}
+        {%- capture variants_json -%}[
+          {%- for v in bp.variants -%}
+            {
+              "id": {{ v.id }},
+              "price": {{ v.price }},
+              "available": {{ v.available }},
+              "title": {{ v.title | json }},
+              "options": {{ v.options | json }}
+              {%- if v.featured_media -%}
+              ,"image": {{ v.featured_media | image_url: width: 360 | json }}
+              {%- endif -%}
+            }{% unless forloop.last %},{% endunless %}
+          {%- endfor -%}
+        ]{%- endcapture -%}
 
-        {%- comment %} Colonne prix total ─────────────────── {% endcomment %}
-        <div class="cbo__total-col">
+        {%- comment %} ── Couleurs uniques ──────────────────────── {% endcomment %}
+        {%- capture colors_json -%}[
+          {%- if has_color_option -%}
+            {%- assign seen_colors = '' -%}
+            {%- for v in bp.variants -%}
+              {%- assign c = v.options[color_option_index] -%}
+              {%- unless seen_colors contains c -%}
+                {%- assign seen_colors = seen_colors | append: c | append: '|||' -%}
+                {%- assign c_lower = c | downcase | replace: ' ', '' -%}
+                { "name": {{ c | json }}, "css": "{{ c_lower }}" }{% unless forloop.last %},{% endunless %}
+              {%- endunless -%}
+            {%- endfor -%}
+          {%- endif -%}
+        ]{%- endcapture -%}
+      {%- endif -%}
+
+      {%- comment %} ══════════════════════════════
+          PRIX ET SÉLECTEURS
+      ══════════════════════════════ {% endcomment %}
+      <div
+        class="cbo__config"
+        data-cbo-config
+        {%- if bp != blank %}
+        data-base-price="{{ bp_variant.price }}"
+        data-variant-id="{{ bp_variant.id }}"
+        data-variants='{{ variants_json | strip_newlines }}'
+        data-colors='{{ colors_json | strip_newlines }}'
+        data-has-color="{{ has_color_option }}"
+        data-color-option-index="{{ color_option_index }}"
+        data-color-option-name="{{ color_option_name }}"
+        data-current-size="{{ bp_variant.options[size_option_index] | default: '' }}"
+        data-size-option-index="{{ size_option_index }}"
+        {%- endif %}
+      >
+        {%- comment %} ── Prix total ────────────────────────────── {% endcomment %}
+        <div class="cbo__price-summary">
           <div class="cbo__total-prices">
-            <s class="cbo__total-original" data-cbo-original>—</s>
-            <span class="cbo__total-discounted" data-cbo-discounted>—</span>
+            <s class="cbo__total-original" data-cbo-original></s>
+            <span class="cbo__total-discounted" data-cbo-discounted>{{ bp_variant.price | money }}</span>
           </div>
           <p class="cbo__savings-line" data-cbo-savings></p>
         </div>
 
+        {%- comment %} ── Sélecteurs couleur par slot ─────────── {% endcomment %}
+        {%- if has_color_option and bp.variants.size > 1 -%}
+          <div class="cbo__slot-selectors" data-cbo-slots>
+            {%- comment %} Les slots sont générés dynamiquement par le JS {% endcomment %}
+          </div>
+        {%- endif -%}
       </div>
-      {%- comment %} fin products {% endcomment %}
 
       {%- comment %} ── Bouton CTA ───────────────────────────── {% endcomment %}
       <div class="cbo__cta">

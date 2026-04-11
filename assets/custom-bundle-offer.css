@@ -257,25 +257,75 @@
   margin: 0;
 }
 
-/* ── Swatches couleur ─────────────────────────────────────────── */
-.cbo__color-swatches {
+/* ── Config & prix ───────────────────────────────────────────── */
+.cbo__config {
   display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 0.6rem;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+.cbo__price-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ── Slots sélecteur couleur par article ─────────────────────── */
+.cbo__slot-selectors {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.6rem;
+  background: #fafaf8;
+  border: 1.5px solid var(--cbo-border, #e8e2da);
+  border-radius: var(--cbo-radius);
+}
+
+.cbo__slots-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0 0 0.4rem;
+  color: #444;
+}
+
+.cbo__slot {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
   flex-wrap: wrap;
 }
 
+.cbo__slot-label {
+  font-size: 1.3rem;
+  font-weight: 600;
+  min-width: 7rem;
+  color: #333;
+}
+
+.cbo__slot-swatches {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.cbo__slot-selected {
+  font-size: 1.2rem;
+  color: #888;
+  font-style: italic;
+}
+
+/* ── Swatches couleur ─────────────────────────────────────────── */
 .cbo__swatch {
   position: relative;
-  width: 2.4rem;
-  height: 2.4rem;
-  padding: 0;
+  width: 2.6rem;
+  height: 2.6rem;
+  padding: 2px;
   border: 2px solid #ddd;
   border-radius: 50%;
   cursor: pointer;
   background: none;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .cbo__swatch:hover {

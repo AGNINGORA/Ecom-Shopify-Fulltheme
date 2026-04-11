@@ -1,6 +1,6 @@
 /**
  * custom-bundle-offer.js
- * Bundle offer – sélection de tiers + sélection couleur par slot + ajout au panier
+ * Bundle : achat multiple du même produit avec couleur différente par slot
  * Vanilla JS · Dawn 15.x
  */
 
@@ -12,31 +12,42 @@
       this.root = root;
 
       // Éléments DOM
-      this.tierRadios    = Array.from(root.querySelectorAll('[data-tier-radio]'));
-      this.tierLabels    = Array.from(root.querySelectorAll('[data-tier-label]'));
-      this.productEls    = Array.from(root.querySelectorAll('[data-cbo-product]'));
-      this.connectors    = Array.from(root.querySelectorAll('[data-cbo-connector]'));
-      this.originalEl    = root.querySelector('[data-cbo-original]');
-      this.discountedEl  = root.querySelector('[data-cbo-discounted]');
-      this.savingsEl     = root.querySelector('[data-cbo-savings]');
-      this.addBtn        = root.querySelector('[data-cbo-add-btn]');
-      this.btnLabel      = root.querySelector('[data-cbo-btn-label]');
-      this.noticeEl      = root.querySelector('[data-cbo-notice]');
+      this.tierRadios   = Array.from(root.querySelectorAll('[data-tier-radio]'));
+      this.tierLabels   = Array.from(root.querySelectorAll('[data-tier-label]'));
+      this.configEl     = root.querySelector('[data-cbo-config]');
+      this.slotsEl      = root.querySelector('[data-cbo-slots]');
+      this.originalEl   = root.querySelector('[data-cbo-original]');
+      this.discountedEl = root.querySelector('[data-cbo-discounted]');
+      this.savingsEl    = root.querySelector('[data-cbo-savings]');
+      this.addBtn       = root.querySelector('[data-cbo-add-btn]');
+      this.btnLabel     = root.querySelector('[data-cbo-btn-label]');
+      this.noticeEl     = root.querySelector('[data-cbo-notice]');
 
-      // Parser les variantes de chaque produit
-      this.productEls.forEach((el) => {
-        try {
-          el._variants = JSON.parse(el.dataset.variants || '[]');
-        } catch {
-          el._variants = [];
-        }
-      });
+      if (!this.configEl) return;
 
-      // État courant
+      // Données produit
+      this.basePrice      = parseInt(this.configEl.dataset.basePrice, 10) || 0;
+      this.defaultVariant = parseInt(this.configEl.dataset.variantId, 10) || 0;
+      this.hasColor       = this.configEl.dataset.hasColor === 'true';
+      this.colorIdx       = parseInt(this.configEl.dataset.colorOptionIndex, 10) || 0;
+      this.colorName      = this.configEl.dataset.colorOptionName || 'Color';
+      this.sizeIdx        = parseInt(this.configEl.dataset.sizeOptionIndex, 10);
+      this.currentSize    = this.configEl.dataset.currentSize || '';
+
+      try {
+        this.variants = JSON.parse(this.configEl.dataset.variants || '[]');
+        this.colors   = JSON.parse(this.configEl.dataset.colors || '[]');
+      } catch {
+        this.variants = [];
+        this.colors   = [];
+      }
+
+      // État : variant choisi par slot
       this.currentQty      = 0;
       this.currentDiscount = 0;
+      this.slotSelections  = []; // array of { color, variantId, price }
 
-      // Init avec le tier sélectionné par défaut
+      // Init
       const checkedRadio = this.tierRadios.find((r) => r.checked);
       if (checkedRadio) this._applyTier(checkedRadio);
 
@@ -51,7 +62,6 @@
         });
       });
 
-      // Clic sur le label (toute la carte)
       this.tierLabels.forEach((label) => {
         label.addEventListener('click', () => {
           const radio = label.querySelector('[data-tier-radio]');
@@ -62,100 +72,12 @@
         });
       });
 
-      // Clic sur les swatches couleur
-      this.productEls.forEach((productEl) => {
-        const swatches = productEl.querySelectorAll('[data-cbo-swatch]');
-        swatches.forEach((swatch) => {
-          swatch.addEventListener('click', () => {
-            this._selectColor(productEl, swatch);
-          });
-        });
-      });
-
       this.addBtn?.addEventListener('click', () => this._addToCart());
-    }
-
-    // ── Sélection de couleur par slot ───────────────────────────
-    _selectColor(productEl, swatch) {
-      const colorOptionIdx = parseInt(productEl.dataset.colorOptionIndex, 10);
-      const selectedColor  = swatch.dataset.color;
-      const variants       = productEl._variants;
-
-      // Trouver la variante correspondant à cette couleur
-      // On garde les autres options actuelles si possible
-      const currentVariantId = parseInt(productEl.dataset.variantId, 10);
-      const currentVariant   = variants.find((v) => v.id === currentVariantId);
-      let newVariant = null;
-
-      if (currentVariant) {
-        // Chercher une variante avec la même taille mais la nouvelle couleur
-        newVariant = variants.find((v) => {
-          if (v.options[colorOptionIdx] !== selectedColor) return false;
-          // Vérifier que les autres options matchent
-          return v.options.every((opt, i) =>
-            i === colorOptionIdx || opt === currentVariant.options[i]
-          );
-        });
-      }
-
-      // Sinon, prendre la première variante de cette couleur
-      if (!newVariant) {
-        newVariant = variants.find(
-          (v) => v.options[colorOptionIdx] === selectedColor && v.available
-        ) || variants.find(
-          (v) => v.options[colorOptionIdx] === selectedColor
-        );
-      }
-
-      if (!newVariant) return;
-
-      // Mettre à jour les data attributes
-      productEl.dataset.variantId = newVariant.id;
-      productEl.dataset.price     = newVariant.price;
-      productEl.dataset.available = newVariant.available;
-
-      // Mettre à jour l'image si la variante en a une
-      if (newVariant.image) {
-        const img = productEl.querySelector('[data-cbo-product-img]');
-        if (img) {
-          img.src    = newVariant.image;
-          img.srcset = newVariant.image;
-        }
-      }
-
-      // Mettre à jour le prix affiché
-      const priceEl = productEl.querySelector('[data-cbo-unit-price]');
-      if (priceEl) {
-        priceEl.textContent = this._formatMoney(newVariant.price);
-      }
-
-      // Mettre à jour le badge épuisé
-      const soldOutEl = productEl.querySelector('[data-cbo-sold-out]');
-      if (newVariant.available) {
-        if (soldOutEl) soldOutEl.remove();
-      } else if (!soldOutEl) {
-        const imgWrap = productEl.querySelector('.cbo__product-img-wrap');
-        if (imgWrap) {
-          const badge = document.createElement('span');
-          badge.className       = 'cbo__product-sold-out';
-          badge.dataset.cboSoldOut = '';
-          badge.textContent     = 'Épuisé';
-          imgWrap.appendChild(badge);
-        }
-      }
-
-      // Mettre à jour l'état actif du swatch
-      productEl.querySelectorAll('[data-cbo-swatch]').forEach((s) => {
-        s.classList.toggle('is-active', s.dataset.color === selectedColor);
-      });
-
-      // Recalculer les prix globaux
-      this._updatePrices();
     }
 
     // ── Appliquer un tier ────────────────────────────────────────
     _applyTier(radio) {
-      this.currentQty      = parseInt(radio.dataset.qty, 10) || 0;
+      this.currentQty      = parseInt(radio.dataset.qty, 10) || 1;
       this.currentDiscount = parseFloat(radio.dataset.discount) || 0;
 
       // Mise à jour visuelle des labels
@@ -164,30 +86,137 @@
         label.classList.toggle('is-selected', r && r === radio);
       });
 
-      // Afficher/masquer les produits et connecteurs selon la quantité
-      this.productEls.forEach((el, i) => {
-        el.classList.toggle('is-hidden', i >= this.currentQty);
-      });
-
-      this.connectors.forEach((c, i) => {
-        // Le connecteur i est entre produit i et i+1
-        c.classList.toggle('is-hidden', i >= this.currentQty - 1);
-        c.style.display = i >= this.currentQty - 1 ? 'none' : '';
-      });
-
+      // Initialiser les sélections de slot
+      this._initSlotSelections();
+      this._renderSlots();
       this._updatePrices();
       this._clearNotice();
     }
 
+    // ── Initialiser les sélections ──────────────────────────────
+    _initSlotSelections() {
+      const defaultColor = this.colors.length > 0 ? this.colors[0].name : '';
+      this.slotSelections = [];
+
+      for (let i = 0; i < this.currentQty; i++) {
+        const variant = this._findVariant(defaultColor);
+        this.slotSelections.push({
+          color:     defaultColor,
+          variantId: variant ? variant.id : this.defaultVariant,
+          price:     variant ? variant.price : this.basePrice,
+          available: variant ? variant.available : true,
+        });
+      }
+    }
+
+    // ── Trouver la variante pour une couleur (et la taille courante) ──
+    _findVariant(color) {
+      if (!this.hasColor) return this.variants[0] || null;
+
+      // D'abord chercher avec la taille courante
+      if (this.currentSize && this.sizeIdx >= 0) {
+        const match = this.variants.find((v) =>
+          v.options[this.colorIdx] === color &&
+          v.options[this.sizeIdx] === this.currentSize &&
+          v.available
+        );
+        if (match) return match;
+
+        // Même taille, même couleur, même si épuisé
+        const matchAny = this.variants.find((v) =>
+          v.options[this.colorIdx] === color &&
+          v.options[this.sizeIdx] === this.currentSize
+        );
+        if (matchAny) return matchAny;
+      }
+
+      // Sinon, première variante dispo de cette couleur
+      return this.variants.find((v) =>
+        v.options[this.colorIdx] === color && v.available
+      ) || this.variants.find((v) =>
+        v.options[this.colorIdx] === color
+      );
+    }
+
+    // ── Rendu des slots couleur ─────────────────────────────────
+    _renderSlots() {
+      if (!this.slotsEl || !this.hasColor || this.colors.length <= 1) return;
+
+      // Pas besoin de slots si qty = 1
+      if (this.currentQty <= 1) {
+        this.slotsEl.innerHTML = '';
+        this.slotsEl.style.display = 'none';
+        return;
+      }
+
+      this.slotsEl.style.display = '';
+      let html = '<p class="cbo__slots-title">Choisissez une couleur par article :</p>';
+
+      for (let i = 0; i < this.currentQty; i++) {
+        const sel = this.slotSelections[i];
+        html += `<div class="cbo__slot" data-slot-index="${i}">`;
+        html += `<span class="cbo__slot-label">Article ${i + 1} :</span>`;
+        html += `<div class="cbo__slot-swatches">`;
+
+        for (const color of this.colors) {
+          const isActive = sel.color === color.name;
+          html += `<button type="button"
+            class="cbo__swatch${isActive ? ' is-active' : ''}"
+            data-cbo-slot-swatch
+            data-slot="${i}"
+            data-color="${color.name}"
+            title="${color.name}"
+            aria-label="${this.colorName}: ${color.name}"
+            style="--swatch-color: ${color.css}">
+            <span class="cbo__swatch-inner"></span>
+          </button>`;
+        }
+
+        html += `</div>`;
+        html += `<span class="cbo__slot-selected">${sel.color}</span>`;
+        html += `</div>`;
+      }
+
+      this.slotsEl.innerHTML = html;
+
+      // Bind les clics
+      this.slotsEl.querySelectorAll('[data-cbo-slot-swatch]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const slotIdx = parseInt(btn.dataset.slot, 10);
+          const color   = btn.dataset.color;
+          this._selectSlotColor(slotIdx, color);
+        });
+      });
+    }
+
+    // ── Sélection de couleur sur un slot ────────────────────────
+    _selectSlotColor(slotIdx, color) {
+      const variant = this._findVariant(color);
+      if (!variant) return;
+
+      this.slotSelections[slotIdx] = {
+        color:     color,
+        variantId: variant.id,
+        price:     variant.price,
+        available: variant.available,
+      };
+
+      // Mettre à jour visuellement ce slot
+      const slotEl = this.slotsEl.querySelector(`[data-slot-index="${slotIdx}"]`);
+      if (slotEl) {
+        slotEl.querySelectorAll('[data-cbo-slot-swatch]').forEach((s) => {
+          s.classList.toggle('is-active', s.dataset.color === color);
+        });
+        const selectedLabel = slotEl.querySelector('.cbo__slot-selected');
+        if (selectedLabel) selectedLabel.textContent = color;
+      }
+
+      this._updatePrices();
+    }
+
     // ── Calcul des prix ─────────────────────────────────────────
     _updatePrices() {
-      const visibleProducts = this.productEls
-        .slice(0, this.currentQty)
-        .filter((el) => el.dataset.available !== 'false');
-
-      const totalCents = visibleProducts.reduce((sum, el) => {
-        return sum + (parseInt(el.dataset.price, 10) || 0);
-      }, 0);
+      const totalCents = this.slotSelections.reduce((sum, s) => sum + s.price, 0);
 
       const discountedCents = this.currentDiscount > 0
         ? Math.round(totalCents * (1 - this.currentDiscount / 100))
@@ -212,22 +241,26 @@
           : '';
       }
 
-      // Désactiver le bouton si aucun produit visible ou disponible
       if (this.addBtn) {
-        this.addBtn.disabled = visibleProducts.length === 0;
+        const anyUnavailable = this.slotSelections.some((s) => !s.available);
+        this.addBtn.disabled = anyUnavailable;
       }
     }
 
     // ── Ajout au panier ─────────────────────────────────────────
     async _addToCart() {
-      const items = this.productEls
-        .slice(0, this.currentQty)
-        .filter((el) => el.dataset.available !== 'false')
-        .map((el) => ({
-          id:       parseInt(el.dataset.variantId, 10),
-          quantity: 1,
-        }));
+      // Grouper par variant ID pour combiner les quantités
+      const grouped = {};
+      for (const slot of this.slotSelections) {
+        if (!slot.available) continue;
+        if (grouped[slot.variantId]) {
+          grouped[slot.variantId].quantity += 1;
+        } else {
+          grouped[slot.variantId] = { id: slot.variantId, quantity: 1 };
+        }
+      }
 
+      const items = Object.values(grouped);
       if (items.length === 0) return;
 
       this._setLoading(true);
@@ -250,14 +283,13 @@
 
         this._setNotice('Lot ajouté au panier !', 'success');
 
-        // Ouvrir le custom cart drawer si disponible
+        // Ouvrir le custom cart drawer
         const ccd = window._ccdInstance;
         if (ccd && typeof ccd.fetchAndRender === 'function') {
           await ccd.fetchAndRender();
           ccd.open();
         }
 
-        // Événements Dawn pour rafraîchir le panier
         document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
         this._refreshCartCount();
 
@@ -268,7 +300,7 @@
       }
     }
 
-    // ── Rafraîchit le compteur panier Dawn ──────────────────────
+    // ── Rafraîchit le compteur panier ──────────────────────────
     async _refreshCartCount() {
       try {
         const res  = await fetch('/cart.js', { headers: { Accept: 'application/json' } });
@@ -286,18 +318,18 @@
           el.style.display = cart.item_count > 0 ? '' : 'none';
         });
       } catch {
-        // Non bloquant
+        // silencieux
       }
     }
 
-    // ── Formatage monétaire ──────────────────────────────────────
+    // ── Formatage monétaire ─────────────────────────────────────
     _formatMoney(cents) {
       const currency = window.Shopify?.currency?.active || 'EUR';
       const locale   = document.documentElement.lang || 'fr-FR';
       try {
         return new Intl.NumberFormat(locale, {
-          style:    'currency',
-          currency: currency,
+          style: 'currency',
+          currency,
           minimumFractionDigits: 2,
         }).format(cents / 100);
       } catch {
