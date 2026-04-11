@@ -27,12 +27,17 @@
       this.loadingEl  = root.querySelector('[data-ccs-loading]');
       this.fallbackEl = root.querySelector('[data-ccs-fallback]');
       this.resultsEl  = root.querySelector('[data-ccs-results]');
+      this.manualEl   = root.querySelector('[data-ccs-manual]');
       this.prevBtn    = root.querySelector('[data-ccs-prev]');
       this.nextBtn    = root.querySelector('[data-ccs-next]');
       this.tpl        = root.parentElement?.querySelector(`#ccs-card-tpl-${root.dataset.sectionId}`)
                         || document.querySelector(`#ccs-card-tpl-${root.dataset.sectionId}`);
 
-      this._loadRecommendations();
+      if (this.manualEl) {
+        this._showManual();
+      } else {
+        this._loadRecommendations();
+      }
       this._bindArrows();
       this._bindSwipeTracking();
     }
@@ -93,7 +98,24 @@
       }
     }
 
-    // ── Afficher le fallback Liquid ──────────────────────────────
+    // ── Afficher les produits manuels ───────────────────────
+    _showManual() {
+      if (this.loadingEl) this.loadingEl.hidden = true;
+      this._bindManualAtc();
+      this._revealArrows();
+    }
+
+    _bindManualAtc() {
+      if (!this.manualEl) return;
+      this.manualEl.querySelectorAll('[data-ccs-atc]').forEach((btn) => {
+        const variantId = btn.dataset.variantId;
+        if (variantId && !btn.disabled) {
+          btn.addEventListener('click', () => this._addToCart(btn, variantId));
+        }
+      });
+    }
+
+    // ── Afficher le fallback Liquid ──────────────────────────
     _showFallback() {
       if (this.loadingEl) this.loadingEl.hidden = true;
       if (this.fallbackEl) {

@@ -71,6 +71,24 @@
           {%- endfor -%}
         </div>
 
+        {%- comment %} ── Produits manuels (blocs) ─────────────── {% endcomment %}
+        {%- assign manual_count = 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'product' and block.settings.product != blank -%}
+            {%- assign manual_count = manual_count | plus: 1 -%}
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- if manual_count > 0 -%}
+          <div class="ccs__manual" data-ccs-manual>
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'product' and block.settings.product != blank -%}
+                {%- render 'custom-cross-sell-card', product: block.settings.product, section: section -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
         {%- comment %} ── Fallback Liquid (remplacé si API ok) ── {% endcomment %}
         <div class="ccs__fallback" data-ccs-fallback hidden>
           {%- for p in fallback_products limit: limit -%}
@@ -200,6 +218,19 @@
       "step": 4,
       "unit": "px",
       "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Produit",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Produit"
+        }
+      ]
     }
   ],
   "presets": [

@@ -71,7 +71,8 @@
 /* Zones de contenu dans le track */
 .ccs__loading,
 .ccs__fallback,
-.ccs__results {
+.ccs__results,
+.ccs__manual {
   display: contents; /* les cartes enfants participent directement au flex */
 }
 
