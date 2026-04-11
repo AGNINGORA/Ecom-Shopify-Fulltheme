@@ -1,38 +1,28 @@
 {% comment %}
-  Custom Bundle Offer – Lots avec remises progressives
+  Custom Bundle Offer – Multi-produits avec remise progressive
   Dawn 15.x · Vanilla JS · fetch API · Mobile-first
 {% endcomment %}
 
 {{ 'custom-bundle-offer.css' | asset_url | stylesheet_tag }}
 
-{%- comment %} ── Tailles de lots configurées ───────────────── {% endcomment %}
-{%- assign tier_blocks   = section.blocks | where: 'type', 'bundle_tier' -%}
 {%- assign product_blocks = section.blocks | where: 'type', 'bundle_product' -%}
-
-{%- comment %} ── Trouver le meilleur tier (remise max) ──────── {% endcomment %}
-{%- assign best_tier_index = 0 -%}
-{%- assign best_discount   = 0 -%}
-{%- for tier in tier_blocks -%}
-  {%- if tier.settings.discount_percent > best_discount -%}
-    {%- assign best_discount   = tier.settings.discount_percent -%}
-    {%- assign best_tier_index = forloop.index0 -%}
-  {%- endif -%}
-{%- endfor -%}
 
 <section
   class="custom-bundle-offer"
   data-section-id="{{ section.id }}"
+  data-discount="{{ section.settings.discount_percent }}"
+  data-min-products="{{ section.settings.min_products }}"
   style="
     --cbo-accent:    {{ section.settings.accent_color }};
     --cbo-border:    {{ section.settings.border_color }};
     --cbo-btn-bg:    {{ section.settings.button_bg }};
     --cbo-btn-color: {{ section.settings.button_color }};
-    --cbo-badge-bg:  {{ section.settings.badge_bg }};
+    padding-top:     {{ section.settings.padding_top }}px;
+    padding-bottom:  {{ section.settings.padding_bottom }}px;
   "
 >
   <div class="cbo__inner page-width">
 
-    {%- comment %} ── En-tête ──────────────────────────────── {% endcomment %}
     {%- if section.settings.title != blank -%}
       <h2 class="cbo__heading">{{ section.settings.title | escape }}</h2>
     {%- endif -%}
@@ -40,153 +30,97 @@
       <p class="cbo__subtitle">{{ section.settings.subtitle | escape }}</p>
     {%- endif -%}
 
-    {%- if tier_blocks.size > 0 and product_blocks.size > 0 -%}
+    {%- if product_blocks.size > 0 -%}
 
       {%- comment %} ══════════════════════════════
-          SÉLECTEUR DE TIERS (taille du lot)
+          GRILLE PRODUITS
       ══════════════════════════════ {% endcomment %}
-      <div class="cbo__tiers" role="radiogroup" aria-label="Choisir la taille du lot">
-        {%- for tier in tier_blocks -%}
-          {%- assign is_best  = false -%}
-          {%- if forloop.index0 == best_tier_index -%}{%- assign is_best = true -%}{%- endif -%}
-          {%- assign tier_qty = tier.settings.quantity | times: 1 -%}
+      <div class="cbo__products" data-cbo-products>
+        {%- for block in product_blocks -%}
+          {%- assign bp = block.settings.product -%}
+          {%- if bp != blank -%}
+            {%- assign bp_v = bp.selected_or_first_available_variant -%}
 
-          <label
-            class="cbo__tier{% if is_best %} is-best{% endif %}{% if forloop.first %} is-selected{% endif %}"
-            data-tier-label
-            {{ tier.shopify_attributes }}
-          >
-            <input
-              type="radio"
-              name="cbo-tier-{{ section.id }}"
-              class="cbo__tier-radio"
-              data-tier-radio
-              value="{{ forloop.index0 }}"
-              data-qty="{{ tier_qty }}"
-              data-discount="{{ tier.settings.discount_percent }}"
-              {% if forloop.first %}checked{% endif %}
+            <div
+              class="cbo__product-card"
+              data-cbo-card
+              data-product-id="{{ bp.id }}"
+              data-variant-id="{{ bp_v.id }}"
+              data-price="{{ bp_v.price }}"
+              data-available="{{ bp_v.available }}"
+              {{ block.shopify_attributes }}
             >
+              {%- comment %} Checkbox ─────────────────── {% endcomment %}
+              <label class="cbo__check-wrap">
+                <input
+                  type="checkbox"
+                  class="cbo__check"
+                  data-cbo-check
+                  checked
+                >
+                <span class="cbo__checkmark">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </span>
+              </label>
 
-            {%- if is_best -%}
-              <span class="cbo__best-badge">
-                {{ section.settings.best_badge_label }}
-              </span>
-            {%- endif -%}
+              {%- comment %} Image ────────────────────── {% endcomment %}
+              <a class="cbo__card-img-link" href="{{ bp.url }}">
+                {%- if bp.featured_image -%}
+                  <img
+                    class="cbo__card-img"
+                    src="{{ bp.featured_image | image_url: width: 200 }}"
+                    alt="{{ bp.featured_image.alt | escape | default: bp.title | escape }}"
+                    loading="lazy"
+                    width="200"
+                    height="200"
+                    data-cbo-img
+                  >
+                {%- else -%}
+                  <div class="cbo__card-img-placeholder"></div>
+                {%- endif -%}
+              </a>
 
-            <span class="cbo__tier-qty">
-              {%- if tier_qty == 1 -%}
-                {{ tier_qty }} produit
-              {%- else -%}
-                {{ tier_qty }} produits
-              {%- endif -%}
-            </span>
+              {%- comment %} Infos ────────────────────── {% endcomment %}
+              <div class="cbo__card-info">
+                <a class="cbo__card-title" href="{{ bp.url }}">{{ bp.title | truncate: 50 }}</a>
 
-            {%- if tier.settings.discount_percent > 0 -%}
-              <span class="cbo__tier-discount">-{{ tier.settings.discount_percent }}%</span>
-            {%- else -%}
-              <span class="cbo__tier-discount cbo__tier-discount--none">Sans remise</span>
-            {%- endif -%}
+                {%- comment %} Sélecteur de variante ──── {% endcomment %}
+                {%- if bp.variants.size > 1 -%}
+                  <select class="cbo__card-variant" data-cbo-variant-select>
+                    {%- for v in bp.variants -%}
+                      <option
+                        value="{{ v.id }}"
+                        data-price="{{ v.price }}"
+                        data-available="{{ v.available }}"
+                        {%- if v.featured_media %} data-img="{{ v.featured_media | image_url: width: 200 }}"{% endif %}
+                        {% if v == bp_v %}selected{% endif %}
+                      >
+                        {{ v.title }}
+                      </option>
+                    {%- endfor -%}
+                  </select>
+                {%- endif -%}
 
-            {%- if tier.settings.label != blank -%}
-              <span class="cbo__tier-custom-label">{{ tier.settings.label | escape }}</span>
-            {%- endif -%}
-          </label>
+                <span class="cbo__card-price" data-cbo-card-price>{{ bp_v.price | money }}</span>
+              </div>
+            </div>
+          {%- endif -%}
         {%- endfor -%}
       </div>
 
       {%- comment %} ══════════════════════════════
-          DONNÉES PRODUIT POUR LE JS
+          RÉSUMÉ PRIX + CTA
       ══════════════════════════════ {% endcomment %}
-      {%- assign bp = product_blocks.first.settings.product -%}
-      {%- if bp != blank -%}
-        {%- assign bp_variant = bp.selected_or_first_available_variant -%}
-
-        {%- comment %} ── Déterminer l'option couleur ──────────── {% endcomment %}
-        {%- assign has_color_option    = false -%}
-        {%- assign color_option_index  = 0 -%}
-        {%- assign color_option_name   = '' -%}
-        {%- assign size_option_index   = -1 -%}
-        {%- for opt in bp.options -%}
-          {%- assign opt_lower = opt | downcase -%}
-          {%- if opt_lower == 'color' or opt_lower == 'colour' or opt_lower == 'couleur' -%}
-            {%- assign has_color_option   = true -%}
-            {%- assign color_option_index = forloop.index0 -%}
-            {%- assign color_option_name  = opt -%}
-          {%- endif -%}
-          {%- if opt_lower == 'size' or opt_lower == 'taille' -%}
-            {%- assign size_option_index = forloop.index0 -%}
-          {%- endif -%}
-        {%- endfor -%}
-
-        {%- comment %} ── JSON des variantes ────────────────────── {% endcomment %}
-        {%- capture variants_json -%}[
-          {%- for v in bp.variants -%}
-            {
-              "id": {{ v.id }},
-              "price": {{ v.price }},
-              "available": {{ v.available }},
-              "title": {{ v.title | json }},
-              "options": {{ v.options | json }}
-              {%- if v.featured_media -%}
-              ,"image": {{ v.featured_media | image_url: width: 360 | json }}
-              {%- endif -%}
-            }{% unless forloop.last %},{% endunless %}
-          {%- endfor -%}
-        ]{%- endcapture -%}
-
-        {%- comment %} ── Couleurs uniques ──────────────────────── {% endcomment %}
-        {%- capture colors_json -%}[
-          {%- if has_color_option -%}
-            {%- assign seen_colors = '' -%}
-            {%- for v in bp.variants -%}
-              {%- assign c = v.options[color_option_index] -%}
-              {%- unless seen_colors contains c -%}
-                {%- assign seen_colors = seen_colors | append: c | append: '|||' -%}
-                {%- assign c_lower = c | downcase | replace: ' ', '' -%}
-                { "name": {{ c | json }}, "css": "{{ c_lower }}" }{% unless forloop.last %},{% endunless %}
-              {%- endunless -%}
-            {%- endfor -%}
-          {%- endif -%}
-        ]{%- endcapture -%}
-      {%- endif -%}
-
-      {%- comment %} ══════════════════════════════
-          PRIX ET SÉLECTEURS
-      ══════════════════════════════ {% endcomment %}
-      <div
-        class="cbo__config"
-        data-cbo-config
-        {%- if bp != blank %}
-        data-base-price="{{ bp_variant.price }}"
-        data-variant-id="{{ bp_variant.id }}"
-        data-variants='{{ variants_json | strip_newlines }}'
-        data-colors='{{ colors_json | strip_newlines }}'
-        data-has-color="{{ has_color_option }}"
-        data-color-option-index="{{ color_option_index }}"
-        data-color-option-name="{{ color_option_name }}"
-        data-current-size="{{ bp_variant.options[size_option_index] | default: '' }}"
-        data-size-option-index="{{ size_option_index }}"
-        {%- endif %}
-      >
-        {%- comment %} ── Prix total ────────────────────────────── {% endcomment %}
-        <div class="cbo__price-summary">
-          <div class="cbo__total-prices">
-            <s class="cbo__total-original" data-cbo-original></s>
-            <span class="cbo__total-discounted" data-cbo-discounted>{{ bp_variant.price | money }}</span>
-          </div>
-          <p class="cbo__savings-line" data-cbo-savings></p>
+      <div class="cbo__summary" data-cbo-summary>
+        <div class="cbo__summary-row">
+          <span class="cbo__summary-label">Prix total :</span>
+          <s class="cbo__summary-original" data-cbo-original hidden></s>
+          <span class="cbo__summary-discounted" data-cbo-discounted></span>
         </div>
+        <p class="cbo__savings-line" data-cbo-savings></p>
 
-        {%- comment %} ── Sélecteurs couleur par slot ─────────── {% endcomment %}
-        {%- if has_color_option and bp.variants.size > 1 -%}
-          <div class="cbo__slot-selectors" data-cbo-slots>
-            {%- comment %} Les slots sont générés dynamiquement par le JS {% endcomment %}
-          </div>
-        {%- endif -%}
-      </div>
-
-      {%- comment %} ── Bouton CTA ───────────────────────────── {% endcomment %}
-      <div class="cbo__cta">
         <button
           class="cbo__add-btn"
           data-cbo-add-btn
@@ -209,7 +143,7 @@
 
     {%- else -%}
       {%- if request.design_mode -%}
-        <p class="cbo__empty">Ajoutez des tiers et des produits via les blocks dans le theme editor.</p>
+        <p class="cbo__empty">Ajoutez des blocs « Produit du bundle » pour composer votre offre.</p>
       {%- endif -%}
     {%- endif -%}
 
@@ -223,7 +157,7 @@
   "name": "Offre bundle",
   "tag": "section",
   "class": "section-custom-bundle-offer",
-  "max_blocks": 12,
+  "max_blocks": 10,
   "settings": [
     {
       "type": "text",
@@ -244,10 +178,24 @@
       "default": "Ajouter le lot au panier"
     },
     {
-      "type": "text",
-      "id": "best_badge_label",
-      "label": "Texte du badge meilleure offre",
-      "default": "MEILLEURE OFFRE"
+      "type": "range",
+      "id": "discount_percent",
+      "label": "Remise bundle (%)",
+      "info": "Remise appliquée quand le nombre minimum de produits est coché",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "min_products",
+      "label": "Produits minimum pour la remise",
+      "info": "Nombre de produits cochés nécessaire pour activer la remise",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 2
     },
     {
       "type": "header",
@@ -264,12 +212,6 @@
       "id": "border_color",
       "label": "Couleur des bordures",
       "default": "#e8e2da"
-    },
-    {
-      "type": "color",
-      "id": "badge_bg",
-      "label": "Fond badge meilleure offre",
-      "default": "#C9A96E"
     },
     {
       "type": "color",
@@ -310,36 +252,6 @@
   ],
   "blocks": [
     {
-      "type": "bundle_tier",
-      "name": "Taille de lot",
-      "settings": [
-        {
-          "type": "range",
-          "id": "quantity",
-          "label": "Nombre de produits dans ce lot",
-          "min": 1,
-          "max": 6,
-          "step": 1,
-          "default": 2
-        },
-        {
-          "type": "range",
-          "id": "discount_percent",
-          "label": "Remise (%)",
-          "min": 0,
-          "max": 60,
-          "step": 5,
-          "default": 10
-        },
-        {
-          "type": "text",
-          "id": "label",
-          "label": "Label optionnel",
-          "placeholder": "ex : Le plus populaire"
-        }
-      ]
-    },
-    {
       "type": "bundle_product",
       "name": "Produit du bundle",
       "settings": [
@@ -353,21 +265,7 @@
   ],
   "presets": [
     {
-      "name": "Offre bundle",
-      "blocks": [
-        {
-          "type": "bundle_tier",
-          "settings": { "quantity": 1, "discount_percent": 0,  "label": "" }
-        },
-        {
-          "type": "bundle_tier",
-          "settings": { "quantity": 2, "discount_percent": 10, "label": "Le plus populaire" }
-        },
-        {
-          "type": "bundle_tier",
-          "settings": { "quantity": 3, "discount_percent": 20, "label": "Meilleure valeur" }
-        }
-      ]
+      "name": "Offre bundle"
     }
   ]
 }
