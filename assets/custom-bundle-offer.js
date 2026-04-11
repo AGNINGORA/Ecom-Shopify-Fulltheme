@@ -1,6 +1,6 @@
 /**
  * custom-bundle-offer.js
- * Bundle offer – sélection de tiers + ajout au panier via fetch
+ * Bundle offer – sélection de tiers + sélection couleur par slot + ajout au panier
  * Vanilla JS · Dawn 15.x
  */
 
@@ -22,6 +22,15 @@
       this.addBtn        = root.querySelector('[data-cbo-add-btn]');
       this.btnLabel      = root.querySelector('[data-cbo-btn-label]');
       this.noticeEl      = root.querySelector('[data-cbo-notice]');
+
+      // Parser les variantes de chaque produit
+      this.productEls.forEach((el) => {
+        try {
+          el._variants = JSON.parse(el.dataset.variants || '[]');
+        } catch {
+          el._variants = [];
+        }
+      });
 
       // État courant
       this.currentQty      = 0;
@@ -53,7 +62,95 @@
         });
       });
 
+      // Clic sur les swatches couleur
+      this.productEls.forEach((productEl) => {
+        const swatches = productEl.querySelectorAll('[data-cbo-swatch]');
+        swatches.forEach((swatch) => {
+          swatch.addEventListener('click', () => {
+            this._selectColor(productEl, swatch);
+          });
+        });
+      });
+
       this.addBtn?.addEventListener('click', () => this._addToCart());
+    }
+
+    // ── Sélection de couleur par slot ───────────────────────────
+    _selectColor(productEl, swatch) {
+      const colorOptionIdx = parseInt(productEl.dataset.colorOptionIndex, 10);
+      const selectedColor  = swatch.dataset.color;
+      const variants       = productEl._variants;
+
+      // Trouver la variante correspondant à cette couleur
+      // On garde les autres options actuelles si possible
+      const currentVariantId = parseInt(productEl.dataset.variantId, 10);
+      const currentVariant   = variants.find((v) => v.id === currentVariantId);
+      let newVariant = null;
+
+      if (currentVariant) {
+        // Chercher une variante avec la même taille mais la nouvelle couleur
+        newVariant = variants.find((v) => {
+          if (v.options[colorOptionIdx] !== selectedColor) return false;
+          // Vérifier que les autres options matchent
+          return v.options.every((opt, i) =>
+            i === colorOptionIdx || opt === currentVariant.options[i]
+          );
+        });
+      }
+
+      // Sinon, prendre la première variante de cette couleur
+      if (!newVariant) {
+        newVariant = variants.find(
+          (v) => v.options[colorOptionIdx] === selectedColor && v.available
+        ) || variants.find(
+          (v) => v.options[colorOptionIdx] === selectedColor
+        );
+      }
+
+      if (!newVariant) return;
+
+      // Mettre à jour les data attributes
+      productEl.dataset.variantId = newVariant.id;
+      productEl.dataset.price     = newVariant.price;
+      productEl.dataset.available = newVariant.available;
+
+      // Mettre à jour l'image si la variante en a une
+      if (newVariant.image) {
+        const img = productEl.querySelector('[data-cbo-product-img]');
+        if (img) {
+          img.src    = newVariant.image;
+          img.srcset = newVariant.image;
+        }
+      }
+
+      // Mettre à jour le prix affiché
+      const priceEl = productEl.querySelector('[data-cbo-unit-price]');
+      if (priceEl) {
+        priceEl.textContent = this._formatMoney(newVariant.price);
+      }
+
+      // Mettre à jour le badge épuisé
+      const soldOutEl = productEl.querySelector('[data-cbo-sold-out]');
+      if (newVariant.available) {
+        if (soldOutEl) soldOutEl.remove();
+      } else if (!soldOutEl) {
+        const imgWrap = productEl.querySelector('.cbo__product-img-wrap');
+        if (imgWrap) {
+          const badge = document.createElement('span');
+          badge.className       = 'cbo__product-sold-out';
+          badge.dataset.cboSoldOut = '';
+          badge.textContent     = 'Épuisé';
+          imgWrap.appendChild(badge);
+        }
+      }
+
+      // Mettre à jour l'état actif du swatch
+      productEl.querySelectorAll('[data-cbo-swatch]').forEach((s) => {
+        s.classList.toggle('is-active', s.dataset.color === selectedColor);
+      });
+
+      // Recalculer les prix globaux
+      this._updatePrices();
     }
 
     // ── Appliquer un tier ────────────────────────────────────────
@@ -153,6 +250,13 @@
 
         this._setNotice('Lot ajouté au panier !', 'success');
 
+        // Ouvrir le custom cart drawer si disponible
+        const ccd = window._ccdInstance;
+        if (ccd && typeof ccd.fetchAndRender === 'function') {
+          await ccd.fetchAndRender();
+          ccd.open();
+        }
+
         // Événements Dawn pour rafraîchir le panier
         document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
         this._refreshCartCount();
@@ -174,6 +278,12 @@
         );
         document.querySelectorAll('[data-cart-count]').forEach((el) => {
           el.textContent = cart.item_count;
+        });
+        document.querySelectorAll('.cart-count-bubble span[aria-hidden="true"]').forEach((el) => {
+          el.textContent = cart.item_count;
+        });
+        document.querySelectorAll('.cart-count-bubble').forEach((el) => {
+          el.style.display = cart.item_count > 0 ? '' : 'none';
         });
       } catch {
         // Non bloquant
