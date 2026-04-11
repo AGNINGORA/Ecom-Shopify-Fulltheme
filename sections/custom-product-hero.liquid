@@ -48,8 +48,10 @@
   <div class="cph__inner page-width">
 
     {%- comment %} ══════════════════════════════
-        GALERIE
+        COLONNE GALERIE
     ══════════════════════════════ {% endcomment %}
+    <div class="cph__gallery-col">
+
     <div class="cph__gallery" id="cph-gallery-{{ section.id }}">
 
       {%- comment %} Track (slides) {% endcomment %}
@@ -250,6 +252,9 @@
         {%- endfor -%}
       </div>
     {%- endif -%}
+
+    </div>
+    {%- comment %} fin cph__gallery-col {% endcomment %}
 
     {%- comment %} ══════════════════════════════
         INFOS PRODUIT

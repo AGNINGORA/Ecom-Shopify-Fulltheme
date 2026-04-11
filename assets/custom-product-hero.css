@@ -520,19 +520,15 @@
    BLOCS SOUS GALERIE
    ══════════════════════════════════════════════════════════════ */
 
+.cph__gallery-col {
+  min-width: 0;
+}
+
 .cph__gallery-below {
   display: flex;
   flex-direction: column;
-  gap: 1.6rem;
-  margin-top: 1.2rem;
-}
-
-@media (min-width: 750px) {
-  .cph__gallery-below {
-    grid-column: 1;
-    grid-row: 2;
-    margin-top: 0;
-  }
+  gap: 1.2rem;
+  margin-top: 1rem;
 }
 
 .cph__gb-block {
