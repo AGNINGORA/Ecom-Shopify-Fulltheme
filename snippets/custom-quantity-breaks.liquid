@@ -127,11 +127,14 @@
     <script type="application/json" data-cqb-colors>
       [
         {%- assign cqb_seen = '' -%}
+        {%- assign cqb_first = true -%}
         {%- for v in product.variants -%}
           {%- assign c_name = v.options[cqb_color_idx] -%}
           {%- unless cqb_seen contains c_name -%}
             {%- assign cqb_seen = cqb_seen | append: c_name | append: '|||' -%}
-            { "name": {{ c_name | json }}, "css": "{{ c_name | downcase | replace: ' ', '' }}" }{%- unless forloop.last -%},{%- endunless -%}
+            {%- unless cqb_first -%},{%- endunless -%}
+            {%- assign cqb_first = false -%}
+            { "name": {{ c_name | json }}, "css": "{{ c_name | downcase | replace: ' ', '' }}" }
           {%- endunless -%}
         {%- endfor -%}
       ]

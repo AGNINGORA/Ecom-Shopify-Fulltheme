@@ -27,11 +27,21 @@
       this.colorIdx  = parseInt(wrap.dataset.colorIdx, 10) || 0;
       this.colorName = wrap.dataset.colorName || 'Color';
 
-      const variantsEl = wrap.querySelector('[data-cqb-variants]');
-      this.allVariants = variantsEl ? JSON.parse(variantsEl.textContent) : [];
+      try {
+        const variantsEl = wrap.querySelector('[data-cqb-variants]');
+        this.allVariants = variantsEl ? JSON.parse(variantsEl.textContent) : [];
+      } catch (e) {
+        console.warn('CQB: variants parse error', e);
+        this.allVariants = [];
+      }
 
-      const colorsEl = wrap.querySelector('[data-cqb-colors]');
-      this.colors = colorsEl ? JSON.parse(colorsEl.textContent) : [];
+      try {
+        const colorsEl = wrap.querySelector('[data-cqb-colors]');
+        this.colors = colorsEl ? JSON.parse(colorsEl.textContent) : [];
+      } catch (e) {
+        console.warn('CQB: colors parse error', e);
+        this.colors = [];
+      }
 
       // Éléments du formulaire — le wrap est rendu À L'INTÉRIEUR du form
       this.form       = wrap.closest('form');
