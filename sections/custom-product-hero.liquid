@@ -181,6 +181,77 @@
     {%- comment %} fin galerie {% endcomment %}
 
     {%- comment %} ══════════════════════════════
+        BLOCS SOUS GALERIE
+    ══════════════════════════════ {% endcomment %}
+    {%- assign has_gallery_below = false -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'gallery_richtext' or block.type == 'gallery_image' or block.type == 'gallery_review' -%}
+        {%- assign has_gallery_below = true -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- if has_gallery_below -%}
+      <div class="cph__gallery-below">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+
+            {%- when 'gallery_richtext' -%}
+              <div class="cph__gb-block cph__gb-richtext" {{ block.shopify_attributes }}>
+                {{ block.settings.content }}
+              </div>
+
+            {%- when 'gallery_image' -%}
+              <div class="cph__gb-block cph__gb-image" {{ block.shopify_attributes }}>
+                {%- if block.settings.image != blank -%}
+                  <img
+                    src="{{ block.settings.image | image_url: width: 800 }}"
+                    srcset="
+                      {{ block.settings.image | image_url: width: 400 }} 400w,
+                      {{ block.settings.image | image_url: width: 600 }} 600w,
+                      {{ block.settings.image | image_url: width: 800 }} 800w
+                    "
+                    sizes="(min-width: 750px) 45vw, 90vw"
+                    alt="{{ block.settings.image.alt | escape | default: '' }}"
+                    loading="lazy"
+                    width="{{ block.settings.image.width }}"
+                    height="{{ block.settings.image.height }}"
+                    class="cph__gb-img"
+                  >
+                {%- endif -%}
+                {%- if block.settings.caption != blank -%}
+                  <p class="cph__gb-caption">{{ block.settings.caption }}</p>
+                {%- endif -%}
+              </div>
+
+            {%- when 'gallery_review' -%}
+              <div class="cph__gb-block cph__gb-review" {{ block.shopify_attributes }}>
+                <div class="cph__gb-review-stars" aria-label="{{ block.settings.rating }} étoiles sur 5">
+                  {%- for i in (1..5) -%}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="{% if i <= block.settings.rating %}#F5A623{% else %}#ddd{% endif %}" aria-hidden="true">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                  {%- endfor -%}
+                </div>
+                {%- if block.settings.text != blank -%}
+                  <p class="cph__gb-review-text">{{ block.settings.text }}</p>
+                {%- endif -%}
+                <div class="cph__gb-review-author">
+                  {%- if block.settings.author != blank -%}
+                    <span class="cph__gb-review-name">{{ block.settings.author }}</span>
+                  {%- endif -%}
+                  {%- if block.settings.verified -%}
+                    <span class="cph__gb-review-verified">✓ Acheteur vérifié</span>
+                  {%- endif -%}
+                </div>
+              </div>
+
+          {%- endcase -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment %} ══════════════════════════════
         INFOS PRODUIT
     ══════════════════════════════ {% endcomment %}
     <div class="cph__info">
@@ -943,6 +1014,65 @@
           "id": "show_apple_pay",
           "label": "Afficher Apple Pay",
           "default": false
+        }
+      ]
+    },
+    {
+      "type": "gallery_richtext",
+      "name": "📝 Sous galerie – Texte",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Contenu",
+          "default": "<p>Ajoutez votre texte ici.</p>"
+        }
+      ]
+    },
+    {
+      "type": "gallery_image",
+      "name": "🖼 Sous galerie – Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Légende (optionnelle)"
+        }
+      ]
+    },
+    {
+      "type": "gallery_review",
+      "name": "⭐ Sous galerie – Avis",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Note",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Texte de l'avis"
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Nom de l'auteur"
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Acheteur vérifié",
+          "default": true
         }
       ]
     }
