@@ -67,6 +67,20 @@
 
   # Image miniature produit
   assign thumb_img = product.featured_image
+
+  # Détecter l'option couleur
+  assign cqb_has_color    = false
+  assign cqb_color_idx    = 0
+  assign cqb_color_name   = ''
+  for opt in product.options
+    assign opt_lower = opt | downcase
+    if opt_lower == 'color' or opt_lower == 'colour' or opt_lower == 'couleur'
+      assign cqb_has_color  = true
+      assign cqb_color_idx  = forloop.index0
+      assign cqb_color_name = opt
+      break
+    endif
+  endfor
 -%}
 
 {%- if cqb_on -%}
@@ -78,6 +92,9 @@
   data-cqb
   data-price="{{ base_price }}"
   data-currency="{{ cart.currency.iso_code }}"
+  data-has-color="{{ cqb_has_color }}"
+  data-color-idx="{{ cqb_color_idx }}"
+  data-color-name="{{ cqb_color_name }}"
 >
 
   {%- comment -%} Prix de toutes les variantes pour mise à jour JS {%- endcomment -%}
@@ -89,6 +106,37 @@
       {%- endfor -%}
     }
   </script>
+
+  {%- comment -%} Données variantes complètes + couleurs pour sélection multi-couleur {%- endcomment -%}
+  {%- if cqb_has_color and product.variants.size > 1 -%}
+    <script type="application/json" data-cqb-variants>
+      [
+        {%- for v in product.variants -%}
+          {
+            "id": {{ v.id }},
+            "price": {{ v.price }},
+            "available": {{ v.available }},
+            "options": {{ v.options | json }}
+            {%- if v.featured_media -%}
+            ,"image": {{ v.featured_media | image_url: width: 120 | json }}
+            {%- endif -%}
+          }{%- unless forloop.last -%},{%- endunless -%}
+        {%- endfor -%}
+      ]
+    </script>
+    <script type="application/json" data-cqb-colors>
+      [
+        {%- assign cqb_seen = '' -%}
+        {%- for v in product.variants -%}
+          {%- assign c_name = v.options[cqb_color_idx] -%}
+          {%- unless cqb_seen contains c_name -%}
+            {%- assign cqb_seen = cqb_seen | append: c_name | append: '|||' -%}
+            { "name": {{ c_name | json }}, "css": "{{ c_name | downcase | replace: ' ', '' }}" }{%- unless forloop.last -%},{%- endunless -%}
+          {%- endunless -%}
+        {%- endfor -%}
+      ]
+    </script>
+  {%- endif -%}
 
   {%- comment -%} Quantité injectée dans le formulaire parent {%- endcomment -%}
   <input type="hidden" name="quantity" value="{{ cqb_qty1 }}" data-cqb-qty-input>
@@ -244,6 +292,11 @@
 
   </div>
 </div>
+
+{%- comment -%} Zone sélecteurs couleur par article (générée par JS quand qty > 1) {%- endcomment -%}
+{%- if cqb_has_color and product.variants.size > 1 -%}
+  <div class="cqb__color-slots" data-cqb-slots style="display:none"></div>
+{%- endif -%}
 
 <script src="{{ 'custom-quantity-breaks.js' | asset_url }}" defer="defer"></script>
 

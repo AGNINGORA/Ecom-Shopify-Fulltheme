@@ -234,6 +234,83 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
+   SÉLECTEURS COULEUR PAR ARTICLE
+   ══════════════════════════════════════════════════════════════ */
+
+.cqb__color-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+  padding: 1.4rem;
+  background: #fafaf8;
+  border: 1.5px solid #e8e2da;
+  border-radius: 1rem;
+}
+
+.cqb__slots-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 0.4rem;
+  color: #444;
+}
+
+.cqb__slot {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.cqb__slot-label {
+  font-size: 1.25rem;
+  font-weight: 600;
+  min-width: 6.5rem;
+  color: #333;
+}
+
+.cqb__slot-swatches {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.cqb__swatch {
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 2px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  cursor: pointer;
+  background: none;
+  transition: border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.cqb__swatch:hover {
+  border-color: #999;
+  transform: scale(1.12);
+}
+
+.cqb__swatch.is-active {
+  border-color: #C9A96E;
+  box-shadow: 0 0 0 2px #C9A96E;
+}
+
+.cqb__swatch-inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--swatch-color, #ccc);
+}
+
+.cqb__slot-color-name {
+  font-size: 1.15rem;
+  color: #888;
+  font-style: italic;
+}
+
+/* ══════════════════════════════════════════════════════════════
    RÉDUCTION DES MOUVEMENTS
    ══════════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
