@@ -11,6 +11,53 @@
   "sections": {
     "product-hero": {
       "type": "custom-product-hero",
+      "blocks": {
+        "gallery_image_aBAeGc": {
+          "type": "gallery_image",
+          "settings": {
+            "image": "shopify://shop_images/9e1ab24c92eabe7beaacfdf704970223.jpg",
+            "caption": ""
+          }
+        },
+        "gallery_review_CXw3Ba": {
+          "type": "gallery_review",
+          "settings": {
+            "rating": 5,
+            "text": "",
+            "author": "",
+            "verified": true
+          }
+        },
+        "gallery_image_zQK47x": {
+          "type": "gallery_image",
+          "settings": {
+            "caption": ""
+          }
+        },
+        "gallery_richtext_PepfAK": {
+          "type": "gallery_richtext",
+          "settings": {
+            "content": "<p>Ajoutez votre texte ici.</p>"
+          }
+        },
+        "reassurance_9jRpJC": {
+          "type": "reassurance",
+          "settings": {
+            "item_1": "100% satisfaite ou remboursée",
+            "item_2": "Formule testée dermatologiquement",
+            "item_3": "Livraison offerte dès 50€",
+            "item_4": "",
+            "check_color": "#c9a96e"
+          }
+        }
+      },
+      "block_order": [
+        "gallery_image_aBAeGc",
+        "gallery_review_CXw3Ba",
+        "gallery_image_zQK47x",
+        "gallery_richtext_PepfAK",
+        "reassurance_9jRpJC"
+      ],
       "settings": {
         "cqb_enabled": true,
         "cqb_qty2": 2,
