@@ -132,14 +132,60 @@
     },
     "bundle-offer": {
       "type": "custom-bundle-offer",
+      "blocks": {
+        "bundle_product_kQgPUB": {
+          "type": "bundle_product",
+          "settings": {
+            "product": "new-bodysuit-shapewear-women-tank-top-tummy-control-full-body-shaper-anti-chafing-shorts-slimming-waist-trainer-butt-lifter"
+          }
+        },
+        "bundle_product_KTW7rC": {
+          "type": "bundle_product",
+          "settings": {
+            "product": "liquid-foundation-effective-concealer-waterproof-sweat-resistant-makeup-professional-cosmetics"
+          }
+        },
+        "bundle_product_4njbVY": {
+          "type": "bundle_product",
+          "settings": {
+            "product": "undergarments-example-product-3"
+          }
+        },
+        "bundle_product_4mMe4x": {
+          "type": "bundle_product",
+          "settings": {
+            "product": "electric-shaver-for-men-and-women-portable-full-body-trimmer-usb-t-shaped-blade-razor-for-beard-armpit-for-washable"
+          }
+        },
+        "bundle_product_jiAVHh": {
+          "type": "bundle_product",
+          "settings": {
+            "product": "breathable-sports-bra-top-fitness-women-brassiere-removable-padded-sport-bra-running-gym-seamless-push-up-bras"
+          }
+        },
+        "bundle_product_47geVH": {
+          "type": "bundle_product",
+          "settings": {
+            "product": "2025-womens-sexy-lace-lace-camisole-vest-shorts-sleepwear-womens-slim-fit-two-piece-home-outfit-new-product-pink-coffee-blue"
+          }
+        }
+      },
+      "block_order": [
+        "bundle_product_kQgPUB",
+        "bundle_product_KTW7rC",
+        "bundle_product_4njbVY",
+        "bundle_product_4mMe4x",
+        "bundle_product_jiAVHh",
+        "bundle_product_47geVH"
+      ],
       "settings": {
         "title": "Offres spéciales",
         "subtitle": "Plus vous achetez, plus vous économisez",
         "button_label": "Ajouter le lot au panier",
-        "best_badge_label": "MEILLEURE OFFRE",
+        "discount_percent": 10,
+        "min_products": 2,
         "accent_color": "#c9a96e",
         "border_color": "#e8e2da",
-        "badge_bg": "#c9a96e",
         "button_bg": "#111111",
         "button_color": "#ffffff",
         "padding_top": 64,
@@ -164,10 +210,110 @@
     },
     "reviews": {
       "type": "custom-reviews",
+      "blocks": {
+        "review_TebXDG": {
+          "type": "review",
+          "settings": {
+            "name": "Marie L.",
+            "rating": 5,
+            "review_text": "Excellent produit ! Ma peau est transformée après seulement 2 semaines d'utilisation. Je recommande vivement.",
+            "date": "12 mars 2025",
+            "skin_type": "none",
+            "verified": true
+          }
+        },
+        "review_rXkrGA": {
+          "type": "review",
+          "settings": {
+            "name": "Marie L.",
+            "rating": 5,
+            "review_text": "Excellent produit ! Ma peau est transformée après seulement 2 semaines d'utilisation. Je recommande vivement.",
+            "date": "12 mars 2025",
+            "skin_type": "none",
+            "verified": true
+          }
+        },
+        "review_TrDjHe": {
+          "type": "review",
+          "settings": {
+            "name": "Marie L.",
+            "rating": 5,
+            "review_text": "Excellent produit ! Ma peau est transformée après seulement 2 semaines d'utilisation. Je recommande vivement.",
+            "date": "12 mars 2025",
+            "skin_type": "none",
+            "verified": true
+          }
+        },
+        "review_ixHw9m": {
+          "type": "review",
+          "settings": {
+            "name": "Marie L.",
+            "rating": 5,
+            "review_text": "Excellent produit ! Ma peau est transformée après seulement 2 semaines d'utilisation. Je recommande vivement.",
+            "date": "12 mars 2025",
+            "skin_type": "none",
+            "verified": true
+          }
+        },
+        "review_MXjB97": {
+          "type": "review",
+          "settings": {
+            "name": "Marie L.",
+            "rating": 5,
+            "review_text": "Excellent produit ! Ma peau est transformée après seulement 2 semaines d'utilisation. Je recommande vivement.",
+            "date": "12 mars 2025",
+            "skin_type": "none",
+            "verified": true
+          }
+        },
+        "review_VW439F": {
+          "type": "review",
+          "settings": {
+            "name": "Marie L.",
+            "rating": 5,
+            "review_text": "Excellent produit ! Ma peau est transformée après seulement 2 semaines d'utilisation. Je recommande vivement.",
+            "date": "12 mars 2025",
+            "skin_type": "none",
+            "verified": true
+          }
+        },
+        "review_kyThki": {
+          "type": "review",
+          "settings": {
+            "name": "Marie L.",
+            "rating": 5,
+            "review_text": "Excellent produit ! Ma peau est transformée après seulement 2 semaines d'utilisation. Je recommande vivement.",
+            "date": "12 mars 2025",
+            "skin_type": "none",
+            "verified": true
+          }
+        },
+        "review_jbbtgM": {
+          "type": "review",
+          "settings": {
+            "name": "Marie L.",
+            "rating": 5,
+            "review_text": "Excellent produit ! Ma peau est transformée après seulement 2 semaines d'utilisation. Je recommande vivement.",
+            "date": "12 mars 2025",
+            "skin_type": "none",
+            "verified": true
+          }
+        }
+      },
+      "block_order": [
+        "review_TebXDG",
+        "review_rXkrGA",
+        "review_TrDjHe",
+        "review_ixHw9m",
+        "review_MXjB97",
+        "review_VW439F",
+        "review_kyThki",
+        "review_jbbtgM"
+      ],
       "settings": {
         "title": "Ce que disent nos clientes",
         "per_page": 5,
-        "review_layout": "grid",
+        "review_layout": "carousel",
         "accent_color": "#c9a96e",
         "star_color": "#f4b942",
         "border_color": "#e8e2da",
