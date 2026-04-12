@@ -11,6 +11,68 @@
   "name": "t:sections.footer.name",
   "type": "footer",
   "sections": {
+    "custom_faq_contact_qpmqMg": {
+      "type": "custom-faq-contact",
+      "blocks": {
+        "faq_item_XybtKA": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Quelle est votre politique de retour ?",
+            "answer": "<p>Vous disposez de 30 jours à compter de la réception de votre commande pour nous retourner un produit non ouvert et non utilisé. Les frais de retour sont à votre charge, sauf en cas d'erreur de notre part.</p>"
+          }
+        },
+        "faq_item_e73Hkx": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Quels sont les délais de livraison ?",
+            "answer": "<p>La livraison standard est effectuée en 3 à 5 jours ouvrés. La livraison express (24h) est disponible pour les commandes passées avant 12h. La livraison est offerte dès 50€ d'achat.</p>"
+          }
+        },
+        "faq_item_gXaB94": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Où sont fabriqués vos produits ?",
+            "answer": "<p>Tous nos produits sont fabriqués en France, dans des laboratoires certifiés, selon des formules développées avec des dermatologues. Nous privilégions des ingrédients naturels et sourcés de manière responsable.</p>"
+          }
+        },
+        "faq_item_arzEgA": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Quels moyens de paiement acceptez-vous ?",
+            "answer": "<p>Nous acceptons les cartes bancaires (Visa, Mastercard, American Express), PayPal, Apple Pay et Google Pay. Vos paiements sont 100% sécurisés via notre partenaire de paiement certifié.</p>"
+          }
+        },
+        "faq_item_8nCaA4": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Comment suivre ma commande ?",
+            "answer": "<p>Dès l'expédition de votre commande, vous recevrez un email avec votre numéro de suivi. Vous pouvez également suivre votre commande directement depuis votre espace client dans la rubrique \"Mes commandes\".</p>"
+          }
+        }
+      },
+      "block_order": [
+        "faq_item_XybtKA",
+        "faq_item_e73Hkx",
+        "faq_item_gXaB94",
+        "faq_item_arzEgA",
+        "faq_item_8nCaA4"
+      ],
+      "name": "FAQ + Contact",
+      "settings": {
+        "contact_title": "Besoin d'aide ?",
+        "contact_hours": "<p>Notre équipe est là pour vous répondre du Lundi au Vendredi de 8h30 à 19h. Samedi de 10h à 17h.</p>",
+        "contact_phone": "",
+        "btn_primary_label": "Contactez notre support",
+        "btn_primary_url": "",
+        "btn_secondary_label": "Consultez notre aide",
+        "btn_secondary_url": "",
+        "faq_title": "Questions fréquentes",
+        "contact_bg": "#F7F5F2",
+        "accent_color": "#C9A96E",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
     "footer": {
       "type": "footer",
       "settings": {
@@ -30,6 +92,7 @@
     }
   },
   "order": [
+    "custom_faq_contact_qpmqMg",
     "footer"
   ]
 }

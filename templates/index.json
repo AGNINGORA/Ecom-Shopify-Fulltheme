@@ -213,23 +213,6 @@
         "padding_top": 64,
         "padding_bottom": 64
       }
-    },
-    "faq": {
-      "type": "custom-faq-contact",
-      "settings": {
-        "contact_title": "Besoin d'aide ?",
-        "contact_hours": "<p>Notre équipe est là pour vous répondre du Lundi au Vendredi de 8h30 à 19h. Samedi de 10h à 17h.</p>",
-        "contact_phone": "",
-        "btn_primary_label": "Contactez notre support",
-        "btn_primary_url": "",
-        "btn_secondary_label": "Consultez notre aide",
-        "btn_secondary_url": "",
-        "faq_title": "Questions fréquentes",
-        "contact_bg": "#f7f5f2",
-        "accent_color": "#c9a96e",
-        "padding_top": 64,
-        "padding_bottom": 80
-      }
     }
   },
   "order": [
@@ -241,7 +224,6 @@
     "before-after",
     "featured-routine",
     "testimonials",
-    "instagram",
-    "faq"
+    "instagram"
   ]
 }

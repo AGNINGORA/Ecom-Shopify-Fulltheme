@@ -157,7 +157,7 @@
           "enabled": true,
           "bar_style": "banner",
           "bar_position": "top",
-          "make_sticky": false,
+          "make_sticky": true,
           "layout": "inline",
           "threshold": 50,
           "hide_when_free": false,
