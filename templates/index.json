@@ -160,25 +160,6 @@
         "padding_bottom": 64
       }
     },
-    "featured-routine": {
-      "type": "custom-featured-routine",
-      "settings": {
-        "eyebrow": "",
-        "title": "Ma routine beauté quotidienne",
-        "subtitle": "5 étapes pour une peau parfaite, matin et soir.",
-        "step_link_label": "Voir",
-        "show_add_all": true,
-        "add_all_label": "Ajouter la routine au panier",
-        "add_all_note": "",
-        "accent_color": "#c9a96e",
-        "number_bg": "#c9a96e",
-        "number_text": "#ffffff",
-        "btn_bg": "#111111",
-        "btn_text_color": "#ffffff",
-        "padding_top": 64,
-        "padding_bottom": 64
-      }
-    },
     "testimonials": {
       "type": "custom-testimonials-carousel",
       "settings": {
@@ -194,25 +175,6 @@
         "padding_top": 80,
         "padding_bottom": 80
       }
-    },
-    "instagram": {
-      "type": "custom-instagram-feed",
-      "settings": {
-        "handle": "",
-        "title": "",
-        "subtitle": "",
-        "grid_columns": "3",
-        "cta_label": "Voir",
-        "overlay_color": "#000000",
-        "overlay_opacity": 50,
-        "btn_bg": "#c9a96e",
-        "btn_text_color": "#ffffff",
-        "profile_url": "",
-        "profile_cta": "",
-        "accent_color": "#c9a96e",
-        "padding_top": 64,
-        "padding_bottom": 64
-      }
     }
   },
   "order": [
@@ -222,8 +184,6 @@
     "benefits",
     "featured-product",
     "before-after",
-    "featured-routine",
-    "testimonials",
-    "instagram"
+    "testimonials"
   ]
 }
