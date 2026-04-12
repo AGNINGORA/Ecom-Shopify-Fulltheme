@@ -1,21 +1,41 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero-banner": {
       "type": "custom-hero-banner",
       "settings": {
         "content_type": "image",
+        "image_desktop": "shopify://shop_images/7ba61935c060df637ce2d7d7e123d47c.jpg",
+        "video_autoplay": true,
+        "overlay_color": "#000000",
         "overlay_opacity": 30,
-        "height_desktop": 80,
+        "height_desktop": 70,
         "height_mobile": 60,
+        "text_alignment": "center",
+        "text_position": "middle",
+        "text_color": "#ffffff",
+        "eyebrow": "",
         "title": "La beauté naturelle, réinventée",
+        "title_size": "lg",
         "subtitle": "Des formules clean, cliniquement testées, pensées pour votre peau.",
         "cta_label": "Découvrir la collection",
         "cta_url": "shopify://collections/all",
         "cta_style": "filled",
-        "text_alignment": "center",
-        "text_color": "#FFFFFF",
-        "cta_bg": "#C9A96E",
-        "cta_text_color": "#FFFFFF",
+        "cta_bg": "#c9a96e",
+        "cta_text_color": "#ffffff",
+        "cta2_label": "",
+        "cta2_url": "",
+        "cta2_style": "outline",
+        "enable_parallax": true,
+        "show_scroll_arrow": true,
         "padding_top": 0,
         "padding_bottom": 0
       }
@@ -25,7 +45,8 @@
       "settings": {
         "title": "Nos Stories",
         "subtitle": "Nouveautés, promos & coulisses",
-        "accent_color": "#C9A96E",
+        "accent_color": "#c9a96e",
+        "ring_gradient": "linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)",
         "padding_top": 32,
         "padding_bottom": 32
       }
@@ -34,14 +55,16 @@
       "type": "custom-ab-cta-banner",
       "settings": {
         "test_name": "homepage_cta",
-        "accent_color": "#C9A96E",
+        "accent_color": "#c9a96e",
         "title_a": "Offre spéciale : -20% aujourd'hui",
         "text_a": "Profitez de notre promotion exclusive sur toute la collection.",
         "cta_label_a": "En profiter maintenant",
-        "cta_color_a": "#C9A96E",
+        "cta_url_a": "",
+        "cta_color_a": "#c9a96e",
         "title_b": "Livraison offerte dès 50€",
         "text_b": "Découvrez notre collection et bénéficiez de la livraison gratuite.",
         "cta_label_b": "Découvrir la collection",
+        "cta_url_b": "",
         "cta_color_b": "#111111",
         "padding_top": 0,
         "padding_bottom": 0
@@ -83,12 +106,19 @@
           }
         }
       },
-      "block_order": ["benefit-1", "benefit-2", "benefit-3", "benefit-4"],
+      "block_order": [
+        "benefit-1",
+        "benefit-2",
+        "benefit-3",
+        "benefit-4"
+      ],
       "settings": {
-        "section_bg": "#F7F5F2",
-        "card_bg": "#FFFFFF",
-        "icon_bg": "#F0EDE8",
-        "accent_color": "#C9A96E",
+        "title": "Formulé pour votre peau, pas pour les marges",
+        "subtitle": "Des ingrédients sélectionnés avec soin, pour des résultats visibles dès les premières semaines.",
+        "section_bg": "#f7f5f2",
+        "card_bg": "#ffffff",
+        "icon_bg": "#f0ede8",
+        "accent_color": "#c9a96e",
         "padding_top": 48,
         "padding_bottom": 48
       }
@@ -96,15 +126,18 @@
     "featured-product": {
       "type": "custom-featured-product",
       "settings": {
-        "title": "Notre bestseller",
+        "product": "",
         "show_rating": true,
         "show_description": true,
         "desc_chars": 220,
         "show_buy_now": true,
-        "accent_color": "#C9A96E",
+        "show_size_guide": false,
+        "size_guide_url": "",
+        "size_guide_label": "Guide de taille",
+        "accent_color": "#c9a96e",
         "add_btn_bg": "#111111",
-        "add_btn_color": "#FFFFFF",
-        "buy_btn_bg": "#FFFFFF",
+        "add_btn_color": "#ffffff",
+        "buy_btn_bg": "#ffffff",
         "buy_btn_color": "#111111",
         "buy_btn_border": "#111111",
         "padding_top": 80,
@@ -114,6 +147,15 @@
     "before-after": {
       "type": "custom-before-after",
       "settings": {
+        "mode": "single",
+        "title": "Des résultats prouvés",
+        "subtitle": "Constatez la différence avec nos clientes",
+        "gallery_columns": "3",
+        "accent_color": "#c9a96e",
+        "label_bg": "#111111",
+        "label_color": "#ffffff",
+        "handle_color": "#ffffff",
+        "stat_number_color": "#c9a96e",
         "padding_top": 64,
         "padding_bottom": 64
       }
@@ -121,6 +163,18 @@
     "featured-routine": {
       "type": "custom-featured-routine",
       "settings": {
+        "eyebrow": "",
+        "title": "Ma routine beauté quotidienne",
+        "subtitle": "5 étapes pour une peau parfaite, matin et soir.",
+        "step_link_label": "Voir",
+        "show_add_all": true,
+        "add_all_label": "Ajouter la routine au panier",
+        "add_all_note": "",
+        "accent_color": "#c9a96e",
+        "number_bg": "#c9a96e",
+        "number_text": "#ffffff",
+        "btn_bg": "#111111",
+        "btn_text_color": "#ffffff",
         "padding_top": 64,
         "padding_bottom": 64
       }
@@ -128,6 +182,15 @@
     "testimonials": {
       "type": "custom-testimonials-carousel",
       "settings": {
+        "eyebrow": "",
+        "title": "Elles adorent nos produits",
+        "subtitle": "",
+        "slides_desktop": "2",
+        "autoplay": true,
+        "autoplay_speed": 5,
+        "accent_color": "#c9a96e",
+        "star_color": "#c9a96e",
+        "card_bg": "#faf8f5",
         "padding_top": 80,
         "padding_bottom": 80
       }
@@ -135,6 +198,18 @@
     "instagram": {
       "type": "custom-instagram-feed",
       "settings": {
+        "handle": "",
+        "title": "",
+        "subtitle": "",
+        "grid_columns": "3",
+        "cta_label": "Voir",
+        "overlay_color": "#000000",
+        "overlay_opacity": 50,
+        "btn_bg": "#c9a96e",
+        "btn_text_color": "#ffffff",
+        "profile_url": "",
+        "profile_cta": "",
+        "accent_color": "#c9a96e",
         "padding_top": 64,
         "padding_bottom": 64
       }
@@ -142,6 +217,16 @@
     "faq": {
       "type": "custom-faq-contact",
       "settings": {
+        "contact_title": "Besoin d'aide ?",
+        "contact_hours": "<p>Notre équipe est là pour vous répondre du Lundi au Vendredi de 8h30 à 19h. Samedi de 10h à 17h.</p>",
+        "contact_phone": "",
+        "btn_primary_label": "Contactez notre support",
+        "btn_primary_url": "",
+        "btn_secondary_label": "Consultez notre aide",
+        "btn_secondary_url": "",
+        "faq_title": "Questions fréquentes",
+        "contact_bg": "#f7f5f2",
+        "accent_color": "#c9a96e",
         "padding_top": 64,
         "padding_bottom": 80
       }
