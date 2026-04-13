@@ -1,0 +1,187 @@
+{% comment %}
+  custom-newsletter-banner.liquid
+  Bannière newsletter — fond sombre, style premium
+  Dawn 15.x · CSS uniquement · Mobile-first
+  CSS : assets/custom-newsletter-banner.css
+{% endcomment %}
+
+{{ 'custom-newsletter-banner.css' | asset_url | stylesheet_tag }}
+
+<section
+  class="cnb"
+  data-section-id="{{ section.id }}"
+  style="
+    --cnb-bg: {{ section.settings.section_bg }};
+    --cnb-text: {{ section.settings.text_color }};
+    --cnb-accent: {{ section.settings.accent_color }};
+    --cnb-input-bg: {{ section.settings.input_bg }};
+    --cnb-input-border: {{ section.settings.input_border }};
+    --cnb-btn-bg: {{ section.settings.button_bg }};
+    --cnb-btn-text: {{ section.settings.button_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="cnb__inner page-width">
+
+    {%- if section.settings.title != blank -%}
+      <h2 class="cnb__title">{{ section.settings.title | escape }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.subtitle != blank -%}
+      <p class="cnb__subtitle">{{ section.settings.subtitle | escape }}</p>
+    {%- endif -%}
+
+    {%- form 'customer', id: 'cnb-form', class: 'cnb__form' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+
+      {%- if form.posted_successfully? -%}
+        <p class="cnb__success" role="status">
+          {{ section.settings.success_message | default: 'Merci pour votre inscription !' | escape }}
+        </p>
+      {%- endif -%}
+
+      {%- if form.errors -%}
+        <p class="cnb__error" role="alert">
+          {{ form.errors.translated_fields.email | capitalize }}
+          {{ form.errors.messages.email }}
+        </p>
+      {%- endif -%}
+
+      <div class="cnb__field-wrap">
+        <input
+          type="email"
+          name="contact[email]"
+          class="cnb__input"
+          placeholder="{{ section.settings.placeholder | default: 'Votre adresse email' | escape }}"
+          required
+          aria-label="{{ section.settings.placeholder | default: 'Votre adresse email' | escape }}"
+          autocomplete="email"
+        >
+        <button type="submit" class="cnb__btn">
+          {{ section.settings.button_label | default: "S'inscrire" | escape }}
+        </button>
+      </div>
+
+    {%- endform -%}
+
+    {%- if section.settings.disclaimer != blank -%}
+      <p class="cnb__disclaimer">{{ section.settings.disclaimer | escape }}</p>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Bannière Newsletter",
+  "tag": "section",
+  "class": "section-custom-newsletter-banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Restez inspirée"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Sous-titre",
+      "default": "Recevez nos nouveautés et offres exclusives en avant-première"
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Placeholder email",
+      "default": "Votre adresse email"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texte du bouton",
+      "default": "S'INSCRIRE"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Message de confirmation",
+      "default": "Merci pour votre inscription !"
+    },
+    {
+      "type": "text",
+      "id": "disclaimer",
+      "label": "Mention légale (optionnel)",
+      "info": "Ex: En vous inscrivant, vous acceptez notre politique de confidentialité."
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Fond section",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Couleur texte",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur accent",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "input_bg",
+      "label": "Fond champ email",
+      "default": "transparent"
+    },
+    {
+      "type": "color",
+      "id": "input_border",
+      "label": "Bordure champ email",
+      "default": "#555555"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Fond bouton",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Texte bouton",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espacement haut",
+      "min": 0, "max": 120, "step": 4, "default": 64, "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espacement bas",
+      "min": 0, "max": 120, "step": 4, "default": 64, "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bannière Newsletter"
+    }
+  ]
+}
+{% endschema %}

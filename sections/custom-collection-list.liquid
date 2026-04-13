@@ -1,0 +1,236 @@
+{% comment %}
+  custom-collection-list.liquid
+  Grille de collections — cartes élégantes avec image, titre, sous-titre
+  Dawn 15.x · CSS uniquement · Mobile-first
+  CSS : assets/custom-collection-list.css
+{% endcomment %}
+
+{{ 'custom-collection-list.css' | asset_url | stylesheet_tag }}
+
+{%- assign col_blocks = section.blocks | where: 'type', 'collection_card' -%}
+
+<section
+  class="ccl"
+  data-section-id="{{ section.id }}"
+  style="
+    --ccl-bg: {{ section.settings.section_bg }};
+    --ccl-card-bg: {{ section.settings.card_bg }};
+    --ccl-accent: {{ section.settings.accent_color }};
+    --ccl-text: {{ section.settings.text_color }};
+    --ccl-subtitle: {{ section.settings.subtitle_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="ccl__inner page-width">
+
+    {%- comment %} ── En-tête ──────────────────────────────── {% endcomment %}
+    <div class="ccl__header">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="ccl__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+      {%- endif -%}
+      {%- if section.settings.title != blank -%}
+        <h2 class="ccl__title">{{ section.settings.title | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtitle != blank -%}
+        <p class="ccl__subtitle">{{ section.settings.subtitle | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if col_blocks.size > 0 -%}
+      <div class="ccl__grid ccl__grid--{{ col_blocks.size | at_most: 4 }}">
+        {%- for block in col_blocks -%}
+          {%- assign col = block.settings.collection -%}
+          {%- assign card_title = block.settings.card_title -%}
+          {%- assign card_sub   = block.settings.card_subtitle -%}
+          {%- assign card_img   = block.settings.card_image -%}
+          {%- assign card_url   = col.url | default: '#' -%}
+
+          {%- if card_title == blank and col != blank -%}
+            {%- assign card_title = col.title -%}
+          {%- endif -%}
+
+          <a
+            class="ccl__card"
+            href="{{ card_url }}"
+            {{ block.shopify_attributes }}
+          >
+            <div class="ccl__card-media">
+              {%- if card_img != blank -%}
+                <img
+                  class="ccl__card-img"
+                  src="{{ card_img | image_url: width: 600 }}"
+                  alt="{{ card_title | escape }}"
+                  width="600"
+                  height="600"
+                  loading="lazy"
+                >
+              {%- elsif col != blank and col.image != blank -%}
+                <img
+                  class="ccl__card-img"
+                  src="{{ col.image | image_url: width: 600 }}"
+                  alt="{{ card_title | escape }}"
+                  width="600"
+                  height="600"
+                  loading="lazy"
+                >
+              {%- else -%}
+                <div class="ccl__card-placeholder">
+                  {{ 'collection-1' | placeholder_svg_tag: 'ccl__placeholder-svg' }}
+                </div>
+              {%- endif -%}
+            </div>
+            <div class="ccl__card-info">
+              {%- if card_title != blank -%}
+                <h3 class="ccl__card-title">{{ card_title | escape }}</h3>
+              {%- endif -%}
+              {%- if card_sub != blank -%}
+                <span class="ccl__card-sub">{{ card_sub | escape }}</span>
+              {%- endif -%}
+            </div>
+          </a>
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <p class="ccl__empty">Ajoutez des blocs « Collection » dans l'éditeur.</p>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Liste de collections",
+  "tag": "section",
+  "class": "section-custom-collection-list",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Sur-titre",
+      "default": "NOS UNIVERS"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Trouvez votre style"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Sous-titre"
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Fond section",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Fond carte",
+      "default": "#FAFAF8"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur accent",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Couleur texte",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Couleur sous-titre carte",
+      "default": "#888888"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espacement haut",
+      "min": 0, "max": 120, "step": 4, "default": 64, "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espacement bas",
+      "min": 0, "max": 120, "step": 4, "default": 64, "unit": "px"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection_card",
+      "name": "Collection",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "card_image",
+          "label": "Image personnalisée",
+          "info": "Remplace l'image de la collection si renseignée"
+        },
+        {
+          "type": "text",
+          "id": "card_title",
+          "label": "Titre personnalisé",
+          "info": "Remplace le titre de la collection si renseigné"
+        },
+        {
+          "type": "text",
+          "id": "card_subtitle",
+          "label": "Sous-titre"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Liste de collections",
+      "blocks": [
+        {
+          "type": "collection_card",
+          "settings": {
+            "card_title": "Dentelle raffinée",
+            "card_subtitle": "CALAIS & CHANTILLY"
+          }
+        },
+        {
+          "type": "collection_card",
+          "settings": {
+            "card_title": "Soie & satin",
+            "card_subtitle": "DOUCEUR ABSOLUE"
+          }
+        },
+        {
+          "type": "collection_card",
+          "settings": {
+            "card_title": "Confort quotidien",
+            "card_subtitle": "SECONDE PEAU"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

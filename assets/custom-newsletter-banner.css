@@ -1,0 +1,112 @@
+/* ═══════════════════════════════════════════════════════════
+   custom-newsletter-banner.css
+   Bannière newsletter — fond sombre, style premium
+   ═══════════════════════════════════════════════════════════ */
+
+.cnb {
+  background: var(--cnb-bg, #1A1A1A);
+  color: var(--cnb-text, #fff);
+}
+
+.cnb__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  max-width: 580px;
+  margin-inline: auto;
+}
+
+/* ── Titre ───────────────────────────────────────────────── */
+.cnb__title {
+  font-family: var(--font-heading-family);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--cnb-text, #fff);
+}
+
+.cnb__subtitle {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--cnb-accent, #C9A96E);
+  margin: 0;
+  opacity: 0.85;
+}
+
+/* ── Formulaire ──────────────────────────────────────────── */
+.cnb__form {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.cnb__field-wrap {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  max-width: 480px;
+  margin-inline: auto;
+  border: 1px solid var(--cnb-input-border, #555);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cnb__input {
+  flex: 1;
+  padding: 14px 16px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: var(--cnb-text, #fff);
+  background: var(--cnb-input-bg, transparent);
+  border: none;
+  outline: none;
+  min-width: 0;
+}
+
+.cnb__input::placeholder {
+  color: rgba(255,255,255,0.45);
+}
+
+.cnb__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 24px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cnb-btn-text, #fff);
+  background: var(--cnb-btn-bg, #C9A96E);
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.25s ease;
+}
+
+.cnb__btn:hover {
+  opacity: 0.85;
+}
+
+/* ── Messages ────────────────────────────────────────────── */
+.cnb__success {
+  color: #4caf50;
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.cnb__error {
+  color: #e53935;
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+/* ── Disclaimer ──────────────────────────────────────────── */
+.cnb__disclaimer {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.35);
+  margin: 4px 0 0;
+}

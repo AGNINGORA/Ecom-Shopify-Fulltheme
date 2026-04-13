@@ -1,0 +1,187 @@
+{% comment %}
+  custom-image-text.liquid
+  Section split image + texte — présentation de marque / storytelling
+  Dawn 15.x · CSS uniquement · Mobile-first
+  CSS : assets/custom-image-text.css
+{% endcomment %}
+
+{{ 'custom-image-text.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign layout = section.settings.layout | default: 'image_left'
+  assign img    = section.settings.image
+-%}
+
+<section
+  class="cit cit--{{ layout }}"
+  data-section-id="{{ section.id }}"
+  style="
+    --cit-bg: {{ section.settings.section_bg }};
+    --cit-text: {{ section.settings.text_color }};
+    --cit-accent: {{ section.settings.accent_color }};
+    --cit-btn-bg: {{ section.settings.button_bg }};
+    --cit-btn-text: {{ section.settings.button_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="cit__inner page-width">
+
+    {%- comment %} ── Image ─────────────────────────────── {% endcomment %}
+    <div class="cit__media">
+      {%- if img != blank -%}
+        <img
+          class="cit__img"
+          src="{{ img | image_url: width: 800 }}"
+          alt="{{ section.settings.image_alt | default: section.settings.title | escape }}"
+          width="800"
+          height="{{ 800 | divided_by: img.aspect_ratio | round }}"
+          loading="lazy"
+        >
+      {%- else -%}
+        <div class="cit__placeholder">
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'cit__placeholder-svg' }}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment %} ── Texte ─────────────────────────────── {% endcomment %}
+    <div class="cit__content">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="cit__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+      {%- endif -%}
+
+      {%- if section.settings.title != blank -%}
+        <h2 class="cit__title">{{ section.settings.title | escape }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.text != blank -%}
+        <div class="cit__text rte">{{ section.settings.text }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.button_label != blank -%}
+        <a
+          class="cit__btn"
+          href="{{ section.settings.button_url | default: '#' }}"
+        >
+          {{ section.settings.button_label | escape }}
+        </a>
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Image + Texte",
+  "tag": "section",
+  "class": "section-custom-image-text",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Disposition",
+      "options": [
+        { "value": "image_left", "label": "Image à gauche" },
+        { "value": "image_right", "label": "Image à droite" }
+      ],
+      "default": "image_left"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Texte alternatif image"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Sur-titre"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Pensé pour vous, créé avec soin"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texte",
+      "default": "<p>Chaque pièce est le fruit d'un savoir-faire artisanal, alliant matières nobles et coupes modernes. Nous croyons qu'un vêtement doit raconter une histoire — la vôtre.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texte du bouton",
+      "default": "En savoir plus"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Lien du bouton"
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Fond section",
+      "default": "#F7F5F2"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Couleur texte",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur accent",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Fond bouton",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Texte bouton",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espacement haut",
+      "min": 0, "max": 120, "step": 4, "default": 64, "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espacement bas",
+      "min": 0, "max": 120, "step": 4, "default": 64, "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image + Texte"
+    }
+  ]
+}
+{% endschema %}

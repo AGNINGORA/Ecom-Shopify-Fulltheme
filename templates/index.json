@@ -13,61 +13,64 @@
       "type": "custom-hero-banner",
       "settings": {
         "content_type": "image",
-        "image_desktop": "shopify://shop_images/7ba61935c060df637ce2d7d7e123d47c.jpg",
-        "video_autoplay": true,
-        "overlay_color": "#000000",
-        "overlay_opacity": 30,
-        "height_desktop": 70,
+        "overlay_opacity": 15,
+        "height_desktop": 80,
         "height_mobile": 60,
+        "eyebrow": "COLLECTION PRINTEMPS-ÉTÉ",
+        "title": "L'élégance au plus près de soi",
+        "title_size": "lg",
+        "subtitle": "Des pièces délicates confectionnées dans les plus belles matières, pour sublimer chaque silhouette.",
+        "cta_label": "DÉCOUVRIR",
+        "cta_url": "shopify://collections/all",
+        "cta_style": "outline",
         "text_alignment": "center",
         "text_position": "middle",
-        "text_color": "#ffffff",
-        "eyebrow": "",
-        "title": "La beauté naturelle, réinventée",
-        "title_size": "lg",
-        "subtitle": "Des formules clean, cliniquement testées, pensées pour votre peau.",
-        "cta_label": "Découvrir la collection",
-        "cta_url": "shopify://collections/all",
-        "cta_style": "filled",
-        "cta_bg": "#c9a96e",
-        "cta_text_color": "#ffffff",
-        "cta2_label": "",
-        "cta2_url": "",
-        "cta2_style": "outline",
-        "enable_parallax": true,
-        "show_scroll_arrow": true,
+        "text_color": "#111111",
+        "overlay_color": "#F5EDE3",
+        "cta_bg": "#C9A96E",
+        "cta_text_color": "#C9A96E",
+        "enable_parallax": false,
+        "show_scroll_arrow": false,
         "padding_top": 0,
         "padding_bottom": 0
       }
     },
-    "stories": {
-      "type": "custom-stories",
+    "collections": {
+      "type": "custom-collection-list",
+      "blocks": {
+        "col-1": {
+          "type": "collection_card",
+          "settings": {
+            "card_title": "Dentelle raffinée",
+            "card_subtitle": "CALAIS & CHANTILLY"
+          }
+        },
+        "col-2": {
+          "type": "collection_card",
+          "settings": {
+            "card_title": "Soie & satin",
+            "card_subtitle": "DOUCEUR ABSOLUE"
+          }
+        },
+        "col-3": {
+          "type": "collection_card",
+          "settings": {
+            "card_title": "Confort quotidien",
+            "card_subtitle": "SECONDE PEAU"
+          }
+        }
+      },
+      "block_order": ["col-1", "col-2", "col-3"],
       "settings": {
-        "title": "Nos Stories",
-        "subtitle": "Nouveautés, promos & coulisses",
-        "accent_color": "#c9a96e",
-        "ring_gradient": "linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)",
-        "padding_top": 32,
-        "padding_bottom": 32
-      }
-    },
-    "ab-cta": {
-      "type": "custom-ab-cta-banner",
-      "settings": {
-        "test_name": "homepage_cta",
-        "accent_color": "#c9a96e",
-        "title_a": "Offre spéciale : -20% aujourd'hui",
-        "text_a": "Profitez de notre promotion exclusive sur toute la collection.",
-        "cta_label_a": "En profiter maintenant",
-        "cta_url_a": "",
-        "cta_color_a": "#c9a96e",
-        "title_b": "Livraison offerte dès 50€",
-        "text_b": "Découvrez notre collection et bénéficiez de la livraison gratuite.",
-        "cta_label_b": "Découvrir la collection",
-        "cta_url_b": "",
-        "cta_color_b": "#111111",
-        "padding_top": 0,
-        "padding_bottom": 0
+        "eyebrow": "NOS UNIVERS",
+        "title": "Trouvez votre style",
+        "section_bg": "#FFFFFF",
+        "card_bg": "#FAFAF8",
+        "accent_color": "#C9A96E",
+        "text_color": "#111111",
+        "subtitle_color": "#888888",
+        "padding_top": 72,
+        "padding_bottom": 72
       }
     },
     "benefits": {
@@ -76,49 +79,42 @@
         "benefit-1": {
           "type": "benefit",
           "settings": {
-            "icon": "leaf",
-            "title": "100 % naturel",
-            "description": "Ingrédients d'origine naturelle, certifiés et traçables."
+            "icon": "star",
+            "title": "Conseil expert",
+            "description": "Un accompagnement sur mesure"
           }
         },
         "benefit-2": {
           "type": "benefit",
           "settings": {
-            "icon": "shield",
-            "title": "Sans parabène",
-            "description": "Aucun conservateur controversé, efficace sur toutes les peaux."
+            "icon": "leaf",
+            "title": "Matières nobles",
+            "description": "Soie, dentelle, coton pima"
           }
         },
         "benefit-3": {
           "type": "benefit",
           "settings": {
-            "icon": "flask",
-            "title": "Cliniquement testé",
-            "description": "Développé avec des dermatologues, résultats prouvés."
+            "icon": "shield",
+            "title": "Échange gratuit",
+            "description": "30 jours pour changer de taille"
           }
         },
         "benefit-4": {
           "type": "benefit",
           "settings": {
             "icon": "truck",
-            "title": "Livraison offerte",
-            "description": "Dès 50 € d'achat, livraison gratuite en France métropolitaine."
+            "title": "Emballage cadeau",
+            "description": "Écrin offert sur demande"
           }
         }
       },
-      "block_order": [
-        "benefit-1",
-        "benefit-2",
-        "benefit-3",
-        "benefit-4"
-      ],
+      "block_order": ["benefit-1", "benefit-2", "benefit-3", "benefit-4"],
       "settings": {
-        "title": "Formulé pour votre peau, pas pour les marges",
-        "subtitle": "Des ingrédients sélectionnés avec soin, pour des résultats visibles dès les premières semaines.",
-        "section_bg": "#f7f5f2",
-        "card_bg": "#ffffff",
-        "icon_bg": "#f0ede8",
-        "accent_color": "#c9a96e",
+        "section_bg": "#F7F5F2",
+        "card_bg": "#FFFFFF",
+        "icon_bg": "#F0EDE8",
+        "accent_color": "#C9A96E",
         "padding_top": 48,
         "padding_bottom": 48
       }
@@ -126,64 +122,79 @@
     "featured-product": {
       "type": "custom-featured-product",
       "settings": {
-        "product": "",
+        "title": "Notre coup de cœur",
         "show_rating": true,
         "show_description": true,
         "desc_chars": 220,
         "show_buy_now": true,
-        "show_size_guide": false,
-        "size_guide_url": "",
-        "size_guide_label": "Guide de taille",
-        "accent_color": "#c9a96e",
+        "accent_color": "#C9A96E",
         "add_btn_bg": "#111111",
-        "add_btn_color": "#ffffff",
-        "buy_btn_bg": "#ffffff",
+        "add_btn_color": "#FFFFFF",
+        "buy_btn_bg": "#FFFFFF",
         "buy_btn_color": "#111111",
         "buy_btn_border": "#111111",
         "padding_top": 80,
         "padding_bottom": 80
       }
     },
-    "before-after": {
-      "type": "custom-before-after",
+    "image-text": {
+      "type": "custom-image-text",
       "settings": {
-        "mode": "single",
-        "title": "Des résultats prouvés",
-        "subtitle": "Constatez la différence avec nos clientes",
-        "gallery_columns": "3",
-        "accent_color": "#c9a96e",
-        "label_bg": "#111111",
-        "label_color": "#ffffff",
-        "handle_color": "#ffffff",
-        "stat_number_color": "#c9a96e",
-        "padding_top": 64,
-        "padding_bottom": 64
+        "layout": "image_left",
+        "eyebrow": "NOTRE HISTOIRE",
+        "title": "Pensé pour vous, créé avec soin",
+        "text": "<p>Chaque pièce est le fruit d'un savoir-faire artisanal, alliant matières nobles et coupes modernes. Nous croyons qu'un vêtement doit raconter une histoire — la vôtre.</p><p>De la sélection des tissus à la confection finale, chaque détail est pensé pour offrir confort, élégance et durabilité au quotidien.</p>",
+        "button_label": "En savoir plus",
+        "section_bg": "#F7F5F2",
+        "text_color": "#111111",
+        "accent_color": "#C9A96E",
+        "button_bg": "#111111",
+        "button_color": "#FFFFFF",
+        "padding_top": 72,
+        "padding_bottom": 72
       }
     },
     "testimonials": {
       "type": "custom-testimonials-carousel",
       "settings": {
-        "eyebrow": "",
-        "title": "Elles adorent nos produits",
-        "subtitle": "",
-        "slides_desktop": "2",
-        "autoplay": true,
-        "autoplay_speed": 5,
-        "accent_color": "#c9a96e",
-        "star_color": "#c9a96e",
-        "card_bg": "#faf8f5",
-        "padding_top": 80,
-        "padding_bottom": 80
+        "padding_top": 72,
+        "padding_bottom": 72
+      }
+    },
+    "instagram": {
+      "type": "custom-instagram-feed",
+      "settings": {
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "newsletter": {
+      "type": "custom-newsletter-banner",
+      "settings": {
+        "title": "Restez inspirée",
+        "subtitle": "Recevez nos nouveautés et offres exclusives en avant-première",
+        "placeholder": "Votre adresse email",
+        "button_label": "S'INSCRIRE",
+        "section_bg": "#1A1A1A",
+        "text_color": "#FFFFFF",
+        "accent_color": "#C9A96E",
+        "input_bg": "transparent",
+        "input_border": "#555555",
+        "button_bg": "#C9A96E",
+        "button_color": "#FFFFFF",
+        "padding_top": 64,
+        "padding_bottom": 64
       }
     }
   },
   "order": [
     "hero-banner",
-    "stories",
-    "ab-cta",
+    "collections",
     "benefits",
     "featured-product",
-    "before-after",
-    "testimonials"
+    "image-text",
+    "testimonials",
+    "instagram",
+    "newsletter"
   ]
 }

@@ -1,0 +1,130 @@
+/* ═══════════════════════════════════════════════════════════
+   custom-image-text.css
+   Section split image + texte — Mobile-first
+   ═══════════════════════════════════════════════════════════ */
+
+.cit {
+  background: var(--cit-bg, #F7F5F2);
+  color: var(--cit-text, #111);
+}
+
+/* ── Layout ──────────────────────────────────────────────── */
+.cit__inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+@media (min-width: 750px) {
+  .cit__inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+
+  .cit--image_right .cit__media {
+    order: 2;
+  }
+
+  .cit--image_right .cit__content {
+    order: 1;
+  }
+}
+
+@media (min-width: 990px) {
+  .cit__inner {
+    gap: 64px;
+  }
+}
+
+/* ── Image ───────────────────────────────────────────────── */
+.cit__media {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.cit__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.cit__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  background: rgba(0,0,0,0.04);
+  border-radius: 12px;
+}
+
+.cit__placeholder-svg {
+  width: 64px;
+  height: 64px;
+  opacity: 0.2;
+}
+
+/* ── Contenu ─────────────────────────────────────────────── */
+.cit__content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cit__eyebrow {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cit-accent, #C9A96E);
+}
+
+.cit__title {
+  font-family: var(--font-heading-family);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 400;
+  line-height: 1.25;
+  margin: 0;
+  color: var(--cit-text, #111);
+}
+
+.cit__text {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: rgba(var(--color-foreground), 0.7);
+  margin: 0;
+}
+
+.cit__text p {
+  margin: 0 0 12px;
+}
+
+.cit__text p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Bouton ──────────────────────────────────────────────── */
+.cit__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 32px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  color: var(--cit-btn-text, #fff);
+  background: var(--cit-btn-bg, #111);
+  border: 1px solid var(--cit-btn-bg, #111);
+  border-radius: 6px;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  align-self: flex-start;
+}
+
+.cit__btn:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
