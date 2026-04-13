@@ -339,6 +339,7 @@
             <div
               class="cph__delivery"
               {{ block.shopify_attributes }}
+              data-delivery-min="{{ block.settings.min_days }}"
               style="--cph-delivery-accent: {{ block.settings.accent_color }};"
             >
               <span class="cph__delivery-icon" aria-hidden="true">
@@ -350,12 +351,12 @@
               <span class="cph__delivery-text">
                 {%- if block.settings.title != blank -%}
                   <strong>{{ block.settings.title | escape }}</strong>
-                  {%- if block.settings.min_days != blank and block.settings.max_days != blank -%}
-                    &nbsp;: {{ block.settings.min_days }}–{{ block.settings.max_days }} jours ouvrés
+                  {%- if block.settings.show_free and block.settings.free_threshold != blank -%}
+                    &ensp;<span class="cph__delivery-free">Gratuit disponible</span>
                   {%- endif -%}
                 {%- endif -%}
-                {%- if block.settings.show_free and block.settings.free_threshold != blank -%}
-                  &ensp;<span class="cph__delivery-free">Gratuite dès {{ block.settings.free_threshold }}</span>
+                {%- if block.settings.min_days != blank -%}
+                  <br><span class="cph__delivery-date-line">Commandez aujourd'hui pour une livraison dès <span data-cph-delivery-date>{{ block.settings.min_days }}–{{ block.settings.max_days }} jours ouvrés</span>.</span>
                 {%- endif -%}
               </span>
             </div>
@@ -381,6 +382,7 @@
             </ul>
 
           {%- when 'payment' -%}
+            {%- comment %} Icônes natives Shopify : se basent sur les moyens de paiement activés dans la boutique ─ {% endcomment %}
             <div class="cph__payment" {{ block.shopify_attributes }}>
               {%- if block.settings.title != blank -%}
                 <span class="cph__payment-title">
@@ -391,23 +393,52 @@
                   {{ block.settings.title | escape }}
                 </span>
               {%- endif -%}
-              <div class="cph__payment-icons">
-                {%- if block.settings.show_visa -%}
-                  <span class="cph__payment-badge" aria-label="Visa">VISA</span>
-                {%- endif -%}
-                {%- if block.settings.show_mastercard -%}
-                  <span class="cph__payment-badge" aria-label="Mastercard">MC</span>
-                {%- endif -%}
-                {%- if block.settings.show_paypal -%}
-                  <span class="cph__payment-badge" aria-label="PayPal">PayPal</span>
-                {%- endif -%}
-                {%- if block.settings.show_amex -%}
-                  <span class="cph__payment-badge" aria-label="Amex">Amex</span>
-                {%- endif -%}
-                {%- if block.settings.show_apple_pay -%}
-                  <span class="cph__payment-badge" aria-label="Apple Pay">Apple Pay</span>
+              <ul class="cph__payment-icons list-payment" role="list">
+                {%- for type in shop.enabled_payment_types -%}
+                  <li class="list-payment__item">
+                    {{ type | payment_type_svg_tag: class: 'icon icon--full-color' }}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+
+          {%- when 'guarantee' -%}
+            <div
+              class="cph__guarantee"
+              {{ block.shopify_attributes }}
+              style="--cph-guarantee-accent: {{ block.settings.icon_color }};"
+            >
+              <div class="cph__guarantee-header">
+                <span class="cph__guarantee-icon" aria-hidden="true">
+                  {%- case block.settings.icon -%}
+                    {%- when 'shield' -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <polyline points="9 12 11 14 15 10"/>
+                      </svg>
+                    {%- when 'check' -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                      </svg>
+                    {%- when 'star' -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                      </svg>
+                    {%- when 'heart' -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                      </svg>
+                  {%- endcase -%}
+                </span>
+                <strong class="cph__guarantee-title">{{ block.settings.title | escape }}</strong>
+                {%- if block.settings.link_url != blank and block.settings.link_label != blank -%}
+                  <a href="{{ block.settings.link_url }}" class="cph__guarantee-link">{{ block.settings.link_label | escape }}</a>
                 {%- endif -%}
               </div>
+              {%- if block.settings.description != blank -%}
+                <div class="cph__guarantee-desc rte">{{ block.settings.description }}</div>
+              {%- endif -%}
             </div>
 
         {%- endcase -%}
@@ -589,6 +620,45 @@
     if (el) { el._galleryInit = new ProductGallery(el); }
   });
 
+})();
+
+// ── Date de livraison estimée (jours ouvrés → date réelle) ──────────
+(function () {
+  'use strict';
+
+  function addBusinessDays(date, days) {
+    let d = new Date(date);
+    let added = 0;
+    while (added < days) {
+      d.setDate(d.getDate() + 1);
+      const day = d.getDay();
+      if (day !== 0 && day !== 6) added++; // ignore Sam=6, Dim=0
+    }
+    return d;
+  }
+
+  function initDeliveryDates() {
+    document.querySelectorAll('.cph__delivery[data-delivery-min]').forEach((el) => {
+      const min = parseInt(el.dataset.deliveryMin, 10);
+      if (!min || isNaN(min)) return;
+      const span = el.querySelector('[data-cph-delivery-date]');
+      if (!span) return;
+      const estimated = addBusinessDays(new Date(), min);
+      const locale = document.documentElement.lang || 'fr-FR';
+      span.textContent = estimated.toLocaleDateString(locale, {
+        weekday: 'long',
+        day:     'numeric',
+        month:   'long',
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDeliveryDates);
+  } else {
+    initDeliveryDates();
+  }
+  document.addEventListener('shopify:section:load', initDeliveryDates);
 })();
 </script>
 
@@ -949,25 +1019,25 @@
       "name": "Texte de réassurance",
       "settings": [
         {
-          "type": "text",
+          "type": "textarea",
           "id": "item_1",
           "label": "Point 1",
           "default": "100% satisfaite ou remboursée"
         },
         {
-          "type": "text",
+          "type": "textarea",
           "id": "item_2",
           "label": "Point 2",
           "default": "Formule testée dermatologiquement"
         },
         {
-          "type": "text",
+          "type": "textarea",
           "id": "item_3",
           "label": "Point 3",
           "default": "Livraison offerte dès 50€"
         },
         {
-          "type": "text",
+          "type": "textarea",
           "id": "item_4",
           "label": "Point 4 (optionnel)",
           "placeholder": "Optionnel"
@@ -982,43 +1052,64 @@
     },
     {
       "type": "payment",
-      "name": "Garanties de paiement",
+      "name": "Moyens de paiement",
       "settings": [
         {
           "type": "text",
           "id": "title",
           "label": "Titre",
-          "default": "Paiement 100% sécurisé"
+          "default": "Moyens de paiement"
         },
         {
-          "type": "checkbox",
-          "id": "show_visa",
-          "label": "Afficher Visa",
-          "default": true
+          "type": "paragraph",
+          "content": "Les icônes affichées correspondent automatiquement aux moyens de paiement activés dans Paramètres → Paiements de votre boutique Shopify."
+        }
+      ]
+    },
+    {
+      "type": "guarantee",
+      "name": "Garantie",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icône",
+          "options": [
+            { "value": "shield", "label": "Bouclier" },
+            { "value": "check",  "label": "Coche" },
+            { "value": "star",   "label": "Étoile" },
+            { "value": "heart",  "label": "Cœur" }
+          ],
+          "default": "shield"
         },
         {
-          "type": "checkbox",
-          "id": "show_mastercard",
-          "label": "Afficher Mastercard",
-          "default": true
+          "type": "text",
+          "id": "title",
+          "label": "Titre",
+          "default": "Garantie de 30 jours"
         },
         {
-          "type": "checkbox",
-          "id": "show_paypal",
-          "label": "Afficher PayPal",
-          "default": true
+          "type": "text",
+          "id": "link_label",
+          "label": "Texte du lien",
+          "default": "En savoir plus"
         },
         {
-          "type": "checkbox",
-          "id": "show_amex",
-          "label": "Afficher American Express",
-          "default": false
+          "type": "url",
+          "id": "link_url",
+          "label": "URL du lien"
         },
         {
-          "type": "checkbox",
-          "id": "show_apple_pay",
-          "label": "Afficher Apple Pay",
-          "default": false
+          "type": "richtext",
+          "id": "description",
+          "label": "Description",
+          "default": "<p>Nous garantissons nos produits. En cas de non-satisfaction, les retours sont possibles dans un délai de 30 jours.</p>"
+        },
+        {
+          "type": "color",
+          "id": "icon_color",
+          "label": "Couleur de l'icône",
+          "default": "#C9A96E"
         }
       ]
     },
