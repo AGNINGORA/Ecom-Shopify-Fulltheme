@@ -16,7 +16,7 @@
 
 .ccl__eyebrow {
   display: block;
-  font-size: 0.85rem;
+  font-size: calc(var(--font-heading-scale) * 1.2rem);
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -26,18 +26,27 @@
 
 .ccl__title {
   font-family: var(--font-heading-family);
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  font-weight: 400;
-  line-height: 1.2;
+  font-style: var(--font-heading-style);
+  font-weight: var(--font-heading-weight);
+  font-size: calc(var(--font-heading-scale) * 2rem);
+  line-height: calc(1 + 0.3 / max(1, var(--font-heading-scale)));
+  letter-spacing: calc(var(--font-heading-scale) * 0.06rem);
   margin: 0 0 8px;
   color: var(--ccl-text, #111);
 }
 
+@media (min-width: 750px) {
+  .ccl__title {
+    font-size: calc(var(--font-heading-scale) * 2.4rem);
+  }
+}
+
 .ccl__subtitle {
-  font-size: 1.05rem;
+  font-size: 1.5rem;
+  line-height: calc(1 + 0.8 / var(--font-body-scale, 1));
   color: var(--ccl-subtitle, #888);
   margin: 0;
-  max-width: 480px;
+  max-width: 520px;
   margin-inline: auto;
 }
 
@@ -123,15 +132,17 @@
 
 .ccl__card-title {
   font-family: var(--font-heading-family);
-  font-size: 1.2rem;
-  font-weight: 500;
-  margin: 0 0 4px;
+  font-style: var(--font-heading-style);
+  font-weight: var(--font-heading-weight);
+  font-size: calc(var(--font-heading-scale) * 1.5rem);
+  line-height: calc(1 + 0.3 / max(1, var(--font-heading-scale)));
+  margin: 0 0 6px;
   color: var(--ccl-text, #111);
 }
 
 .ccl__card-sub {
   display: block;
-  font-size: 0.82rem;
+  font-size: 1.2rem;
   font-weight: 500;
   letter-spacing: 0.15em;
   text-transform: uppercase;
