@@ -13,9 +13,13 @@
       "type": "custom-hero-banner",
       "settings": {
         "content_type": "image",
+        "overlay_color": "#F5EDE3",
         "overlay_opacity": 15,
         "height_desktop": 80,
         "height_mobile": 60,
+        "text_alignment": "center",
+        "text_position": "middle",
+        "text_color": "#111111",
         "eyebrow": "COLLECTION PRINTEMPS-ÉTÉ",
         "title": "L'élégance au plus près de soi",
         "title_size": "lg",
@@ -23,10 +27,6 @@
         "cta_label": "DÉCOUVRIR",
         "cta_url": "shopify://collections/all",
         "cta_style": "outline",
-        "text_alignment": "center",
-        "text_position": "middle",
-        "text_color": "#111111",
-        "overlay_color": "#F5EDE3",
         "cta_bg": "#C9A96E",
         "cta_text_color": "#C9A96E",
         "enable_parallax": false,
@@ -60,7 +60,11 @@
           }
         }
       },
-      "block_order": ["col-1", "col-2", "col-3"],
+      "block_order": [
+        "col-1",
+        "col-2",
+        "col-3"
+      ],
       "settings": {
         "eyebrow": "NOS UNIVERS",
         "title": "Trouvez votre style",
@@ -109,7 +113,12 @@
           }
         }
       },
-      "block_order": ["benefit-1", "benefit-2", "benefit-3", "benefit-4"],
+      "block_order": [
+        "benefit-1",
+        "benefit-2",
+        "benefit-3",
+        "benefit-4"
+      ],
       "settings": {
         "section_bg": "#F7F5F2",
         "card_bg": "#FFFFFF",
@@ -122,7 +131,6 @@
     "featured-product": {
       "type": "custom-featured-product",
       "settings": {
-        "title": "Notre coup de cœur",
         "show_rating": true,
         "show_description": true,
         "desc_chars": 220,
