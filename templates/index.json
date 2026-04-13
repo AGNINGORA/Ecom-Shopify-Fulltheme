@@ -184,12 +184,10 @@
         "eyebrow": "",
         "title": "Elles adorent nos produits",
         "subtitle": "",
-        "slides_desktop": "2",
-        "autoplay": true,
-        "autoplay_speed": 5,
         "accent_color": "#c9a96e",
         "star_color": "#c9a96e",
         "card_bg": "#faf8f5",
+        "text_color": "#111111",
         "padding_top": 72,
         "padding_bottom": 72
       }
@@ -197,6 +195,17 @@
     "custom_reviews_mHwf3V": {
       "type": "custom-reviews",
       "blocks": {
+        "review_FtdwxC": {
+          "type": "review",
+          "settings": {
+            "name": "Marie L.",
+            "rating": 5,
+            "review_text": "Excellent produit ! Ma peau est transformée après seulement 2 semaines d'utilisation. Je recommande vivement.",
+            "date": "12 mars 2025",
+            "skin_type": "none",
+            "verified": true
+          }
+        },
         "review_bzYA3j": {
           "type": "review",
           "settings": {
@@ -228,6 +237,7 @@
             "review_text": "Très bon produit, je le recommande ! J'aurais juste aimé un packaging plus éco-responsable, d'où 4 étoiles.",
             "date": "1er mars 2025",
             "skin_type": "sèche",
+            "photo": "shopify://shop_images/undergarments-natural-4.jpg",
             "verified": true
           }
         },
@@ -255,6 +265,7 @@
         }
       },
       "block_order": [
+        "review_FtdwxC",
         "review_bzYA3j",
         "review_KLkUUH",
         "review_6CyNz9",
@@ -264,10 +275,10 @@
       "name": "Avis clients",
       "settings": {
         "title": "Ce que disent nos clientes",
-        "per_page": 5,
+        "per_page": 9,
         "review_layout": "carousel",
-        "accent_color": "#C9A96E",
-        "star_color": "#F4B942",
+        "accent_color": "#c9a96e",
+        "star_color": "#f4b942",
         "border_color": "#e8e2da",
         "padding_top": 48,
         "padding_bottom": 48
