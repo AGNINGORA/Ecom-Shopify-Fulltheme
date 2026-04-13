@@ -13,7 +13,8 @@
       "type": "custom-hero-banner",
       "settings": {
         "content_type": "image",
-        "overlay_color": "#F5EDE3",
+        "video_autoplay": true,
+        "overlay_color": "#f5ede3",
         "overlay_opacity": 15,
         "height_desktop": 80,
         "height_mobile": 60,
@@ -27,8 +28,11 @@
         "cta_label": "DÉCOUVRIR",
         "cta_url": "shopify://collections/all",
         "cta_style": "outline",
-        "cta_bg": "#C9A96E",
-        "cta_text_color": "#C9A96E",
+        "cta_bg": "#c9a96e",
+        "cta_text_color": "#c9a96e",
+        "cta2_label": "",
+        "cta2_url": "",
+        "cta2_style": "outline",
         "enable_parallax": false,
         "show_scroll_arrow": false,
         "padding_top": 0,
@@ -41,6 +45,7 @@
         "col-1": {
           "type": "collection_card",
           "settings": {
+            "collection": "",
             "card_title": "Dentelle raffinée",
             "card_subtitle": "CALAIS & CHANTILLY"
           }
@@ -48,6 +53,7 @@
         "col-2": {
           "type": "collection_card",
           "settings": {
+            "collection": "",
             "card_title": "Soie & satin",
             "card_subtitle": "DOUCEUR ABSOLUE"
           }
@@ -55,6 +61,7 @@
         "col-3": {
           "type": "collection_card",
           "settings": {
+            "collection": "",
             "card_title": "Confort quotidien",
             "card_subtitle": "SECONDE PEAU"
           }
@@ -68,9 +75,10 @@
       "settings": {
         "eyebrow": "NOS UNIVERS",
         "title": "Trouvez votre style",
-        "section_bg": "#FFFFFF",
-        "card_bg": "#FAFAF8",
-        "accent_color": "#C9A96E",
+        "subtitle": "",
+        "section_bg": "#ffffff",
+        "card_bg": "#fafaf8",
+        "accent_color": "#c9a96e",
         "text_color": "#111111",
         "subtitle_color": "#888888",
         "padding_top": 72,
@@ -120,10 +128,12 @@
         "benefit-4"
       ],
       "settings": {
-        "section_bg": "#F7F5F2",
-        "card_bg": "#FFFFFF",
-        "icon_bg": "#F0EDE8",
-        "accent_color": "#C9A96E",
+        "title": "Formulé pour votre peau, pas pour les marges",
+        "subtitle": "Des ingrédients sélectionnés avec soin, pour des résultats visibles dès les premières semaines.",
+        "section_bg": "#f7f5f2",
+        "card_bg": "#ffffff",
+        "icon_bg": "#f0ede8",
+        "accent_color": "#c9a96e",
         "padding_top": 48,
         "padding_bottom": 48
       }
@@ -131,14 +141,18 @@
     "featured-product": {
       "type": "custom-featured-product",
       "settings": {
+        "product": "",
         "show_rating": true,
         "show_description": true,
         "desc_chars": 220,
         "show_buy_now": true,
-        "accent_color": "#C9A96E",
+        "show_size_guide": false,
+        "size_guide_url": "",
+        "size_guide_label": "Guide de taille",
+        "accent_color": "#c9a96e",
         "add_btn_bg": "#111111",
-        "add_btn_color": "#FFFFFF",
-        "buy_btn_bg": "#FFFFFF",
+        "add_btn_color": "#ffffff",
+        "buy_btn_bg": "#ffffff",
         "buy_btn_color": "#111111",
         "buy_btn_border": "#111111",
         "padding_top": 80,
@@ -149,15 +163,17 @@
       "type": "custom-image-text",
       "settings": {
         "layout": "image_left",
+        "image_alt": "",
         "eyebrow": "NOTRE HISTOIRE",
         "title": "Pensé pour vous, créé avec soin",
         "text": "<p>Chaque pièce est le fruit d'un savoir-faire artisanal, alliant matières nobles et coupes modernes. Nous croyons qu'un vêtement doit raconter une histoire — la vôtre.</p><p>De la sélection des tissus à la confection finale, chaque détail est pensé pour offrir confort, élégance et durabilité au quotidien.</p>",
         "button_label": "En savoir plus",
-        "section_bg": "#F7F5F2",
+        "button_url": "",
+        "section_bg": "#f7f5f2",
         "text_color": "#111111",
-        "accent_color": "#C9A96E",
+        "accent_color": "#c9a96e",
         "button_bg": "#111111",
-        "button_color": "#FFFFFF",
+        "button_color": "#ffffff",
         "padding_top": 72,
         "padding_bottom": 72
       }
@@ -165,33 +181,96 @@
     "testimonials": {
       "type": "custom-testimonials-carousel",
       "settings": {
+        "eyebrow": "",
+        "title": "Elles adorent nos produits",
+        "subtitle": "",
+        "slides_desktop": "2",
+        "autoplay": true,
+        "autoplay_speed": 5,
+        "accent_color": "#c9a96e",
+        "star_color": "#c9a96e",
+        "card_bg": "#faf8f5",
         "padding_top": 72,
         "padding_bottom": 72
       }
     },
-    "instagram": {
-      "type": "custom-instagram-feed",
+    "custom_reviews_mHwf3V": {
+      "type": "custom-reviews",
+      "blocks": {
+        "review_bzYA3j": {
+          "type": "review",
+          "settings": {
+            "name": "Sophie M.",
+            "rating": 5,
+            "review_text": "Ma peau est tellement plus lumineuse depuis que j'utilise ce produit ! Je l'utilise matin et soir depuis 3 semaines et les résultats sont bluffants.",
+            "date": "15 mars 2025",
+            "skin_type": "mixte",
+            "verified": true
+          }
+        },
+        "review_KLkUUH": {
+          "type": "review",
+          "settings": {
+            "name": "Camille R.",
+            "rating": 5,
+            "review_text": "Texture légère, odeur agréable et efficacité au rendez-vous. Ma peau sensible a très bien réagi, aucune rougeur.",
+            "date": "8 mars 2025",
+            "skin_type": "normale",
+            "photo": "shopify://shop_images/undergarments-natural-3.jpg",
+            "verified": true
+          }
+        },
+        "review_6CyNz9": {
+          "type": "review",
+          "settings": {
+            "name": "Lucie T.",
+            "rating": 4,
+            "review_text": "Très bon produit, je le recommande ! J'aurais juste aimé un packaging plus éco-responsable, d'où 4 étoiles.",
+            "date": "1er mars 2025",
+            "skin_type": "sèche",
+            "verified": true
+          }
+        },
+        "review_4ERbaw": {
+          "type": "review",
+          "settings": {
+            "name": "Emma B.",
+            "rating": 5,
+            "review_text": "Commande reçue rapidement et produit conforme à la description. Résultats visibles dès la première semaine !",
+            "date": "22 février 2025",
+            "skin_type": "grasse",
+            "verified": false
+          }
+        },
+        "review_mjKct9": {
+          "type": "review",
+          "settings": {
+            "name": "Julie P.",
+            "rating": 4,
+            "review_text": "Bonne formule, j'apprécie les ingrédients naturels. Je reviendrai commander dès que mon pot sera terminé.",
+            "date": "14 février 2025",
+            "skin_type": "normale",
+            "verified": true
+          }
+        }
+      },
+      "block_order": [
+        "review_bzYA3j",
+        "review_KLkUUH",
+        "review_6CyNz9",
+        "review_4ERbaw",
+        "review_mjKct9"
+      ],
+      "name": "Avis clients",
       "settings": {
-        "padding_top": 64,
-        "padding_bottom": 64
-      }
-    },
-    "newsletter": {
-      "type": "custom-newsletter-banner",
-      "settings": {
-        "title": "Restez inspirée",
-        "subtitle": "Recevez nos nouveautés et offres exclusives en avant-première",
-        "placeholder": "Votre adresse email",
-        "button_label": "S'INSCRIRE",
-        "section_bg": "#1A1A1A",
-        "text_color": "#FFFFFF",
+        "title": "Ce que disent nos clientes",
+        "per_page": 5,
+        "review_layout": "carousel",
         "accent_color": "#C9A96E",
-        "input_bg": "transparent",
-        "input_border": "#555555",
-        "button_bg": "#C9A96E",
-        "button_color": "#FFFFFF",
-        "padding_top": 64,
-        "padding_bottom": 64
+        "star_color": "#F4B942",
+        "border_color": "#e8e2da",
+        "padding_top": 48,
+        "padding_bottom": 48
       }
     }
   },
@@ -202,6 +281,6 @@
     "featured-product",
     "image-text",
     "testimonials",
-    "instagram"
+    "custom_reviews_mHwf3V"
   ]
 }
