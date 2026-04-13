@@ -1,25 +1,26 @@
 {% comment %}
   custom-testimonials-carousel.liquid
-  Carrousel d'avis clients — autoplay, flèches, dots, scroll-snap
-  Dawn 15.x · Vanilla JS · CSS scroll-snap (pas de librairie)
+  Grille masonry d'avis clients — images produit, étoiles, texte, auteur
+  Dawn 15.x · CSS Grid · Mobile-first
   CSS : assets/custom-testimonials-carousel.css
-  JS  : assets/custom-testimonials-carousel.js
 {% endcomment %}
 
 {{ 'custom-testimonials-carousel.css' | asset_url | stylesheet_tag }}
 
 {%- assign testimonial_blocks = section.blocks | where: 'type', 'testimonial' -%}
-{%- assign slides_desktop = section.settings.slides_desktop | default: 2 -%}
 
 <section
   class="ctc"
   data-section-id="{{ section.id }}"
   style="
-    --ctc-accent:    {{ section.settings.accent_color }};
-    --ctc-star:      {{ section.settings.star_color }};
-    --ctc-card-bg:   {{ section.settings.card_bg }};
-    --ctc-slides-desktop: {{ slides_desktop }};
+    --ctc-accent:  {{ section.settings.accent_color }};
+    --ctc-star:    {{ section.settings.star_color }};
+    --ctc-card-bg: {{ section.settings.card_bg }};
+    --ctc-text:    {{ section.settings.text_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
   "
+  {{ section.shopify_attributes }}
 >
   <div class="ctc__inner page-width">
 
@@ -36,39 +37,48 @@
       {%- endif -%}
     </div>
 
-  </div>
-
-  {%- comment %} Carrousel ───────────────────────────────────────── {% endcomment %}
-  {%- if testimonial_blocks.size > 0 -%}
-    <div
-      class="ctc__carousel"
-      data-ctc-carousel
-      data-autoplay="{{ section.settings.autoplay }}"
-      data-speed="{{ section.settings.autoplay_speed | times: 1000 }}"
-      data-slides-desktop="{{ slides_desktop }}"
-    >
-      {%- comment %} Track (scroll-snap) {% endcomment %}
-      <div class="ctc__track" data-ctc-track aria-live="polite" aria-atomic="false">
-
+    {%- comment %} Grille masonry ──────────────────────────── {% endcomment %}
+    {%- if testimonial_blocks.size > 0 -%}
+      <div class="ctc__grid">
         {%- for block in testimonial_blocks -%}
           {%- liquid
-            assign rating = block.settings.rating | plus: 0
+            assign rating   = block.settings.rating | plus: 0
+            assign has_image = false
+            if block.settings.image != blank
+              assign has_image = true
+            endif
           -%}
           <article
-            class="ctc__slide"
-            data-ctc-slide
-            aria-label="Avis de {{ block.settings.name | default: 'client' | escape }}, {{ forloop.index }} sur {{ testimonial_blocks.size }}"
-            role="group"
+            class="ctc__card{% if has_image %} ctc__card--has-image{% endif %}"
             {{ block.shopify_attributes }}
           >
-            <div class="ctc__card">
 
-              {%- comment %} Note étoiles {% endcomment %}
+            {%- comment %} Image produit / lifestyle {% endcomment %}
+            {%- if has_image -%}
+              <div class="ctc__card-media">
+                <img
+                  class="ctc__card-img"
+                  src="{{ block.settings.image | image_url: width: 600 }}"
+                  alt="{{ block.settings.review_title | default: block.settings.name | escape }}"
+                  width="600"
+                  height="{{ 600 | divided_by: block.settings.image.aspect_ratio | round }}"
+                  loading="lazy"
+                >
+              </div>
+            {%- endif -%}
+
+            <div class="ctc__card-body">
+              {%- comment %} Titre avis {% endcomment %}
+              {%- if block.settings.review_title != blank -%}
+                <h3 class="ctc__review-title">{{ block.settings.review_title | escape }}</h3>
+              {%- endif -%}
+
+              {%- comment %} Étoiles {% endcomment %}
               {%- if rating > 0 -%}
                 <div class="ctc__stars" aria-label="{{ rating }} étoiles sur 5">
                   {%- for i in (1..5) -%}
-                    <span class="ctc__star {% if i <= rating %}ctc__star--filled{% else %}ctc__star--empty{% endif %}" aria-hidden="true">
-                      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <span class="ctc__star{% if i <= rating %} ctc__star--filled{% else %} ctc__star--empty{% endif %}" aria-hidden="true">
+                      <svg viewBox="0 0 16 16" fill="none">
                         {%- if i <= rating -%}
                           <path d="M8 1L10 6H15L11 9.5L12.5 14.5L8 11.5L3.5 14.5L5 9.5L1 6H6L8 1Z" fill="currentColor"/>
                         {%- else -%}
@@ -80,96 +90,39 @@
                 </div>
               {%- endif -%}
 
-              {%- comment %} Citation {% endcomment %}
+              {%- comment %} Texte avis {% endcomment %}
               {%- if block.settings.text != blank -%}
-                <blockquote class="ctc__quote">
-                  <p>{{ block.settings.text | escape }}</p>
-                </blockquote>
+                <p class="ctc__text">{{ block.settings.text | escape | truncate: 200 }}</p>
               {%- endif -%}
 
               {%- comment %} Auteur {% endcomment %}
-              <div class="ctc__author">
-                {%- if block.settings.photo != blank -%}
-                  <div class="ctc__author-avatar">
-                    <img
-                      src="{{ block.settings.photo | image_url: width: 120, format: 'webp' }}"
-                      alt="{{ block.settings.name | default: '' | escape }}"
-                      width="60"
-                      height="60"
-                      loading="lazy"
-                    >
-                  </div>
-                {%- else -%}
-                  <div class="ctc__author-initials" aria-hidden="true">
-                    {{ block.settings.name | slice: 0, 1 | upcase }}
-                  </div>
+              <div class="ctc__footer">
+                <span class="ctc__dash" aria-hidden="true">—</span>
+                <span class="ctc__author-name">{{ block.settings.name | escape }}</span>
+                {%- if block.settings.verified -%}
+                  <span class="ctc__verified" aria-label="Achat vérifié">
+                    <svg viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                      <circle cx="7" cy="7" r="6" fill="currentColor"/>
+                      <path d="M4.5 7L6.2 8.7L9.5 5.3" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
                 {%- endif -%}
-                <div class="ctc__author-info">
-                  {%- if block.settings.name != blank -%}
-                    <p class="ctc__author-name">{{ block.settings.name | escape }}</p>
-                  {%- endif -%}
-                  {%- if block.settings.location != blank -%}
-                    <p class="ctc__author-location">{{ block.settings.location | escape }}</p>
-                  {%- endif -%}
-                  {%- if block.settings.verified -%}
-                    <p class="ctc__verified">
-                      <svg viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                        <path d="M7 1L8.5 3.5H11.5L10 6L11.5 8.5H8.5L7 11L5.5 8.5H2.5L4 6L2.5 3.5H5.5L7 1Z" fill="currentColor"/>
-                        <path d="M5 6.5L6.5 8L9 5" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      Achat vérifié
-                    </p>
-                  {%- endif -%}
-                </div>
               </div>
-
             </div>
+
           </article>
         {%- endfor -%}
-
       </div>
-      {%- comment %} fin track {% endcomment %}
+    {%- else -%}
+      <p class="ctc__empty">Ajoutez des blocs « Témoignage » dans l'éditeur.</p>
+    {%- endif -%}
 
-      {%- comment %} Flèches navigation {% endcomment %}
-      {%- if testimonial_blocks.size > 1 -%}
-        <button class="ctc__arrow ctc__arrow--prev" data-ctc-prev type="button" aria-label="Avis précédent">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <button class="ctc__arrow ctc__arrow--next" data-ctc-next type="button" aria-label="Avis suivant">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      {%- endif -%}
-
-      {%- comment %} Indicateurs (dots) {% endcomment %}
-      {%- if testimonial_blocks.size > 1 -%}
-        <div class="ctc__dots" data-ctc-dots role="tablist" aria-label="Sélectionner un avis">
-          {%- for block in testimonial_blocks -%}
-            <button
-              class="ctc__dot{% if forloop.first %} is-active{% endif %}"
-              data-ctc-dot="{{ forloop.index0 }}"
-              type="button"
-              role="tab"
-              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
-              aria-label="Avis {{ forloop.index }}"
-            ></button>
-          {%- endfor -%}
-        </div>
-      {%- endif -%}
-
-    </div>
-  {%- endif -%}
-
+  </div>
 </section>
-
-<script src="{{ 'custom-testimonials-carousel.js' | asset_url }}" defer></script>
 
 {% schema %}
 {
-  "name": "Témoignages carrousel",
+  "name": "Avis clients – Grille",
   "tag": "section",
   "class": "section-custom-testimonials-carousel",
   "max_blocks": 12,
@@ -184,7 +137,7 @@
       "type": "text",
       "id": "title",
       "label": "Titre",
-      "default": "Elles adorent nos produits"
+      "default": "Elles en parlent mieux que nous"
     },
     {
       "type": "text",
@@ -194,42 +147,12 @@
     },
     {
       "type": "header",
-      "content": "Carrousel"
-    },
-    {
-      "type": "select",
-      "id": "slides_desktop",
-      "label": "Avis visibles sur desktop",
-      "options": [
-        { "value": "1", "label": "1" },
-        { "value": "2", "label": "2" },
-        { "value": "3", "label": "3" }
-      ],
-      "default": "2"
-    },
-    {
-      "type": "checkbox",
-      "id": "autoplay",
-      "label": "Défilement automatique",
-      "default": true
-    },
-    {
-      "type": "range",
-      "id": "autoplay_speed",
-      "label": "Délai entre les avis (secondes)",
-      "min": 3,
-      "max": 10,
-      "step": 1,
-      "default": 5
-    },
-    {
-      "type": "header",
       "content": "Couleurs"
     },
     {
       "type": "color",
       "id": "accent_color",
-      "label": "Couleur d'accent (flèches, dots)",
+      "label": "Couleur d'accent",
       "default": "#C9A96E"
     },
     {
@@ -242,7 +165,13 @@
       "type": "color",
       "id": "card_bg",
       "label": "Fond des cartes",
-      "default": "#faf8f5"
+      "default": "#FAFAF8"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Couleur texte",
+      "default": "#111111"
     },
     {
       "type": "header",
@@ -252,15 +181,15 @@
       "type": "range",
       "id": "padding_top",
       "label": "Espace au-dessus",
-      "min": 0, "max": 100, "step": 4, "unit": "px",
-      "default": 60
+      "min": 0, "max": 120, "step": 4, "unit": "px",
+      "default": 64
     },
     {
       "type": "range",
       "id": "padding_bottom",
       "label": "Espace en-dessous",
-      "min": 0, "max": 100, "step": 4, "unit": "px",
-      "default": 60
+      "min": 0, "max": 120, "step": 4, "unit": "px",
+      "default": 64
     }
   ],
   "blocks": [
@@ -270,8 +199,20 @@
       "settings": [
         {
           "type": "image_picker",
+          "id": "image",
+          "label": "Image produit / photo",
+          "info": "Image affichée en haut de la carte (recommandé : 600×600 ou plus)"
+        },
+        {
+          "type": "image_picker",
           "id": "photo",
           "label": "Photo du client (optionnelle)"
+        },
+        {
+          "type": "text",
+          "id": "review_title",
+          "label": "Titre de l'avis",
+          "default": "Très satisfaite !"
         },
         {
           "type": "text",
@@ -282,7 +223,7 @@
         {
           "type": "text",
           "id": "location",
-          "label": "Ville / localisation (optionnelle)",
+          "label": "Ville (optionnelle)",
           "placeholder": "ex : Paris"
         },
         {
@@ -301,7 +242,7 @@
         {
           "type": "textarea",
           "id": "text",
-          "label": "Témoignage",
+          "label": "Texte de l'avis",
           "default": "Résultats visibles dès la première semaine. Ma peau est transformée, plus lumineuse et hydratée. Je recommande les yeux fermés !"
         },
         {
@@ -315,11 +256,14 @@
   ],
   "presets": [
     {
-      "name": "Témoignages carrousel",
+      "name": "Avis clients – Grille",
       "blocks": [
-        { "type": "testimonial", "settings": { "name": "Sophie L.", "location": "Lyon", "rating": "5", "text": "Ma peau n'a jamais été aussi belle. Le sérum est devenu indispensable dans ma routine.", "verified": true } },
-        { "type": "testimonial", "settings": { "name": "Camille R.", "location": "Paris", "rating": "5", "text": "Je suis bluffée par les résultats en seulement 4 semaines. Tellement naturel et efficace.", "verified": true } },
-        { "type": "testimonial", "settings": { "name": "Julie M.", "location": "Bordeaux", "rating": "5", "text": "Enfin des produits qui tiennent leurs promesses ! Ma peau est rayonnante et hydratée.", "verified": true } }
+        { "type": "testimonial", "settings": { "review_title": "A très bien fonctionné", "name": "Sophie L.", "rating": "5", "text": "La plupart des gens m'ont dit que je n'obtiendrais pas une grande différence, mais je l'utilise habituellement et les résultats sont incroyables.", "verified": true } },
+        { "type": "testimonial", "settings": { "review_title": "J'adore ce produit.", "name": "Camille R.", "rating": "5", "text": "Il fonctionne à merveille, parfois on oublie qu'il est là. C'est tellement plus facile et pratique au quotidien.", "verified": true } },
+        { "type": "testimonial", "settings": { "review_title": "Génial", "name": "Hanna F.", "rating": "5", "text": "La plupart des gens m'ont dit que c'est un appareil portable, mais je l'utilise généralement plus que tout et j'ai l'impression que c'est le meilleur investissement.", "verified": true } },
+        { "type": "testimonial", "settings": { "review_title": "Très belle qualité", "name": "Nina", "rating": "4", "text": "Pour une fille de taille moyenne, c'est parfait. Bien ajusté au niveau de la ceinture, pas trop large. C'est ce que je cherchais.", "verified": true } },
+        { "type": "testimonial", "settings": { "review_title": "La maman l'adore et le bébé aussi.", "name": "Keli", "rating": "5", "text": "J'ai acheté ce produit et maintenant il a un an et je l'utilise toujours. Il l'adore, et ma vie est tellement plus facile.", "verified": true } },
+        { "type": "testimonial", "settings": { "review_title": "Excellent rapport qualité-prix", "name": "Cataleya", "rating": "5", "text": "On peut le laisser partout, c'est super léger et facile à transporter. Je l'ai offert à ma sœur qui l'adore aussi.", "verified": true } }
       ]
     }
   ]
