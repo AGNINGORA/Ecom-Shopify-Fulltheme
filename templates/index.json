@@ -283,6 +283,48 @@
         "padding_top": 48,
         "padding_bottom": 48
       }
+    },
+    "custom_bundle_offer_FNTpAX": {
+      "type": "custom-bundle-offer",
+      "blocks": {
+        "bundle_product_ABnNzP": {
+          "type": "bundle_product",
+          "settings": {
+            "product": "nouveau-body-shapewear-femmes-debardeur-controle-du-ventre-corps-complet-shaper-anti-frottement-shorts-minceur-taille-formateur-bout-a-bout"
+          }
+        },
+        "bundle_product_JB6RLy": {
+          "type": "bundle_product",
+          "settings": {
+            "product": "guudia-crochets-ventre-controle-culotte-mise-a-niveau-en-forme-darc-controle-sous-vetements-ventre-lisse-sans-couture-maille-bout-a-bout-levage-ensemble"
+          }
+        },
+        "bundle_product_PHgUKm": {
+          "type": "bundle_product",
+          "settings": {
+            "product": "guudia-attendre-tondeuse-culotte-controle-ventre-cotele-taille-ceinture-sans-couture-shapewear-culotte-taille-haute-lisse-sur-shaper-porter"
+          }
+        }
+      },
+      "block_order": [
+        "bundle_product_ABnNzP",
+        "bundle_product_JB6RLy",
+        "bundle_product_PHgUKm"
+      ],
+      "name": "Offre bundle",
+      "settings": {
+        "title": "Nos clientes achetent souvent en complement",
+        "subtitle": "Plus vous achetez, plus vous économisez",
+        "button_label": "Ajouter le lot au panier",
+        "discount_percent": 10,
+        "min_products": 2,
+        "accent_color": "#C9A96E",
+        "border_color": "#e8e2da",
+        "button_bg": "#111111",
+        "button_color": "#ffffff",
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
     }
   },
   "order": [
@@ -292,6 +334,7 @@
     "featured-product",
     "image-text",
     "testimonials",
-    "custom_reviews_mHwf3V"
+    "custom_reviews_mHwf3V",
+    "custom_bundle_offer_FNTpAX"
   ]
 }
