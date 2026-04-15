@@ -6,7 +6,7 @@
 
 {%- if section.settings.enabled -%}
 
-{{ 'custom-newsletter-popup.css' | asset_url | stylesheet_tag }}
+<link rel="stylesheet" href="{{ 'custom-newsletter-popup.css' | asset_url }}" media="print" onload="this.media='all'">
 
 <div
   data-cnp

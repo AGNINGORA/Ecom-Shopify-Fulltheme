@@ -6,7 +6,7 @@
 
 {%- if template.name == 'product' -%}
 
-{{ 'custom-sticky-cart.css' | asset_url | stylesheet_tag }}
+<link rel="stylesheet" href="{{ 'custom-sticky-cart.css' | asset_url }}" media="print" onload="this.media='all'">
 
 {%- assign current_variant = product.selected_or_first_available_variant -%}
 

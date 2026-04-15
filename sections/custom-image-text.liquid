@@ -34,6 +34,13 @@
         <img
           class="cit__img"
           src="{{ img | image_url: width: 800 }}"
+          srcset="
+            {{ img | image_url: width: 400 }} 400w,
+            {{ img | image_url: width: 600 }} 600w,
+            {{ img | image_url: width: 800 }} 800w,
+            {{ img | image_url: width: 1000 }} 1000w
+          "
+          sizes="(min-width: 750px) 50vw, 100vw"
           alt="{{ section.settings.image_alt | default: section.settings.title | escape }}"
           width="800"
           height="{{ 800 | divided_by: img.aspect_ratio | round }}"

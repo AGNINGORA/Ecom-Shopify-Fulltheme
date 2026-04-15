@@ -59,6 +59,12 @@
                 <img
                   class="ctc__card-img"
                   src="{{ block.settings.image | image_url: width: 600 }}"
+                  srcset="
+                    {{ block.settings.image | image_url: width: 300 }} 300w,
+                    {{ block.settings.image | image_url: width: 450 }} 450w,
+                    {{ block.settings.image | image_url: width: 600 }} 600w
+                  "
+                  sizes="(min-width: 990px) 33vw, (min-width: 550px) 50vw, 100vw"
                   alt="{{ block.settings.review_title | default: block.settings.name | escape }}"
                   width="600"
                   height="{{ 600 | divided_by: block.settings.image.aspect_ratio | round }}"

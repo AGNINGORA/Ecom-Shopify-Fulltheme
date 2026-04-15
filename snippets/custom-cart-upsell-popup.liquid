@@ -9,7 +9,7 @@
   — aucun paramètre : tout est configurable via les data-* injectés par le JS
 {% endcomment %}
 
-{{ 'custom-cart-upsell-popup.css' | asset_url | stylesheet_tag }}
+<link rel="stylesheet" href="{{ 'custom-cart-upsell-popup.css' | asset_url }}" media="print" onload="this.media='all'">
 
 {%- comment %} ── Overlay ─────────────────────────────────────── {% endcomment %}
 <div

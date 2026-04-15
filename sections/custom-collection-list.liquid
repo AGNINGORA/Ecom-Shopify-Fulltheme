@@ -61,6 +61,12 @@
                 <img
                   class="ccl__card-img"
                   src="{{ card_img | image_url: width: 600 }}"
+                  srcset="
+                    {{ card_img | image_url: width: 300 }} 300w,
+                    {{ card_img | image_url: width: 450 }} 450w,
+                    {{ card_img | image_url: width: 600 }} 600w
+                  "
+                  sizes="(min-width: 990px) 33vw, (min-width: 550px) 50vw, 100vw"
                   alt="{{ card_title | escape }}"
                   width="600"
                   height="600"
@@ -70,6 +76,12 @@
                 <img
                   class="ccl__card-img"
                   src="{{ col.image | image_url: width: 600 }}"
+                  srcset="
+                    {{ col.image | image_url: width: 300 }} 300w,
+                    {{ col.image | image_url: width: 450 }} 450w,
+                    {{ col.image | image_url: width: 600 }} 600w
+                  "
+                  sizes="(min-width: 990px) 33vw, (min-width: 550px) 50vw, 100vw"
                   alt="{{ card_title | escape }}"
                   width="600"
                   height="600"

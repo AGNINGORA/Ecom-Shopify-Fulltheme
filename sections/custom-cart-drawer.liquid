@@ -6,7 +6,7 @@
   JS  : assets/custom-cart-drawer.js
 {% endcomment %}
 
-{{ 'custom-cart-drawer.css' | asset_url | stylesheet_tag }}
+<link rel="stylesheet" href="{{ 'custom-cart-drawer.css' | asset_url }}" media="print" onload="this.media='all'">
 
 {%- liquid
   assign threshold_cents = section.settings.free_shipping_threshold | times: 100

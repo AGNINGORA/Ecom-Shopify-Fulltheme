@@ -11,7 +11,7 @@
 
 {%- if section.settings.enabled -%}
 
-{{ 'custom-exit-intent.css' | asset_url | stylesheet_tag }}
+<link rel="stylesheet" href="{{ 'custom-exit-intent.css' | asset_url }}" media="print" onload="this.media='all'">
 
 {%- liquid
   assign ei_title       = section.settings.title       | default: 'Attendez ! Une offre rien que pour vous 🎁'

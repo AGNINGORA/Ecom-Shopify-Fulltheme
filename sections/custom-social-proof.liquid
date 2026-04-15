@@ -6,7 +6,7 @@
 
 {%- if section.settings.enabled and section.blocks.size > 0 -%}
 
-{{ 'custom-social-proof.css' | asset_url | stylesheet_tag }}
+<link rel="stylesheet" href="{{ 'custom-social-proof.css' | asset_url }}" media="print" onload="this.media='all'">
 
 <div
   class="csp__toast"
