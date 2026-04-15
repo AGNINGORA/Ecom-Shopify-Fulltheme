@@ -14,7 +14,7 @@
     "announcement-bar": {
       "type": "announcement-bar",
       "blocks": {
-        "announcement-bar-0": {
+        "announcement_W8XWHq": {
           "type": "announcement",
           "settings": {
             "text": "Bienvenue sur votre boutique",
@@ -23,10 +23,10 @@
         }
       },
       "block_order": [
-        "announcement-bar-0"
+        "announcement_W8XWHq"
       ],
       "settings": {
-        "auto_rotate": false,
+        "auto_rotate": true,
         "change_slides_speed": 5,
         "color_scheme": "scheme-1",
         "show_line_separator": true,
