@@ -56,15 +56,27 @@
     visibility 0s var(--ccd-duration);
 }
 
-.ccd__drawer,
-.ccd__drawer a,
-.ccd__drawer p,
-.ccd__drawer span,
-.ccd__drawer button,
-.ccd__drawer h1,
-.ccd__drawer h2,
-.ccd__drawer h3 {
-  color: #1a1a1a;
+/* Force text color — beat any color-scheme inheritance */
+#custom-cart-drawer.ccd__drawer,
+#custom-cart-drawer.ccd__drawer * {
+  color: #1a1a1a !important;
+}
+
+/* Preserve specific colored elements */
+#custom-cart-drawer .ccd-item__price--sale,
+#custom-cart-drawer .ccd__upsell-price,
+#custom-cart-drawer .ccd__savings-text {
+  color: var(--ccd-accent, #C9A96E) !important;
+}
+
+#custom-cart-drawer .ccd__checkout,
+#custom-cart-drawer .ccd__empty-cta,
+#custom-cart-drawer .ccd__view-cart {
+  color: var(--ccd-btn-txt, #fff) !important;
+}
+
+#custom-cart-drawer .ccd__shipping-msg.is-free {
+  color: #16a34a !important;
 }
 
 .ccd__drawer.is-open {
