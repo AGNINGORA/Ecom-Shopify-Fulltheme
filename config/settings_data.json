@@ -199,8 +199,6 @@
           "shipping_free_msg": "Félicitations ! Livraison gratuite !",
           "show_upsell": true,
           "upsell_title": "Vous aimerez peut-être",
-          "upsell_product_1": "",
-          "upsell_product_2": "",
           "show_gift_options": true,
           "gift_wrapping_price": 0,
           "show_payment_icons": true,
@@ -266,10 +264,10 @@
     "color_schemes": {
       "scheme-1": {
         "settings": {
-          "background": "#ffffff",
+          "background": "#632f00",
           "background_gradient": "",
-          "text": "#121212",
-          "button": "#121212",
+          "text": "#ffffff",
+          "button": "#a95100",
           "button_label": "#ffffff",
           "secondary_button_label": "#121212",
           "shadow": "#121212"
@@ -288,7 +286,7 @@
       },
       "scheme-3": {
         "settings": {
-          "background": "#242833",
+          "background": "#a95100",
           "background_gradient": "",
           "text": "#ffffff",
           "button": "#ffffff",

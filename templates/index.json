@@ -14,7 +14,7 @@
       "settings": {
         "content_type": "image",
         "video_autoplay": true,
-        "overlay_color": "#f5ede3",
+        "overlay_color": "#be9e76",
         "overlay_opacity": 15,
         "height_desktop": 95,
         "height_mobile": 60,
@@ -42,17 +42,10 @@
     "rich_text_kGDWFU": {
       "type": "rich-text",
       "blocks": {
-        "heading_LkAwkH": {
-          "type": "heading",
-          "settings": {
-            "heading": "Parler de sa marque",
-            "heading_size": "h1"
-          }
-        },
         "text_YRVqwi": {
           "type": "text",
           "settings": {
-            "text": "<p>Partagez des informations sur votre marque. Décrivez un produit, partagez des annonces ou souhaitez la bienvenue à vos clients dans votre boutique.</p>"
+            "text": "<p>Ça me va comme un gant. Ça me façonne le corps à la perfection, je commande toutes les couleurs.</p>"
           }
         },
         "button_RydREd": {
@@ -68,7 +61,6 @@
         }
       },
       "block_order": [
-        "heading_LkAwkH",
         "text_YRVqwi",
         "button_RydREd"
       ],
@@ -76,7 +68,38 @@
       "settings": {
         "desktop_content_position": "center",
         "content_alignment": "center",
-        "color_scheme": "",
+        "color_scheme": "scheme-2",
+        "full_width": true,
+        "padding_top": 40,
+        "padding_bottom": 52
+      }
+    },
+    "rich_text_APQUHz": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_b8GiHW": {
+          "type": "heading",
+          "settings": {
+            "heading": "<em>Le manifeste Sheerise</em>",
+            "heading_size": "h1"
+          }
+        },
+        "text_fGDXnH": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Ce n'est pas un body gainant. C'est le premier vêtement que tu enfiles — celui que personne ne voit, mais que toi, tu sens. Celui qui te fait te tenir droite, entrer dans ta robe préférée, et oser le regard des autres.<br/><br/></p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading_b8GiHW",
+        "text_fGDXnH"
+      ],
+      "name": "t:sections.rich-text.presets.name",
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "center",
+        "color_scheme": "scheme-1",
         "full_width": true,
         "padding_top": 40,
         "padding_bottom": 52
@@ -373,6 +396,7 @@
   "order": [
     "hero-banner",
     "rich_text_kGDWFU",
+    "rich_text_APQUHz",
     "collections",
     "benefits",
     "featured-product",
