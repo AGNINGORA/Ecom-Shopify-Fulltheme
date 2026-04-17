@@ -16,6 +16,11 @@
   <link rel="stylesheet" href="{{ 'component-mega-menu.css' | asset_url }}" media="print" onload="this.media='all'">
 {%- endif -%}
 
+{%- if section.settings.menu_type_desktop == 'mega-pro' -%}
+  <link rel="stylesheet" href="{{ 'component-mega-menu.css' | asset_url }}" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="{{ 'mega-menu-pro.css' | asset_url }}" media="print" onload="this.media='all'">
+{%- endif -%}
+
 <style>
   header-drawer {
     justify-self: start;
@@ -199,6 +204,8 @@
       if section.settings.menu != blank
         if section.settings.menu_type_desktop == 'dropdown'
           render 'header-dropdown-menu'
+        elsif section.settings.menu_type_desktop == 'mega-pro'
+          render 'header-mega-menu-pro'
         elsif section.settings.menu_type_desktop != 'drawer'
           render 'header-mega-menu'
         endif
@@ -571,6 +578,10 @@
           "label": "t:sections.header.settings.menu_type_desktop.options__2.label"
         },
         {
+          "value": "mega-pro",
+          "label": "Mega menu Pro (produits + promo)"
+        },
+        {
           "value": "drawer",
           "label": "t:sections.header.settings.menu_type_desktop.options__3.label"
         }
@@ -648,6 +659,54 @@
       "default": true,
       "label": "t:sections.header.settings.enable_customer_avatar.label",
       "info": "t:sections.header.settings.enable_customer_avatar.info"
+    },
+    {
+      "type": "header",
+      "content": "━━ MEGA MENU PRO ━━"
+    },
+    {
+      "type": "range",
+      "id": "mega_product_count",
+      "label": "Nombre de produits affichés",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "info": "Produits issus de la collection liée au lien du menu"
+    },
+    {
+      "type": "text",
+      "id": "mega_view_all_label",
+      "label": "Texte du bouton \"Voir tous\"",
+      "default": "VOIR TOUS LES PRODUITS"
+    },
+    {
+      "type": "image_picker",
+      "id": "mega_promo_image",
+      "label": "Image promo (bloc droite)"
+    },
+    {
+      "type": "text",
+      "id": "mega_promo_title",
+      "label": "Titre promo",
+      "default": "Pack"
+    },
+    {
+      "type": "text",
+      "id": "mega_promo_text",
+      "label": "Description promo",
+      "default": "Optez pour des routines qui ciblent un objectif précis"
+    },
+    {
+      "type": "text",
+      "id": "mega_promo_cta",
+      "label": "Texte du bouton promo",
+      "default": "NOS PACKS"
+    },
+    {
+      "type": "url",
+      "id": "mega_promo_link",
+      "label": "Lien promo"
     },
     {
       "type": "header",

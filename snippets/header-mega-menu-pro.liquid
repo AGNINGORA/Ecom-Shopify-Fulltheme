@@ -1,0 +1,168 @@
+{% comment %}
+  header-mega-menu-pro.liquid
+  Mega menu professionnel — affiche les produits de la collection liée
+  + un bloc promo configurable à droite + bouton "Voir tous"
+  Utilisé quand menu_type_desktop == 'mega-pro'
+{% endcomment %}
+
+<nav class="header__inline-menu">
+  <ul class="list-menu list-menu--inline" role="list">
+    {%- for link in section.settings.menu.links -%}
+      <li>
+        {%- if link.links != blank -%}
+          <header-menu>
+            <details id="Details-HeaderMenu-{{ forloop.index }}" class="mega-menu mmp">
+              <summary
+                id="HeaderMenu-{{ link.handle }}"
+                class="header__menu-item list-menu__item link focus-inset"
+              >
+                <span
+                  {%- if link.child_active %}
+                    class="header__active-menu-item"
+                  {% endif %}
+                >
+                  {{- link.title | escape -}}
+                </span>
+                {{- 'icon-caret.svg' | inline_asset_content -}}
+              </summary>
+
+              <div
+                id="MegaMenu-Content-{{ forloop.index }}"
+                class="mega-menu__content mmp__content color-{{ section.settings.menu_color_scheme }} gradient motion-reduce global-settings-popup"
+                tabindex="-1"
+              >
+                <div class="mmp__grid page-width">
+
+                  {%- comment %} ── Colonne produits ── {% endcomment %}
+                  {%- liquid
+                    assign linked_collection = link.object
+                    assign show_products = false
+                    if linked_collection and linked_collection.products.size > 0
+                      assign show_products = true
+                    endif
+                    assign product_limit = section.settings.mega_product_count | default: 3
+                  -%}
+
+                  {%- if show_products -%}
+                    <div class="mmp__products">
+                      {%- for product in linked_collection.products limit: product_limit -%}
+                        <a href="{{ product.url }}" class="mmp__product-card">
+                          <div class="mmp__product-img-wrap">
+                            {%- if product.featured_image != blank -%}
+                              <img
+                                class="mmp__product-img"
+                                src="{{ product.featured_image | image_url: width: 300, format: 'webp' }}"
+                                alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                                width="300"
+                                height="{{ 300 | divided_by: product.featured_image.aspect_ratio | round }}"
+                                loading="lazy"
+                              >
+                            {%- else -%}
+                              <div class="mmp__product-placeholder">
+                                {{ 'product-1' | placeholder_svg_tag }}
+                              </div>
+                            {%- endif -%}
+                          </div>
+                          <div class="mmp__product-info">
+                            <p class="mmp__product-title">{{ product.title | escape }}</p>
+                            <p class="mmp__product-price">{{ product.price | money }}</p>
+                          </div>
+                          {%- if product.type != blank -%}
+                            <span class="mmp__product-tag">{{ product.type | escape }}</span>
+                          {%- endif -%}
+                        </a>
+                      {%- endfor -%}
+                    </div>
+
+                  {%- else -%}
+                    {%- comment %} Fallback : liens texte classiques {% endcomment %}
+                    <div class="mmp__links">
+                      {%- for childlink in link.links -%}
+                        <div class="mmp__link-group">
+                          <a
+                            href="{{ childlink.url }}"
+                            class="mmp__link-title{% if childlink.current %} mmp__link--active{% endif %}"
+                          >
+                            {{ childlink.title | escape }}
+                          </a>
+                          {%- if childlink.links != blank -%}
+                            <ul class="mmp__sublinks">
+                              {%- for grandchild in childlink.links -%}
+                                <li>
+                                  <a
+                                    href="{{ grandchild.url }}"
+                                    class="mmp__sublink{% if grandchild.current %} mmp__link--active{% endif %}"
+                                  >
+                                    {{ grandchild.title | escape }}
+                                  </a>
+                                </li>
+                              {%- endfor -%}
+                            </ul>
+                          {%- endif -%}
+                        </div>
+                      {%- endfor -%}
+                    </div>
+                  {%- endif -%}
+
+                  {%- comment %} ── Bloc promo (droite) ── {% endcomment %}
+                  {%- if section.settings.mega_promo_image != blank -%}
+                    <a href="{{ section.settings.mega_promo_link | default: '#' }}" class="mmp__promo">
+                      <img
+                        class="mmp__promo-img"
+                        src="{{ section.settings.mega_promo_image | image_url: width: 480, format: 'webp' }}"
+                        alt="{{ section.settings.mega_promo_title | default: 'Promotion' | escape }}"
+                        width="480"
+                        height="{{ 480 | divided_by: section.settings.mega_promo_image.aspect_ratio | round }}"
+                        loading="lazy"
+                      >
+                      <div class="mmp__promo-overlay">
+                        {%- if section.settings.mega_promo_title != blank -%}
+                          <p class="mmp__promo-title">{{ section.settings.mega_promo_title | escape }}</p>
+                        {%- endif -%}
+                        {%- if section.settings.mega_promo_text != blank -%}
+                          <p class="mmp__promo-text">{{ section.settings.mega_promo_text | escape }}</p>
+                        {%- endif -%}
+                        {%- if section.settings.mega_promo_cta != blank -%}
+                          <span class="mmp__promo-cta">{{ section.settings.mega_promo_cta | escape }}</span>
+                        {%- endif -%}
+                      </div>
+                    </a>
+                  {%- endif -%}
+
+                </div>
+
+                {%- comment %} ── Bouton "Voir tous" ── {% endcomment %}
+                {%- if show_products -%}
+                  <div class="mmp__footer page-width">
+                    <a href="{{ link.url }}" class="mmp__view-all">
+                      {{ section.settings.mega_view_all_label | default: 'VOIR TOUS LES PRODUITS' | escape }}
+                    </a>
+                  </div>
+                {%- endif -%}
+
+              </div>
+            </details>
+          </header-menu>
+
+        {%- else -%}
+          <a
+            id="HeaderMenu-{{ link.handle }}"
+            href="{{ link.url }}"
+            class="header__menu-item list-menu__item link link--text focus-inset"
+            {% if link.current %}
+              aria-current="page"
+            {% endif %}
+          >
+            <span
+              {%- if link.current %}
+                class="header__active-menu-item"
+              {% endif %}
+            >
+              {{- link.title | escape -}}
+            </span>
+          </a>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+</nav>
