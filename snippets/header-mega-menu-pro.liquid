@@ -1,173 +1,222 @@
 {% comment %}
   header-mega-menu-pro.liquid
-  Mega menu professionnel — affiche les produits de la collection liée
-  + un bloc promo configurable à droite + bouton "Voir tous"
-  Utilisé quand menu_type_desktop == 'mega-pro'
+  Mega menu standalone — ne depend pas de Dawn's <details> / <header-menu>.
+  Controle par JS inline avec toggle de classe .mmp-item--open.
+  Utilise quand menu_type_desktop == 'mega' ou 'mega-pro'
 {% endcomment %}
 
 <style>
-  /* ── CSS critique inline — ne dépend d'aucun fichier externe ── */
-  details.mmp > .mmp__content {
+  /* ============================================================
+     CSS CRITIQUE INLINE — standalone, aucune dependance externe
+     ============================================================ */
+  .header__inline-menu .mmp-item {
+    position: static;
+    display: flex;
+    align-items: center;
+  }
+
+  .mmp-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: transparent;
+    border: 0;
+    padding: 1.2rem 1.6rem;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    line-height: 1;
+  }
+  .mmp-toggle:hover { text-decoration: underline; }
+  .mmp-toggle svg { width: 1rem; height: 1rem; transition: transform 0.2s ease; }
+  .mmp-item--open .mmp-toggle svg { transform: rotate(180deg); }
+
+  .mmp-panel {
     position: absolute !important;
     left: 0 !important;
     right: 0 !important;
     top: 100% !important;
-    z-index: 4 !important;
-    background-color: rgb(var(--color-background)) !important;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    z-index: 100 !important;
+    background-color: rgb(var(--color-background));
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+    padding: 3rem 0;
     opacity: 0;
+    visibility: hidden;
     transform: translateY(-0.8rem);
     pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0s linear 0.22s;
   }
-  details.mmp[open] > .mmp__content {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-    pointer-events: auto !important;
+  .mmp-item--open .mmp-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0s linear 0s;
   }
-  details.mmp {
-    position: static !important;
+
+  /* Overlay sombre sous le header quand panneau ouvert */
+  .mmp-overlay {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: var(--mmp-header-bottom, 100px);
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 2;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.22s ease, visibility 0s linear 0.22s;
+    pointer-events: none;
+  }
+  .mmp-overlay.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 0.22s ease, visibility 0s linear 0s;
   }
 </style>
 
-<nav class="header__inline-menu">
+<div class="mmp-overlay" data-mmp-overlay aria-hidden="true"></div>
+
+<nav class="header__inline-menu" data-mmp-root>
   <ul class="list-menu list-menu--inline" role="list">
     {%- for link in section.settings.menu.links -%}
-      <li>
+      <li class="mmp-item" data-mmp-item>
         {%- if link.links != blank -%}
-          <header-menu>
-            <details id="Details-HeaderMenu-{{ forloop.index }}" class="mega-menu mmp">
-              <summary
-                id="HeaderMenu-{{ link.handle }}"
-                class="header__menu-item list-menu__item link focus-inset"
-              >
-                <span
-                  {%- if link.child_active %}
-                    class="header__active-menu-item"
-                  {% endif %}
-                >
-                  {{- link.title | escape -}}
-                </span>
-                {{- 'icon-caret.svg' | inline_asset_content -}}
-              </summary>
+          <button
+            type="button"
+            class="mmp-toggle header__menu-item list-menu__item link focus-inset"
+            data-mmp-toggle
+            aria-expanded="false"
+            aria-controls="MegaMenu-Content-{{ forloop.index }}"
+          >
+            <span
+              {%- if link.child_active %}
+                class="header__active-menu-item"
+              {% endif %}
+            >
+              {{- link.title | escape -}}
+            </span>
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          </button>
 
-              <div
-                id="MegaMenu-Content-{{ forloop.index }}"
-                class="mega-menu__content mmp__content color-{{ section.settings.menu_color_scheme }} gradient"
-                tabindex="-1"
-              >
-                <div class="mmp__grid page-width">
+          <div
+            id="MegaMenu-Content-{{ forloop.index }}"
+            class="mmp-panel mmp__content color-{{ section.settings.menu_color_scheme }} gradient"
+            data-mmp-panel
+            tabindex="-1"
+            aria-hidden="true"
+          >
+            <div class="mmp__grid page-width">
 
-                  {%- comment %} ── Colonne produits ── {% endcomment %}
-                  {%- liquid
-                    assign linked_collection = link.object
-                    assign show_products = false
-                    if linked_collection and linked_collection.products.size > 0
-                      assign show_products = true
-                    endif
-                    assign product_limit = section.settings.mega_product_count | default: 3
-                  -%}
+              {%- comment %} ── Colonne produits ── {% endcomment %}
+              {%- liquid
+                assign linked_collection = link.object
+                assign show_products = false
+                if linked_collection and linked_collection.products.size > 0
+                  assign show_products = true
+                endif
+                assign product_limit = section.settings.mega_product_count | default: 3
+              -%}
 
-                  {%- if show_products -%}
-                    <div class="mmp__products">
-                      {%- for product in linked_collection.products limit: product_limit -%}
-                        <a href="{{ product.url }}" class="mmp__product-card">
-                          <div class="mmp__product-img-wrap">
-                            {%- if product.featured_image != blank -%}
-                              <img
-                                class="mmp__product-img"
-                                src="{{ product.featured_image | image_url: width: 300, format: 'webp' }}"
-                                alt="{{ product.featured_image.alt | default: product.title | escape }}"
-                                width="300"
-                                height="{{ 300 | divided_by: product.featured_image.aspect_ratio | round }}"
-                                loading="lazy"
-                              >
-                            {%- else -%}
-                              <div class="mmp__product-placeholder">
-                                {{ 'product-1' | placeholder_svg_tag }}
-                              </div>
-                            {%- endif -%}
-                          </div>
-                          <div class="mmp__product-info">
-                            <p class="mmp__product-title">{{ product.title | escape }}</p>
-                            <p class="mmp__product-price">{{ product.price | money }}</p>
-                          </div>
-                          {%- if product.type != blank -%}
-                            <span class="mmp__product-tag">{{ product.type | escape }}</span>
-                          {%- endif -%}
-                        </a>
-                      {%- endfor -%}
-                    </div>
-
-                  {%- else -%}
-                    {%- comment %} Fallback : liens texte classiques {% endcomment %}
-                    <div class="mmp__links">
-                      {%- for childlink in link.links -%}
-                        <div class="mmp__link-group">
-                          <a
-                            href="{{ childlink.url }}"
-                            class="mmp__link-title{% if childlink.current %} mmp__link--active{% endif %}"
+              {%- if show_products -%}
+                <div class="mmp__products">
+                  {%- for product in linked_collection.products limit: product_limit -%}
+                    <a href="{{ product.url }}" class="mmp__product-card">
+                      <div class="mmp__product-img-wrap">
+                        {%- if product.featured_image != blank -%}
+                          <img
+                            class="mmp__product-img"
+                            src="{{ product.featured_image | image_url: width: 300, format: 'webp' }}"
+                            alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                            width="300"
+                            height="{{ 300 | divided_by: product.featured_image.aspect_ratio | round }}"
+                            loading="lazy"
                           >
-                            {{ childlink.title | escape }}
-                          </a>
-                          {%- if childlink.links != blank -%}
-                            <ul class="mmp__sublinks">
-                              {%- for grandchild in childlink.links -%}
-                                <li>
-                                  <a
-                                    href="{{ grandchild.url }}"
-                                    class="mmp__sublink{% if grandchild.current %} mmp__link--active{% endif %}"
-                                  >
-                                    {{ grandchild.title | escape }}
-                                  </a>
-                                </li>
-                              {%- endfor -%}
-                            </ul>
-                          {%- endif -%}
-                        </div>
-                      {%- endfor -%}
-                    </div>
-                  {%- endif -%}
-
-                  {%- comment %} ── Bloc promo (droite) ── {% endcomment %}
-                  {%- if section.settings.mega_promo_image != blank -%}
-                    <a href="{{ section.settings.mega_promo_link | default: '#' }}" class="mmp__promo">
-                      <img
-                        class="mmp__promo-img"
-                        src="{{ section.settings.mega_promo_image | image_url: width: 480, format: 'webp' }}"
-                        alt="{{ section.settings.mega_promo_title | default: 'Promotion' | escape }}"
-                        width="480"
-                        height="{{ 480 | divided_by: section.settings.mega_promo_image.aspect_ratio | round }}"
-                        loading="lazy"
-                      >
-                      <div class="mmp__promo-overlay">
-                        {%- if section.settings.mega_promo_title != blank -%}
-                          <p class="mmp__promo-title">{{ section.settings.mega_promo_title | escape }}</p>
-                        {%- endif -%}
-                        {%- if section.settings.mega_promo_text != blank -%}
-                          <p class="mmp__promo-text">{{ section.settings.mega_promo_text | escape }}</p>
-                        {%- endif -%}
-                        {%- if section.settings.mega_promo_cta != blank -%}
-                          <span class="mmp__promo-cta">{{ section.settings.mega_promo_cta | escape }}</span>
+                        {%- else -%}
+                          <div class="mmp__product-placeholder">
+                            {{ 'product-1' | placeholder_svg_tag }}
+                          </div>
                         {%- endif -%}
                       </div>
+                      <div class="mmp__product-info">
+                        <p class="mmp__product-title">{{ product.title | escape }}</p>
+                        <p class="mmp__product-price">{{ product.price | money }}</p>
+                      </div>
+                      {%- if product.type != blank -%}
+                        <span class="mmp__product-tag">{{ product.type | escape }}</span>
+                      {%- endif -%}
                     </a>
-                  {%- endif -%}
-
+                  {%- endfor -%}
                 </div>
 
-                {%- comment %} ── Bouton "Voir tous" ── {% endcomment %}
-                {%- if show_products -%}
-                  <div class="mmp__footer page-width">
-                    <a href="{{ link.url }}" class="mmp__view-all">
-                      {{ section.settings.mega_view_all_label | default: 'VOIR TOUS LES PRODUITS' | escape }}
-                    </a>
-                  </div>
-                {%- endif -%}
+              {%- else -%}
+                {%- comment %} Fallback : liens texte classiques {% endcomment %}
+                <div class="mmp__links">
+                  {%- for childlink in link.links -%}
+                    <div class="mmp__link-group">
+                      <a
+                        href="{{ childlink.url }}"
+                        class="mmp__link-title{% if childlink.current %} mmp__link--active{% endif %}"
+                      >
+                        {{ childlink.title | escape }}
+                      </a>
+                      {%- if childlink.links != blank -%}
+                        <ul class="mmp__sublinks">
+                          {%- for grandchild in childlink.links -%}
+                            <li>
+                              <a
+                                href="{{ grandchild.url }}"
+                                class="mmp__sublink{% if grandchild.current %} mmp__link--active{% endif %}"
+                              >
+                                {{ grandchild.title | escape }}
+                              </a>
+                            </li>
+                          {%- endfor -%}
+                        </ul>
+                      {%- endif -%}
+                    </div>
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
 
+              {%- comment %} ── Bloc promo (droite) ── {% endcomment %}
+              {%- if section.settings.mega_promo_image != blank -%}
+                <a href="{{ section.settings.mega_promo_link | default: '#' }}" class="mmp__promo">
+                  <img
+                    class="mmp__promo-img"
+                    src="{{ section.settings.mega_promo_image | image_url: width: 480, format: 'webp' }}"
+                    alt="{{ section.settings.mega_promo_title | default: 'Promotion' | escape }}"
+                    width="480"
+                    height="{{ 480 | divided_by: section.settings.mega_promo_image.aspect_ratio | round }}"
+                    loading="lazy"
+                  >
+                  <div class="mmp__promo-overlay">
+                    {%- if section.settings.mega_promo_title != blank -%}
+                      <p class="mmp__promo-title">{{ section.settings.mega_promo_title | escape }}</p>
+                    {%- endif -%}
+                    {%- if section.settings.mega_promo_text != blank -%}
+                      <p class="mmp__promo-text">{{ section.settings.mega_promo_text | escape }}</p>
+                    {%- endif -%}
+                    {%- if section.settings.mega_promo_cta != blank -%}
+                      <span class="mmp__promo-cta">{{ section.settings.mega_promo_cta | escape }}</span>
+                    {%- endif -%}
+                  </div>
+                </a>
+              {%- endif -%}
+
+            </div>
+
+            {%- comment %} ── Bouton "Voir tous" ── {% endcomment %}
+            {%- if show_products -%}
+              <div class="mmp__footer page-width">
+                <a href="{{ link.url }}" class="mmp__view-all">
+                  {{ section.settings.mega_view_all_label | default: 'VOIR TOUS LES PRODUITS' | escape }}
+                </a>
               </div>
-            </details>
-          </header-menu>
+            {%- endif -%}
+
+          </div>
 
         {%- else -%}
           <a
@@ -191,3 +240,107 @@
     {%- endfor -%}
   </ul>
 </nav>
+
+<script>
+(function () {
+  'use strict';
+  // Init une seule fois
+  if (window.__mmpInit) return;
+  window.__mmpInit = true;
+
+  function ready(fn) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn, { once: true });
+    } else {
+      fn();
+    }
+  }
+
+  ready(function () {
+    var root = document.querySelector('[data-mmp-root]');
+    if (!root) return;
+
+    var items = Array.prototype.slice.call(root.querySelectorAll('[data-mmp-item]'));
+    var overlay = document.querySelector('[data-mmp-overlay]');
+    var activeItem = null;
+
+    function closeAll() {
+      items.forEach(function (item) {
+        item.classList.remove('mmp-item--open');
+        var t = item.querySelector('[data-mmp-toggle]');
+        var p = item.querySelector('[data-mmp-panel]');
+        if (t) t.setAttribute('aria-expanded', 'false');
+        if (p) p.setAttribute('aria-hidden', 'true');
+      });
+      activeItem = null;
+      if (overlay) overlay.classList.remove('is-visible');
+      document.body.classList.remove('mmp-panel-open');
+    }
+
+    function updateHeaderBottom() {
+      var header = document.querySelector('.header-wrapper');
+      if (!header) return;
+      var rect = header.getBoundingClientRect();
+      document.documentElement.style.setProperty('--mmp-header-bottom', Math.max(0, rect.bottom) + 'px');
+    }
+
+    function openItem(item) {
+      if (activeItem && activeItem !== item) {
+        activeItem.classList.remove('mmp-item--open');
+        var prevT = activeItem.querySelector('[data-mmp-toggle]');
+        var prevP = activeItem.querySelector('[data-mmp-panel]');
+        if (prevT) prevT.setAttribute('aria-expanded', 'false');
+        if (prevP) prevP.setAttribute('aria-hidden', 'true');
+      }
+      updateHeaderBottom();
+      item.classList.add('mmp-item--open');
+      var t = item.querySelector('[data-mmp-toggle]');
+      var p = item.querySelector('[data-mmp-panel]');
+      if (t) t.setAttribute('aria-expanded', 'true');
+      if (p) p.setAttribute('aria-hidden', 'false');
+      activeItem = item;
+      if (overlay) overlay.classList.add('is-visible');
+      document.body.classList.add('mmp-panel-open');
+    }
+
+    items.forEach(function (item) {
+      var toggle = item.querySelector('[data-mmp-toggle]');
+      if (!toggle) return;
+
+      toggle.addEventListener('click', function (e) {
+        // Empecher tout autre handler (cart drawer, etc.) d'intervenir
+        e.preventDefault();
+        e.stopPropagation();
+        if (item.classList.contains('mmp-item--open')) {
+          closeAll();
+        } else {
+          openItem(item);
+        }
+      });
+    });
+
+    // Clic overlay ferme
+    if (overlay) {
+      overlay.addEventListener('click', closeAll);
+    }
+
+    // Clic hors du menu ferme
+    document.addEventListener('click', function (e) {
+      if (!activeItem) return;
+      if (e.target.closest('[data-mmp-root]') || e.target.closest('[data-mmp-overlay]')) return;
+      closeAll();
+    });
+
+    // Escape ferme
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && activeItem) {
+        closeAll();
+        if (activeItem) {
+          var t = activeItem.querySelector('[data-mmp-toggle]');
+          if (t) t.focus();
+        }
+      }
+    });
+  });
+})();
+</script>
