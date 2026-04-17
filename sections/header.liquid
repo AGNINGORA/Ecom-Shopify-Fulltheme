@@ -113,6 +113,24 @@
   .header__icons > :not(.desktop-localization-wrapper):not(details):not(a):not(script):not(link):not(style):not(.header__icon):not(.cwl__header-link):not(#cart-icon-bubble) {
     display: none !important;
   }
+  /* Extensions navigateur : widgets flottants / capsule / pill injectés dans le body */
+  body > div[class*="dark-reader"],
+  body > div[class*="darkreader"],
+  body > div[id*="dark-reader"],
+  body > [id*="monica"],
+  body > [id*="kagi-"],
+  body > [id*="__plasma"],
+  body > [class*="ytp-"],
+  #accessibility-widget,
+  [data-cfasync],
+  [id*="cai-widget"],
+  [id*="beacon-container"],
+  .shopify-buy-frame,
+  body > iframe[style*="z-index"]:not([src*="shopify"]) {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
 </style>
 
 <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
