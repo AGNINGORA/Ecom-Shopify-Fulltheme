@@ -46,6 +46,7 @@
   display: flex;
   flex-direction: column;
   background: #fff;
+  color: #1a1a1a;
   box-shadow: -4px 0 32px rgba(0, 0, 0, 0.12);
 
   transform: translateX(100%);
@@ -53,6 +54,17 @@
   transition:
     transform var(--ccd-duration) var(--ccd-ease),
     visibility 0s var(--ccd-duration);
+}
+
+.ccd__drawer,
+.ccd__drawer a,
+.ccd__drawer p,
+.ccd__drawer span,
+.ccd__drawer button,
+.ccd__drawer h1,
+.ccd__drawer h2,
+.ccd__drawer h3 {
+  color: #1a1a1a;
 }
 
 .ccd__drawer.is-open {
