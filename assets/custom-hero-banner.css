@@ -1,6 +1,7 @@
 /* =============================================================
    custom-hero-banner.css
-   Hero plein écran — image/vidéo, overlay, parallax, CTA
+   Hero plein écran PRO — image/vidéo, overlay gradient, parallax,
+   badge, animations, countdown, trust icons, filtres image
    Dawn 15.x · Mobile-first
    ============================================================= */
 
@@ -26,19 +27,19 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   MEDIA (image / vidéo)
+   MEDIA (image / vidéo / vidéo externe)
    ══════════════════════════════════════════════════════════════ */
 
 .chb__media {
   position: absolute;
-  inset: -15%; /* Marge pour le parallax sans laisser de blanc */
+  inset: -15%;
   z-index: 0;
   will-change: transform;
-  transition: transform 0s linear; /* Contrôlé par JS rAF */
+  transition: transform 0s linear;
   background: rgb(var(--color-background));
+  filter: brightness(var(--chb-brightness, 1)) contrast(var(--chb-contrast, 1));
 }
 
-/* Désactiver l'extra-inset si pas de parallax */
 .chb:not([data-chb-parallax]) .chb__media {
   inset: 0;
 }
@@ -50,13 +51,13 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: var(--chb-focal, center center);
   display: block;
   pointer-events: none;
   user-select: none;
 }
 
-/* ── Vidéo ──────────────────────────────────────────────────── */
+/* ── Vidéo Shopify ──────────────────────────────────────────── */
 .chb__video {
   position: absolute;
   inset: 0;
@@ -65,6 +66,20 @@
   object-fit: cover;
   object-position: center;
   display: block;
+  pointer-events: none;
+}
+
+/* ── Vidéo externe (YouTube / Vimeo) ────────────────────────── */
+.chb__ext-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: 177.78vh; /* 16:9 */
+  height: 56.25vw; /* 16:9 */
+  transform: translate(-50%, -50%);
+  border: 0;
   pointer-events: none;
 }
 
@@ -82,16 +97,95 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   OVERLAY
+   BADGE
+   ══════════════════════════════════════════════════════════════ */
+
+.chb__badge {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.4rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 5rem;
+  line-height: 1.3;
+}
+
+.chb__badge-icon {
+  font-size: 1.3em;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   OVERLAY — Solid + Gradient variants
    ══════════════════════════════════════════════════════════════ */
 
 .chb__overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
+  pointer-events: none;
+}
+
+/* Solid */
+.chb__overlay--solid {
   background: var(--chb-overlay, transparent);
   opacity: var(--chb-overlay-opacity, 0);
-  pointer-events: none;
+}
+
+/* Gradient top → bottom */
+.chb__overlay--gradient-tb {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--chb-overlay) calc(var(--chb-overlay-opacity) * 100%), transparent) 0%,
+    color-mix(in srgb, var(--chb-overlay-end, transparent) calc(var(--chb-overlay-end-opacity, 0) * 100%), transparent) 100%
+  );
+  opacity: 1;
+}
+
+/* Gradient bottom → top */
+.chb__overlay--gradient-bt {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--chb-overlay) calc(var(--chb-overlay-opacity) * 100%), transparent) 0%,
+    color-mix(in srgb, var(--chb-overlay-end, transparent) calc(var(--chb-overlay-end-opacity, 0) * 100%), transparent) 100%
+  );
+  opacity: 1;
+}
+
+/* Gradient left → right */
+.chb__overlay--gradient-lr {
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--chb-overlay) calc(var(--chb-overlay-opacity) * 100%), transparent) 0%,
+    color-mix(in srgb, var(--chb-overlay-end, transparent) calc(var(--chb-overlay-end-opacity, 0) * 100%), transparent) 100%
+  );
+  opacity: 1;
+}
+
+/* Gradient right → left */
+.chb__overlay--gradient-rl {
+  background: linear-gradient(
+    to left,
+    color-mix(in srgb, var(--chb-overlay) calc(var(--chb-overlay-opacity) * 100%), transparent) 0%,
+    color-mix(in srgb, var(--chb-overlay-end, transparent) calc(var(--chb-overlay-end-opacity, 0) * 100%), transparent) 100%
+  );
+  opacity: 1;
+}
+
+/* Gradient radial */
+.chb__overlay--gradient-radial {
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--chb-overlay-end, transparent) calc(var(--chb-overlay-end-opacity, 0) * 100%), transparent) 0%,
+    color-mix(in srgb, var(--chb-overlay) calc(var(--chb-overlay-opacity) * 100%), transparent) 100%
+  );
+  opacity: 1;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -122,13 +216,22 @@
 .chb__text {
   display: flex;
   flex-direction: column;
-  gap: 1.6rem;
-  max-width: 72rem;
+  gap: var(--chb-gap, 1.6rem);
+  max-width: var(--chb-content-width, 72rem);
 }
 
 .chb__content--center .chb__text { text-align: center; align-items: center; }
 .chb__content--left   .chb__text { text-align: left;   align-items: flex-start; }
 .chb__content--right  .chb__text { text-align: right;  align-items: flex-end; }
+
+/* ── Text shadow dynamique ─────────────────────────────────── */
+.chb__eyebrow,
+.chb__title,
+.chb__subtitle {
+  text-shadow:
+    0 calc(var(--chb-text-shadow, 0) * 0.1px) calc(var(--chb-text-shadow, 0) * 2px)
+    rgba(0, 0, 0, calc(var(--chb-text-shadow, 0) * 0.08));
+}
 
 /* ── Accroche (eyebrow) ─────────────────────────────────────── */
 .chb__eyebrow {
@@ -148,11 +251,11 @@
   letter-spacing: -0.02em;
 }
 
-/* Tailles */
-.chb__title--sm { font-size: clamp(2rem,   3.5vw, 3.2rem); }
-.chb__title--md { font-size: clamp(2.8rem, 4.5vw, 4.4rem); }
-.chb__title--lg { font-size: clamp(3.6rem, 5.5vw, 6rem);   }
-.chb__title--xl { font-size: clamp(4.4rem, 7vw,   8rem);   }
+.chb__title--sm  { font-size: clamp(2rem,   3.5vw, 3.2rem); }
+.chb__title--md  { font-size: clamp(2.8rem, 4.5vw, 4.4rem); }
+.chb__title--lg  { font-size: clamp(3.6rem, 5.5vw, 6rem);   }
+.chb__title--xl  { font-size: clamp(4.4rem, 7vw,   8rem);   }
+.chb__title--xxl { font-size: clamp(5.4rem, 9vw,   11rem);  }
 
 /* ── Sous-titre ─────────────────────────────────────────────── */
 .chb__subtitle {
@@ -161,6 +264,59 @@
   line-height: 1.55;
   opacity: 0.85;
   max-width: 56rem;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   COUNTDOWN
+   ══════════════════════════════════════════════════════════════ */
+
+.chb__countdown {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.chb__cd-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 4.8rem;
+  padding: 0.8rem 1rem;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 0.6rem;
+  backdrop-filter: blur(4px);
+}
+
+.chb__cd-num {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.chb__cd-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  margin-top: 0.2rem;
+}
+
+.chb__cd-sep {
+  font-size: 2rem;
+  font-weight: 700;
+  opacity: 0.5;
+  margin: 0 0.1rem;
+}
+
+@media (max-width: 749px) {
+  .chb__cd-unit {
+    min-width: 3.6rem;
+    padding: 0.6rem 0.8rem;
+  }
+  .chb__cd-num { font-size: 1.6rem; }
+  .chb__cd-sep { font-size: 1.4rem; }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -177,24 +333,28 @@
 .chb__content--center .chb__ctas { justify-content: center; }
 .chb__content--right  .chb__ctas { justify-content: flex-end; }
 
-/* ── Base bouton ────────────────────────────────────────────── */
 .chb__cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   padding: 1.2rem 2.8rem;
   font-size: 1.45rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  border-radius: 0.6rem;
+  border-radius: var(--chb-cta-radius, 0.6rem);
   text-decoration: none;
   cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.15s ease;
+  transition: opacity 0.2s ease, transform 0.15s ease, background 0.2s ease;
   white-space: nowrap;
 }
 
 .chb__cta:hover  { opacity: 0.88; }
 .chb__cta:active { transform: scale(0.98); }
+
+.chb__cta-icon {
+  font-size: 1.2em;
+}
 
 /* ── Style plein ────────────────────────────────────────────── */
 .chb__cta--filled {
@@ -226,6 +386,88 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
+   TRUST ICONS
+   ══════════════════════════════════════════════════════════════ */
+
+.chb__trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 0.8rem;
+}
+
+.chb__content--center .chb__trust { justify-content: center; }
+.chb__content--right  .chb__trust { justify-content: flex-end; }
+
+.chb__trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.chb__trust-icon {
+  font-size: 1.5em;
+}
+
+@media (max-width: 749px) {
+  .chb__trust {
+    gap: 1.2rem;
+  }
+  .chb__trust-item {
+    font-size: 1.15rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ANIMATIONS D'ENTRÉE
+   ══════════════════════════════════════════════════════════════ */
+
+/* État initial (invisible) */
+.chb--animate .chb__anim-el {
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* fade-up : fondu + montée */
+.chb--animate[data-chb-animation="fade-up"] .chb__anim-el {
+  transform: translateY(3rem);
+}
+.chb--animate[data-chb-animation="fade-up"] .chb__anim-el--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* fade-in : fondu simple */
+.chb--animate[data-chb-animation="fade-in"] .chb__anim-el {
+  transform: none;
+}
+.chb--animate[data-chb-animation="fade-in"] .chb__anim-el--visible {
+  opacity: 1;
+}
+
+/* slide-up : glissement vers le haut */
+.chb--animate[data-chb-animation="slide-up"] .chb__anim-el {
+  transform: translateY(5rem);
+}
+.chb--animate[data-chb-animation="slide-up"] .chb__anim-el--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* zoom-in : zoom entrant */
+.chb--animate[data-chb-animation="zoom-in"] .chb__anim-el {
+  transform: scale(0.85);
+}
+.chb--animate[data-chb-animation="zoom-in"] .chb__anim-el--visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ══════════════════════════════════════════════════════════════
    FLÈCHE DE DÉFILEMENT
    ══════════════════════════════════════════════════════════════ */
 
@@ -252,8 +494,7 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ESPACEMENT (schema padding_top / padding_bottom)
-   Injecté via inline style sur la section parente
+   ESPACEMENT
    ══════════════════════════════════════════════════════════════ */
 
 .section-custom-hero-banner {
@@ -274,5 +515,11 @@
 
   .chb__scroll-arrow {
     animation: none;
+  }
+
+  .chb--animate .chb__anim-el {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 }

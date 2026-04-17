@@ -1,7 +1,8 @@
 {% comment %}
   custom-hero-banner.liquid
-  Hero plein écran — image ou vidéo, parallax, mobile-first
-  Dawn 15.x · Parallax inline JS
+  Hero plein écran premium — image/vidéo, parallax, animations, overlay gradient,
+  badge, focal point, trust icons, countdown, vidéo externe, filtres image
+  Dawn 15.x · Vanilla JS
   CSS : assets/custom-hero-banner.css
 {% endcomment %}
 
@@ -14,42 +15,76 @@
   if img_desktop != blank
     assign has_image = true
   endif
+
   assign has_video = false
   if section.settings.content_type == 'video' and section.settings.video != blank
     assign has_video = true
   endif
 
+  assign has_ext_video = false
+  if section.settings.content_type == 'external_video' and section.settings.video_url != blank
+    assign has_ext_video = true
+  endif
+
   assign overlay_opacity_dec = section.settings.overlay_opacity | divided_by: 100.0
+  assign overlay_type = section.settings.overlay_type
 
   assign txt_align = section.settings.text_alignment
   assign txt_pos   = section.settings.text_position
+  assign anim      = section.settings.animation
+  assign focal     = section.settings.focal_point
+  assign content_w = section.settings.content_width
 
   assign cta_label = section.settings.cta_label
   assign cta_url   = section.settings.cta_url
   assign cta_style = section.settings.cta_style
+
+  assign filter_brightness = section.settings.image_brightness | divided_by: 100.0
+  assign filter_contrast   = section.settings.image_contrast | divided_by: 100.0
 -%}
 
 <section
-  class="chb"
+  class="chb {% if anim != 'none' %}chb--animate{% endif %}"
   data-section-id="{{ section.id }}"
+  data-chb-animation="{{ anim }}"
   {% if section.settings.enable_parallax and has_image %}data-chb-parallax{% endif %}
   style="
     --chb-height-desktop: {{ section.settings.height_desktop }}vh;
     --chb-height-mobile:  {{ section.settings.height_mobile }}vh;
     --chb-overlay:        {{ section.settings.overlay_color }};
     --chb-overlay-opacity:{{ overlay_opacity_dec }};
+    --chb-overlay-end:    {{ section.settings.overlay_color_end | default: 'transparent' }};
+    --chb-overlay-end-opacity: {{ section.settings.overlay_opacity_end | default: 0 | divided_by: 100.0 }};
     --chb-text:           {{ section.settings.text_color }};
     --chb-cta-bg:         {{ section.settings.cta_bg }};
     --chb-cta-txt:        {{ section.settings.cta_text_color }};
+    --chb-cta-radius:     {{ section.settings.cta_radius }}px;
+    --chb-focal:          {{ focal | replace: '-', ' ' }};
+    --chb-brightness:     {{ filter_brightness }};
+    --chb-contrast:       {{ filter_contrast }};
+    --chb-text-shadow:    {{ section.settings.text_shadow_strength }};
+    --chb-content-width:  {{ content_w }}rem;
+    --chb-gap:            {{ section.settings.elements_gap }}rem;
+    --chb-padding-top:    {{ section.settings.padding_top }}px;
+    --chb-padding-bottom: {{ section.settings.padding_bottom }}px;
   "
   {{ section.shopify_attributes }}
 >
 
-  {%- comment %} ── Media (image ou vidéo) ────────────────────── {% endcomment %}
+  {%- comment %} ── Badge ──────────────────────────────────────── {% endcomment %}
+  {%- if section.settings.badge_text != blank -%}
+    <div class="chb__badge" style="background: {{ section.settings.badge_bg | default: '#C9A96E' }}; color: {{ section.settings.badge_color | default: '#fff' }};">
+      {%- if section.settings.badge_icon != blank -%}
+        <span class="chb__badge-icon" aria-hidden="true">{{ section.settings.badge_icon }}</span>
+      {%- endif -%}
+      {{ section.settings.badge_text | escape }}
+    </div>
+  {%- endif -%}
+
+  {%- comment %} ── Media (image, vidéo, vidéo externe) ─────── {% endcomment %}
   <div class="chb__media" data-chb-media>
 
     {%- if has_video -%}
-      {%- comment %} Vidéo Shopify hébergée {% endcomment %}
       <video
         class="chb__video"
         {% if section.settings.video_autoplay %}autoplay muted{% endif %}
@@ -63,8 +98,36 @@
         {%- endfor -%}
       </video>
 
+    {%- elsif has_ext_video -%}
+      {%- assign vurl = section.settings.video_url -%}
+      {%- if vurl contains 'youtube' or vurl contains 'youtu.be' -%}
+        {%- comment %} YouTube {% endcomment %}
+        {%- assign yt_id = vurl | split: 'v=' | last | split: '&' | first -%}
+        {%- if vurl contains 'youtu.be' -%}
+          {%- assign yt_id = vurl | split: 'youtu.be/' | last | split: '?' | first -%}
+        {%- endif -%}
+        <iframe
+          class="chb__ext-video"
+          src="https://www.youtube.com/embed/{{ yt_id }}?autoplay=1&mute=1&loop=1&playlist={{ yt_id }}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
+          allow="autoplay; encrypted-media"
+          allowfullscreen
+          loading="lazy"
+          title="Vidéo hero"
+        ></iframe>
+      {%- elsif vurl contains 'vimeo' -%}
+        {%- comment %} Vimeo {% endcomment %}
+        {%- assign vim_id = vurl | split: 'vimeo.com/' | last | split: '/' | first | split: '?' | first -%}
+        <iframe
+          class="chb__ext-video"
+          src="https://player.vimeo.com/video/{{ vim_id }}?autoplay=1&muted=1&loop=1&background=1"
+          allow="autoplay; encrypted-media"
+          allowfullscreen
+          loading="lazy"
+          title="Vidéo hero"
+        ></iframe>
+      {%- endif -%}
+
     {%- elsif has_image -%}
-      {%- comment %} Image desktop + mobile via <picture> {% endcomment %}
       <picture>
         {%- if img_mobile != blank -%}
           <source
@@ -77,7 +140,6 @@
             height="{{ img_mobile.height }}"
           >
         {%- elsif img_desktop != blank -%}
-          {%- comment %} Recadrer l'image desktop à ratio portrait sur mobile {% endcomment %}
           <source
             media="(max-width: 749px)"
             srcset="
@@ -107,7 +169,6 @@
       </picture>
 
     {%- elsif request.design_mode -%}
-      {%- comment %} Placeholder éditeur {% endcomment %}
       <div class="chb__placeholder">
         {{ 'lifestyle-1' | placeholder_svg_tag: 'chb__placeholder-svg' }}
       </div>
@@ -117,34 +178,62 @@
 
   {%- comment %} ── Overlay ──────────────────────────────────── {% endcomment %}
   {%- if section.settings.overlay_opacity > 0 -%}
-    <div class="chb__overlay" aria-hidden="true"></div>
+    <div class="chb__overlay chb__overlay--{{ overlay_type }}" aria-hidden="true"></div>
   {%- endif -%}
 
   {%- comment %} ── Contenu texte ─────────────────────────────── {% endcomment %}
   <div class="chb__content chb__content--{{ txt_align }} chb__content--{{ txt_pos }}">
     <div class="page-width">
-      <div class="chb__text">
+      <div class="chb__text" data-chb-text>
 
         {%- if section.settings.eyebrow != blank -%}
-          <p class="chb__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+          <p class="chb__eyebrow chb__anim-el" data-chb-anim-delay="0">{{ section.settings.eyebrow | escape }}</p>
         {%- endif -%}
 
         {%- if section.settings.title != blank -%}
-          <h2 class="chb__title chb__title--{{ section.settings.title_size }}">
+          <{{ section.settings.title_tag | default: 'h2' }} class="chb__title chb__title--{{ section.settings.title_size }} chb__anim-el" data-chb-anim-delay="1">
             {{ section.settings.title | newline_to_br }}
-          </h2>
+          </{{ section.settings.title_tag | default: 'h2' }}>
         {%- endif -%}
 
         {%- if section.settings.subtitle != blank -%}
-          <p class="chb__subtitle">{{ section.settings.subtitle | escape }}</p>
+          <p class="chb__subtitle chb__anim-el" data-chb-anim-delay="2">{{ section.settings.subtitle | escape }}</p>
+        {%- endif -%}
+
+        {%- comment %} Countdown {% endcomment %}
+        {%- if section.settings.countdown_date != blank -%}
+          <div class="chb__countdown chb__anim-el" data-chb-anim-delay="3" data-chb-countdown="{{ section.settings.countdown_date }}">
+            <div class="chb__cd-unit">
+              <span class="chb__cd-num" data-chb-cd-d>00</span>
+              <span class="chb__cd-label">Jours</span>
+            </div>
+            <span class="chb__cd-sep">:</span>
+            <div class="chb__cd-unit">
+              <span class="chb__cd-num" data-chb-cd-h>00</span>
+              <span class="chb__cd-label">Heures</span>
+            </div>
+            <span class="chb__cd-sep">:</span>
+            <div class="chb__cd-unit">
+              <span class="chb__cd-num" data-chb-cd-m>00</span>
+              <span class="chb__cd-label">Min</span>
+            </div>
+            <span class="chb__cd-sep">:</span>
+            <div class="chb__cd-unit">
+              <span class="chb__cd-num" data-chb-cd-s>00</span>
+              <span class="chb__cd-label">Sec</span>
+            </div>
+          </div>
         {%- endif -%}
 
         {%- if cta_label != blank and cta_url != blank -%}
-          <div class="chb__ctas">
+          <div class="chb__ctas chb__anim-el" data-chb-anim-delay="4">
             <a
               class="chb__cta chb__cta--{{ cta_style }}"
               href="{{ cta_url }}"
             >
+              {%- if section.settings.cta_icon != blank -%}
+                <span class="chb__cta-icon">{{ section.settings.cta_icon }}</span>
+              {%- endif -%}
               {{ cta_label | escape }}
             </a>
 
@@ -159,11 +248,41 @@
           </div>
         {%- endif -%}
 
+        {%- comment %} Trust icons {% endcomment %}
+        {%- if section.settings.show_trust_icons -%}
+          <div class="chb__trust chb__anim-el" data-chb-anim-delay="5">
+            {%- if section.settings.trust_1_text != blank -%}
+              <div class="chb__trust-item">
+                {%- if section.settings.trust_1_icon != blank -%}
+                  <span class="chb__trust-icon">{{ section.settings.trust_1_icon }}</span>
+                {%- endif -%}
+                <span>{{ section.settings.trust_1_text | escape }}</span>
+              </div>
+            {%- endif -%}
+            {%- if section.settings.trust_2_text != blank -%}
+              <div class="chb__trust-item">
+                {%- if section.settings.trust_2_icon != blank -%}
+                  <span class="chb__trust-icon">{{ section.settings.trust_2_icon }}</span>
+                {%- endif -%}
+                <span>{{ section.settings.trust_2_text | escape }}</span>
+              </div>
+            {%- endif -%}
+            {%- if section.settings.trust_3_text != blank -%}
+              <div class="chb__trust-item">
+                {%- if section.settings.trust_3_icon != blank -%}
+                  <span class="chb__trust-icon">{{ section.settings.trust_3_icon }}</span>
+                {%- endif -%}
+                <span>{{ section.settings.trust_3_text | escape }}</span>
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
       </div>
     </div>
   </div>
 
-  {%- comment %} ── Flèche de défilement (optionnelle) ───────── {% endcomment %}
+  {%- comment %} ── Flèche de défilement ───────────────────── {% endcomment %}
   {%- if section.settings.show_scroll_arrow -%}
     <div class="chb__scroll-arrow" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -174,66 +293,93 @@
 
 </section>
 
-{%- comment %} ── Parallax (inline, zéro dépendance) ────────── {% endcomment %}
-{%- if section.settings.enable_parallax and has_image -%}
+{%- comment %} ── JS : Parallax + Animations + Countdown ──────── {% endcomment %}
 <script>
 (function () {
   'use strict';
 
-  const section = document.querySelector('.chb[data-section-id="{{ section.id }}"]');
-  if (!section) return;
+  var sectionEl = document.querySelector('.chb[data-section-id="{{ section.id }}"]');
+  if (!sectionEl) return;
 
-  const media = section.querySelector('[data-chb-media]');
-  if (!media) return;
-
-  // N'appliquer que si pas de préférence pour réduire le mouvement
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (prefersReduced) return;
-
-  // Facteur : 0 = immobile, 0.4 = parallax fort
-  const FACTOR = 0.3;
-  let ticking   = false;
-
-  function update() {
-    const rect  = section.getBoundingClientRect();
-    const vh    = window.innerHeight;
-
-    // Seulement quand la section est visible
-    if (rect.bottom < 0 || rect.top > vh) {
-      ticking = false;
-      return;
+  // ── Parallax ──────────────────────────────────
+  if (sectionEl.hasAttribute('data-chb-parallax')) {
+    var media = sectionEl.querySelector('[data-chb-media]');
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (media && !prefersReduced) {
+      var FACTOR = 0.3;
+      var ticking = false;
+      function updateParallax() {
+        var rect = sectionEl.getBoundingClientRect();
+        var vh = window.innerHeight;
+        if (rect.bottom < 0 || rect.top > vh) { ticking = false; return; }
+        var progress = -(rect.top / (vh + rect.height));
+        var shift = progress * rect.height * FACTOR;
+        media.style.transform = 'translateY(' + shift.toFixed(1) + 'px)';
+        ticking = false;
+      }
+      window.addEventListener('scroll', function () {
+        if (!ticking) { window.requestAnimationFrame(updateParallax); ticking = true; }
+      }, { passive: true });
+      updateParallax();
     }
-
-    // Ratio de progression de la section dans le viewport (-1 → 1)
-    const progress = -(rect.top / (vh + rect.height));
-    const shift    = progress * rect.height * FACTOR;
-
-    media.style.transform = 'translateY(' + shift.toFixed(1) + 'px)';
-    ticking = false;
   }
 
-  window.addEventListener('scroll', function () {
-    if (!ticking) {
-      window.requestAnimationFrame(update);
-      ticking = true;
+  // ── Animations texte (IntersectionObserver) ───
+  var animType = sectionEl.dataset.chbAnimation;
+  if (animType && animType !== 'none') {
+    var animEls = sectionEl.querySelectorAll('.chb__anim-el');
+    if (animEls.length > 0 && 'IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            animEls.forEach(function (el) {
+              var delay = parseInt(el.dataset.chbAnimDelay || '0', 10);
+              el.style.transitionDelay = (delay * 0.12) + 's';
+              el.classList.add('chb__anim-el--visible');
+            });
+            observer.disconnect();
+          }
+        });
+      }, { threshold: 0.15 });
+      observer.observe(sectionEl);
     }
-  }, { passive: true });
+  }
 
-  // Init
-  update();
+  // ── Countdown ─────────────────────────────────
+  var cdEl = sectionEl.querySelector('[data-chb-countdown]');
+  if (cdEl) {
+    var target = new Date(cdEl.dataset.chbCountdown).getTime();
+    var dEl = cdEl.querySelector('[data-chb-cd-d]');
+    var hEl = cdEl.querySelector('[data-chb-cd-h]');
+    var mEl = cdEl.querySelector('[data-chb-cd-m]');
+    var sEl = cdEl.querySelector('[data-chb-cd-s]');
+    function updateCD() {
+      var diff = Math.max(0, target - Date.now());
+      if (diff === 0) { cdEl.textContent = 'Offre expirée'; return; }
+      var d = Math.floor(diff / 86400000);
+      var h = Math.floor((diff % 86400000) / 3600000);
+      var m = Math.floor((diff % 3600000) / 60000);
+      var s = Math.floor((diff % 60000) / 1000);
+      if (dEl) dEl.textContent = String(d).padStart(2, '0');
+      if (hEl) hEl.textContent = String(h).padStart(2, '0');
+      if (mEl) mEl.textContent = String(m).padStart(2, '0');
+      if (sEl) sEl.textContent = String(s).padStart(2, '0');
+    }
+    updateCD();
+    setInterval(updateCD, 1000);
+  }
 })();
 </script>
-{%- endif -%}
 
 {% schema %}
 {
-  "name": "Hero Banner",
+  "name": "Hero Banner Pro",
   "tag": "div",
   "class": "section-custom-hero-banner",
   "settings": [
     {
       "type": "header",
-      "content": "Média"
+      "content": "━━ MÉDIA ━━"
     },
     {
       "type": "select",
@@ -241,25 +387,50 @@
       "label": "Type de contenu",
       "options": [
         { "value": "image", "label": "Image" },
-        { "value": "video", "label": "Vidéo" }
+        { "value": "video", "label": "Vidéo Shopify" },
+        { "value": "external_video", "label": "YouTube / Vimeo" }
       ],
       "default": "image"
     },
     {
       "type": "image_picker",
       "id": "image_desktop",
-      "label": "Image (desktop)"
+      "label": "Image desktop"
     },
     {
       "type": "image_picker",
       "id": "image_mobile",
       "label": "Image mobile (optionnelle)",
-      "info": "Si vide, l'image desktop est utilisée sur mobile"
+      "info": "Si vide, l'image desktop est utilisée"
+    },
+    {
+      "type": "select",
+      "id": "focal_point",
+      "label": "Point focal de l'image",
+      "options": [
+        { "value": "center-center", "label": "Centre" },
+        { "value": "center-top",    "label": "Centre haut" },
+        { "value": "center-bottom", "label": "Centre bas" },
+        { "value": "left-center",   "label": "Gauche" },
+        { "value": "right-center",  "label": "Droite" },
+        { "value": "left-top",      "label": "Haut gauche" },
+        { "value": "right-top",     "label": "Haut droite" },
+        { "value": "left-bottom",   "label": "Bas gauche" },
+        { "value": "right-bottom",  "label": "Bas droite" }
+      ],
+      "default": "center-center",
+      "info": "Contrôle la zone visible quand l'image est recadrée"
     },
     {
       "type": "video",
       "id": "video",
-      "label": "Vidéo (hébergée sur Shopify)"
+      "label": "Vidéo Shopify"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "URL YouTube ou Vimeo",
+      "info": "Ex : https://www.youtube.com/watch?v=xxx"
     },
     {
       "type": "checkbox",
@@ -269,27 +440,82 @@
     },
     {
       "type": "header",
-      "content": "Overlay"
+      "content": "━━ FILTRES IMAGE ━━"
+    },
+    {
+      "type": "range",
+      "id": "image_brightness",
+      "label": "Luminosité",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "image_contrast",
+      "label": "Contraste",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "━━ OVERLAY ━━"
+    },
+    {
+      "type": "select",
+      "id": "overlay_type",
+      "label": "Type d'overlay",
+      "options": [
+        { "value": "solid",       "label": "Couleur unie" },
+        { "value": "gradient-tb", "label": "Dégradé haut → bas" },
+        { "value": "gradient-bt", "label": "Dégradé bas → haut" },
+        { "value": "gradient-lr", "label": "Dégradé gauche → droite" },
+        { "value": "gradient-rl", "label": "Dégradé droite → gauche" },
+        { "value": "gradient-radial", "label": "Dégradé radial (centre clair)" }
+      ],
+      "default": "solid"
     },
     {
       "type": "color",
       "id": "overlay_color",
-      "label": "Couleur de l'overlay",
+      "label": "Couleur début",
       "default": "#000000"
     },
     {
       "type": "range",
       "id": "overlay_opacity",
-      "label": "Opacité de l'overlay",
+      "label": "Opacité début",
       "min": 0,
-      "max": 80,
+      "max": 95,
       "step": 5,
       "unit": "%",
       "default": 40
     },
     {
+      "type": "color",
+      "id": "overlay_color_end",
+      "label": "Couleur fin (dégradés)",
+      "default": "#000000",
+      "info": "Utilisée uniquement avec les dégradés"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity_end",
+      "label": "Opacité fin (dégradés)",
+      "min": 0,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "default": 0
+    },
+    {
       "type": "header",
-      "content": "Hauteur"
+      "content": "━━ DISPOSITION ━━"
     },
     {
       "type": "range",
@@ -310,10 +536,6 @@
       "step": 5,
       "unit": "vh",
       "default": 60
-    },
-    {
-      "type": "header",
-      "content": "Texte"
     },
     {
       "type": "select",
@@ -338,10 +560,74 @@
       "default": "middle"
     },
     {
+      "type": "range",
+      "id": "content_width",
+      "label": "Largeur du contenu",
+      "min": 40,
+      "max": 90,
+      "step": 5,
+      "unit": "rem",
+      "default": 72,
+      "info": "Contrôle la largeur max du bloc texte"
+    },
+    {
+      "type": "range",
+      "id": "elements_gap",
+      "label": "Espacement entre éléments",
+      "min": 0.8,
+      "max": 4.0,
+      "step": 0.2,
+      "unit": "rem",
+      "default": 1.6
+    },
+    {
+      "type": "header",
+      "content": "━━ BADGE ━━"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Texte du badge",
+      "placeholder": "ex : Nouveauté",
+      "info": "Laisser vide = pas de badge"
+    },
+    {
+      "type": "text",
+      "id": "badge_icon",
+      "label": "Emoji badge",
+      "placeholder": "ex : 🔥"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg",
+      "label": "Fond du badge",
+      "default": "#C9A96E"
+    },
+    {
+      "type": "color",
+      "id": "badge_color",
+      "label": "Texte du badge",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "━━ TEXTE ━━"
+    },
+    {
       "type": "color",
       "id": "text_color",
       "label": "Couleur du texte",
       "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "text_shadow_strength",
+      "label": "Ombre du texte",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 0,
+      "info": "0 = pas d'ombre, 10 = ombre forte. Améliore la lisibilité sur images claires."
     },
     {
       "type": "text",
@@ -363,9 +649,22 @@
         { "value": "sm", "label": "Petite" },
         { "value": "md", "label": "Moyenne" },
         { "value": "lg", "label": "Grande" },
-        { "value": "xl", "label": "Très grande" }
+        { "value": "xl", "label": "Très grande" },
+        { "value": "xxl", "label": "Géante" }
       ],
       "default": "lg"
+    },
+    {
+      "type": "select",
+      "id": "title_tag",
+      "label": "Balise HTML du titre",
+      "options": [
+        { "value": "h1", "label": "H1 (page d'accueil)" },
+        { "value": "h2", "label": "H2 (standard)" },
+        { "value": "p",  "label": "Paragraphe" }
+      ],
+      "default": "h2",
+      "info": "H1 recommandé pour la page d'accueil (SEO)"
     },
     {
       "type": "textarea",
@@ -375,7 +674,34 @@
     },
     {
       "type": "header",
-      "content": "Bouton principal"
+      "content": "━━ COUNTDOWN ━━"
+    },
+    {
+      "type": "text",
+      "id": "countdown_date",
+      "label": "Date de fin (YYYY-MM-DD HH:MM)",
+      "info": "Ex : 2026-06-01 23:59. Laisser vide = pas de countdown."
+    },
+    {
+      "type": "header",
+      "content": "━━ ANIMATIONS ━━"
+    },
+    {
+      "type": "select",
+      "id": "animation",
+      "label": "Animation d'entrée du texte",
+      "options": [
+        { "value": "none",      "label": "Aucune" },
+        { "value": "fade-up",   "label": "Fondu + montée" },
+        { "value": "fade-in",   "label": "Fondu simple" },
+        { "value": "slide-up",  "label": "Glissement vers le haut" },
+        { "value": "zoom-in",   "label": "Zoom entrant" }
+      ],
+      "default": "fade-up"
+    },
+    {
+      "type": "header",
+      "content": "━━ BOUTON PRINCIPAL ━━"
     },
     {
       "type": "text",
@@ -389,9 +715,15 @@
       "label": "Lien du bouton"
     },
     {
+      "type": "text",
+      "id": "cta_icon",
+      "label": "Emoji avant le texte",
+      "placeholder": "ex : 🛍️"
+    },
+    {
       "type": "select",
       "id": "cta_style",
-      "label": "Style du bouton",
+      "label": "Style",
       "options": [
         { "value": "filled",  "label": "Plein" },
         { "value": "outline", "label": "Contour" },
@@ -412,8 +744,18 @@
       "default": "#ffffff"
     },
     {
+      "type": "range",
+      "id": "cta_radius",
+      "label": "Arrondi des boutons",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 6
+    },
+    {
       "type": "header",
-      "content": "Bouton secondaire (optionnel)"
+      "content": "━━ BOUTON SECONDAIRE ━━"
     },
     {
       "type": "text",
@@ -439,24 +781,70 @@
     },
     {
       "type": "header",
-      "content": "Options"
+      "content": "━━ TRUST ICONS ━━"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_icons",
+      "label": "Afficher les icônes de confiance",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "trust_1_icon",
+      "label": "Icône 1",
+      "default": "🚚"
+    },
+    {
+      "type": "text",
+      "id": "trust_1_text",
+      "label": "Texte 1",
+      "default": "Livraison gratuite"
+    },
+    {
+      "type": "text",
+      "id": "trust_2_icon",
+      "label": "Icône 2",
+      "default": "🔒"
+    },
+    {
+      "type": "text",
+      "id": "trust_2_text",
+      "label": "Texte 2",
+      "default": "Paiement sécurisé"
+    },
+    {
+      "type": "text",
+      "id": "trust_3_icon",
+      "label": "Icône 3",
+      "default": "↩️"
+    },
+    {
+      "type": "text",
+      "id": "trust_3_text",
+      "label": "Texte 3",
+      "default": "Retours sous 30j"
+    },
+    {
+      "type": "header",
+      "content": "━━ OPTIONS ━━"
     },
     {
       "type": "checkbox",
       "id": "enable_parallax",
       "label": "Effet parallax au défilement",
       "default": true,
-      "info": "Désactivé automatiquement si l'utilisateur préfère réduire le mouvement"
+      "info": "Désactivé si l'utilisateur préfère réduire le mouvement"
     },
     {
       "type": "checkbox",
       "id": "show_scroll_arrow",
-      "label": "Afficher la flèche de défilement",
+      "label": "Flèche de défilement",
       "default": true
     },
     {
       "type": "header",
-      "content": "Espacement"
+      "content": "━━ ESPACEMENT ━━"
     },
     {
       "type": "range",
@@ -481,20 +869,26 @@
   ],
   "presets": [
     {
-      "name": "Hero Banner",
+      "name": "Hero Banner Pro",
       "settings": {
         "content_type": "image",
-        "title": "Révélez votre beauté naturelle",
-        "subtitle": "Des soins naturels conçus pour sublimer votre peau au quotidien.",
-        "cta_label": "Découvrir la collection",
+        "title": "Invisible sous tes\nvêtements.",
+        "eyebrow": "PLUS DE 1000 VENTES",
+        "subtitle": "Inoubliable dans le miroir.",
+        "cta_label": "JE VEUX LE MIEN",
         "cta_style": "filled",
-        "text_alignment": "center",
+        "text_alignment": "left",
         "text_position": "middle",
-        "height_desktop": 80,
-        "height_mobile": 60,
-        "overlay_opacity": 40,
+        "height_desktop": 85,
+        "height_mobile": 65,
+        "overlay_opacity": 35,
+        "overlay_type": "gradient-lr",
+        "animation": "fade-up",
         "enable_parallax": true,
-        "show_scroll_arrow": true
+        "show_scroll_arrow": true,
+        "title_tag": "h1",
+        "title_size": "xl",
+        "show_trust_icons": true
       }
     }
   ]
