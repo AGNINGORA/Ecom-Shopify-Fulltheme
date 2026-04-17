@@ -5,6 +5,30 @@
    ============================================================= */
 
 /* ══════════════════════════════════════════════════════════════
+   OVERRIDE — z-index et transitions (fix global-settings-popup)
+   ══════════════════════════════════════════════════════════════ */
+
+.mmp .mega-menu__content.mmp__content {
+  z-index: 4;
+  border-width: 0;
+  border-radius: 0;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.js .mmp .mega-menu__content.mmp__content {
+  opacity: 0;
+  transform: translateY(-0.8rem);
+  pointer-events: none;
+}
+
+.mmp[open] > .mega-menu__content.mmp__content {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ══════════════════════════════════════════════════════════════
    PANNEAU — Layout principal
    ══════════════════════════════════════════════════════════════ */
 
@@ -290,7 +314,7 @@
    ANIMATION ENTRÉE PANNEAU
    ══════════════════════════════════════════════════════════════ */
 
-.mmp .mega-menu__content {
+.mmp__content {
   padding-top: 2.4rem;
   padding-bottom: 2.4rem;
 }

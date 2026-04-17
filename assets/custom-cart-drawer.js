@@ -446,9 +446,11 @@
       // Interception des clics sur le panier Dawn (phase capture)
       document.addEventListener('click', (e) => {
         const trigger = e.target.closest(
-          'a[href="/cart"], [aria-controls="CartDrawer"], cart-icon-bubble, [data-open-cart-drawer]'
+          '#cart-icon-bubble, [aria-controls="CartDrawer"], [data-open-cart-drawer]'
         );
         if (!trigger) return;
+        // Ne pas intercepter les clics dans le mega menu ou d'autres dropdowns
+        if (e.target.closest('.mega-menu__content, .header__submenu, header-menu details[open]')) return;
 
         e.preventDefault();
         e.stopPropagation();
