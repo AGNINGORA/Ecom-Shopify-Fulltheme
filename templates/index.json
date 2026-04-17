@@ -287,10 +287,16 @@
     "custom_bundle_offer_FNTpAX": {
       "type": "custom-bundle-offer",
       "blocks": {
-        "bundle_product_ABnNzP": {
+        "bundle_product_HaCmWB": {
           "type": "bundle_product",
           "settings": {
-            "product": "nouveau-body-shapewear-femmes-debardeur-controle-du-ventre-corps-complet-shaper-anti-frottement-shorts-minceur-taille-formateur-bout-a-bout"
+            "product": "large-size-sexy-bra-for-women-ladies-underwear-translucent-lace-chiffon-wireless-minimizer-lingerie-brassiere-bralette-tops"
+          }
+        },
+        "bundle_product_cjJhPW": {
+          "type": "bundle_product",
+          "settings": {
+            "product": "guudia-combinaison-tunicontrol-en-ique-dex-vetements-de-compression-string-string-string-body-shapers-chi-less-wipropagation-entrejambe-ouvert"
           }
         },
         "bundle_product_JB6RLy": {
@@ -298,18 +304,12 @@
           "settings": {
             "product": "guudia-crochets-ventre-controle-culotte-mise-a-niveau-en-forme-darc-controle-sous-vetements-ventre-lisse-sans-couture-maille-bout-a-bout-levage-ensemble"
           }
-        },
-        "bundle_product_PHgUKm": {
-          "type": "bundle_product",
-          "settings": {
-            "product": "guudia-attendre-tondeuse-culotte-controle-ventre-cotele-taille-ceinture-sans-couture-shapewear-culotte-taille-haute-lisse-sur-shaper-porter"
-          }
         }
       },
       "block_order": [
-        "bundle_product_ABnNzP",
-        "bundle_product_JB6RLy",
-        "bundle_product_PHgUKm"
+        "bundle_product_HaCmWB",
+        "bundle_product_cjJhPW",
+        "bundle_product_JB6RLy"
       ],
       "name": "Offre bundle",
       "settings": {
