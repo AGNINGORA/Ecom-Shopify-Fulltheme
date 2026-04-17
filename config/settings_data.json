@@ -141,6 +141,19 @@
       },
       "custom-promo-bar": {
         "type": "custom-promo-bar",
+        "blocks": {
+          "message_gtPXFH": {
+            "type": "message",
+            "settings": {
+              "icon": "🚚",
+              "text": "Livraison gratuite dès 50 € d'achat",
+              "link": ""
+            }
+          }
+        },
+        "block_order": [
+          "message_gtPXFH"
+        ],
         "settings": {
           "enabled": true,
           "sticky": false,

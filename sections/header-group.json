@@ -11,59 +11,6 @@
   "name": "t:sections.header.name",
   "type": "header",
   "sections": {
-    "announcement-bar": {
-      "type": "custom-announcement-bar",
-      "blocks": {
-        "promo_1": {
-          "type": "announcement",
-          "settings": {
-            "icon": "🚚",
-            "text": "Livraison gratuite dès 50€ d'achat",
-            "link": "",
-            "cta_label": "",
-            "countdown_date": "",
-            "bg_color": "",
-            "text_color": ""
-          }
-        },
-        "promo_2": {
-          "type": "announcement",
-          "settings": {
-            "icon": "🔥",
-            "text": "Soldes flash — jusqu'à -40%",
-            "link": "",
-            "cta_label": "J'en profite",
-            "countdown_date": "2026-06-01 23:59",
-            "bg_color": "",
-            "text_color": ""
-          }
-        },
-        "promo_3": {
-          "type": "announcement",
-          "settings": {
-            "icon": "✨",
-            "text": "Bienvenue dans notre boutique",
-            "link": "",
-            "cta_label": "",
-            "countdown_date": "",
-            "bg_color": "",
-            "text_color": ""
-          }
-        }
-      },
-      "block_order": [
-        "promo_1",
-        "promo_2",
-        "promo_3"
-      ],
-      "settings": {
-        "bg_color": "#1a1a1a",
-        "text_color": "#ffffff",
-        "auto_rotate": true,
-        "speed": 5,
-        "show_dismiss": false
-      }
-    },
     "header": {
       "type": "header",
       "settings": {
@@ -91,7 +38,6 @@
     }
   },
   "order": [
-    "announcement-bar",
     "header"
   ]
 }
