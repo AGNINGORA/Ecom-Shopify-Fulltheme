@@ -116,7 +116,9 @@
   </div>
 
   {%- comment %} ── Overlay ──────────────────────────────────── {% endcomment %}
-  <div class="chb__overlay" aria-hidden="true"></div>
+  {%- if section.settings.overlay_opacity > 0 -%}
+    <div class="chb__overlay" aria-hidden="true"></div>
+  {%- endif -%}
 
   {%- comment %} ── Contenu texte ─────────────────────────────── {% endcomment %}
   <div class="chb__content chb__content--{{ txt_align }} chb__content--{{ txt_pos }}">

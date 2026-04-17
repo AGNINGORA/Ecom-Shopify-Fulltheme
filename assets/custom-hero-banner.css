@@ -35,6 +35,7 @@
   z-index: 0;
   will-change: transform;
   transition: transform 0s linear; /* Contrôlé par JS rAF */
+  background: rgb(var(--color-background));
 }
 
 /* Désactiver l'extra-inset si pas de parallax */
@@ -88,8 +89,8 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: var(--chb-overlay, #000);
-  opacity: var(--chb-overlay-opacity, 0.4);
+  background: var(--chb-overlay, transparent);
+  opacity: var(--chb-overlay-opacity, 0);
   pointer-events: none;
 }
 
