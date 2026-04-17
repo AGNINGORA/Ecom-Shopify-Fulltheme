@@ -1,0 +1,297 @@
+/* =============================================================
+   custom-announcement-bar.css
+   Barre d'annonce premium — auto-rotate, icônes, countdown, CTA
+   Dawn 15.x · Mobile-first
+   ============================================================= */
+
+/* ── Variables ─────────────────────────────────────────────── */
+:root {
+  --cab-height: auto;
+  --cab-speed: 0.4s;
+  --cab-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   WRAPPER
+   ══════════════════════════════════════════════════════════════ */
+
+.cab {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.cab__inner {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SLIDES
+   ══════════════════════════════════════════════════════════════ */
+
+.cab__slides {
+  position: relative;
+  width: 100%;
+}
+
+.cab__slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 1rem 4rem;
+  min-height: 4.2rem;
+  text-align: center;
+  transition: opacity var(--cab-speed) var(--cab-ease),
+              transform var(--cab-speed) var(--cab-ease);
+}
+
+/* Quand il y a plusieurs slides */
+.cab__slides--multi .cab__slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(0.6rem);
+}
+
+.cab__slides--multi .cab__slide.is-active {
+  position: relative;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* ── Icône ──────────────────────────────────────────────────── */
+.cab__icon {
+  flex-shrink: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* ── Texte ──────────────────────────────────────────────────── */
+.cab__text {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.cab__text a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.cab__text a:hover {
+  opacity: 0.8;
+}
+
+/* ── Countdown ─────────────────────────────────────────────── */
+.cab__countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin-left: 0.6rem;
+}
+
+.cab__countdown-unit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.cab__countdown-num {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.3rem;
+  min-width: 2.2rem;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.cab__countdown-sep {
+  opacity: 0.5;
+  font-size: 1.1rem;
+}
+
+.cab__countdown-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── CTA bouton ────────────────────────────────────────────── */
+.cab__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 1.2rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 99px;
+  border: 1.5px solid currentColor;
+  color: inherit;
+  white-space: nowrap;
+  transition: background 0.15s ease, transform 0.1s ease;
+  margin-left: 0.6rem;
+}
+
+.cab__cta:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.03);
+}
+
+.cab__cta svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+/* ── Navigation flèches ───────────────────────────────────── */
+.cab__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+  z-index: 2;
+  padding: 0;
+}
+
+.cab__nav:hover {
+  opacity: 1;
+}
+
+.cab__nav svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.cab__nav--prev {
+  left: 0.8rem;
+}
+
+.cab__nav--next {
+  right: 0.8rem;
+}
+
+/* Cacher les flèches s'il n'y a qu'une slide */
+.cab__slides:not(.cab__slides--multi) ~ .cab__nav {
+  display: none;
+}
+
+/* ── Barre de progression (entre les slides) ─────────────── */
+.cab__progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.3;
+  width: 0%;
+  transition: none;
+}
+
+.cab__progress.is-animating {
+  transition: width linear;
+}
+
+/* ── Bouton fermer ─────────────────────────────────────────── */
+.cab__dismiss {
+  position: absolute;
+  top: 50%;
+  right: 0.6rem;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.4;
+  transition: opacity 0.15s ease;
+  padding: 0;
+  z-index: 3;
+}
+
+.cab__dismiss:hover {
+  opacity: 1;
+}
+
+.cab__dismiss svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+/* ── État fermé ────────────────────────────────────────────── */
+.cab.is-dismissed {
+  display: none;
+}
+
+/* ── Mobile ────────────────────────────────────────────────── */
+@media screen and (max-width: 749px) {
+  .cab__slide {
+    padding: 0.8rem 3.2rem;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .cab__text {
+    font-size: 1.15rem;
+  }
+
+  .cab__cta {
+    font-size: 1.05rem;
+    padding: 0.3rem 0.8rem;
+  }
+
+  .cab__countdown-num {
+    font-size: 1.05rem;
+    min-width: 1.8rem;
+    padding: 0.1rem 0.3rem;
+  }
+
+  .cab__nav {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  .cab__nav svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+}
+
+/* ── Reduced motion ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .cab__slide {
+    transition: none;
+  }
+  .cab__progress {
+    display: none;
+  }
+}

@@ -12,27 +12,50 @@
   "type": "header",
   "sections": {
     "announcement-bar": {
-      "type": "announcement-bar",
+      "type": "custom-announcement-bar",
       "blocks": {
-        "announcement_W8XWHq": {
+        "announcement_1": {
           "type": "announcement",
           "settings": {
+            "icon": "🚚",
+            "text": "Livraison gratuite dès 50€ d'achat",
+            "link": "",
+            "cta_label": "",
+            "countdown_date": ""
+          }
+        },
+        "announcement_2": {
+          "type": "announcement",
+          "settings": {
+            "icon": "🔥",
+            "text": "Soldes — jusqu'à -40% sur une sélection",
+            "link": "",
+            "cta_label": "J'en profite",
+            "countdown_date": ""
+          }
+        },
+        "announcement_3": {
+          "type": "announcement",
+          "settings": {
+            "icon": "✨",
             "text": "Bienvenue sur votre boutique",
-            "link": ""
+            "link": "",
+            "cta_label": "",
+            "countdown_date": ""
           }
         }
       },
       "block_order": [
-        "announcement_W8XWHq"
+        "announcement_1",
+        "announcement_2",
+        "announcement_3"
       ],
       "settings": {
+        "bg_color": "#1a1a1a",
+        "text_color": "#ffffff",
         "auto_rotate": true,
-        "change_slides_speed": 5,
-        "color_scheme": "scheme-1",
-        "show_line_separator": true,
-        "show_social": false,
-        "enable_country_selector": false,
-        "enable_language_selector": false
+        "speed": 5,
+        "show_dismiss": false
       }
     },
     "header": {

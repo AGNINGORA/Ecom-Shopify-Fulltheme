@@ -1,0 +1,286 @@
+{% comment %}
+  custom-announcement-bar.liquid
+  Barre d'annonce premium — multi-slides, countdown, icônes, CTA, dismiss
+  CSS : assets/custom-announcement-bar.css
+  JS  : assets/custom-announcement-bar.js
+{% endcomment %}
+
+{%- if section.blocks.size > 0 -%}
+
+{{ 'custom-announcement-bar.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign bg_color   = section.settings.bg_color | default: '#1a1a1a'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign multi      = false
+  if section.blocks.size > 1
+    assign multi = true
+  endif
+-%}
+
+<div
+  class="cab"
+  data-cab
+  data-cab-autoplay="{{ section.settings.auto_rotate }}"
+  data-cab-speed="{{ section.settings.speed }}"
+  style="background: {{ bg_color }}; color: {{ text_color }};"
+  role="region"
+  aria-label="Annonces"
+  {{ section.shopify_attributes }}
+>
+  <div class="cab__inner">
+    <div class="cab__slides {% if multi %}cab__slides--multi{% endif %}">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign slide_bg   = block.settings.bg_color
+          assign slide_text = block.settings.text_color
+          assign has_custom = false
+          if slide_bg != blank and slide_bg != bg_color
+            assign has_custom = true
+          endif
+          if slide_text != blank and slide_text != text_color
+            assign has_custom = true
+          endif
+        -%}
+        <div
+          class="cab__slide {% if forloop.first %}is-active{% endif %}"
+          data-cab-slide
+          {% if has_custom %}
+            style="{% if slide_bg != blank %}background: {{ slide_bg }};{% endif %}{% if slide_text != blank %}color: {{ slide_text }};{% endif %}"
+          {% endif %}
+          {{ block.shopify_attributes }}
+        >
+          {%- comment %} Icône / Emoji {% endcomment %}
+          {%- if block.settings.icon != blank -%}
+            <span class="cab__icon" aria-hidden="true">{{ block.settings.icon }}</span>
+          {%- endif -%}
+
+          {%- comment %} Texte principal {% endcomment %}
+          {%- if block.settings.text != blank -%}
+            <p class="cab__text">
+              {%- if block.settings.link != blank and block.settings.cta_label == blank -%}
+                <a href="{{ block.settings.link }}">{{ block.settings.text }}</a>
+              {%- else -%}
+                {{ block.settings.text }}
+              {%- endif -%}
+
+              {%- comment %} Countdown {% endcomment %}
+              {%- if block.settings.countdown_date != blank -%}
+                <span class="cab__countdown" data-cab-countdown="{{ block.settings.countdown_date }}">
+                  <span class="cab__countdown-unit">
+                    <span class="cab__countdown-num" data-cab-d>00</span>
+                    <span class="cab__countdown-label">j</span>
+                  </span>
+                  <span class="cab__countdown-sep">:</span>
+                  <span class="cab__countdown-unit">
+                    <span class="cab__countdown-num" data-cab-h>00</span>
+                    <span class="cab__countdown-label">h</span>
+                  </span>
+                  <span class="cab__countdown-sep">:</span>
+                  <span class="cab__countdown-unit">
+                    <span class="cab__countdown-num" data-cab-m>00</span>
+                    <span class="cab__countdown-label">m</span>
+                  </span>
+                  <span class="cab__countdown-sep">:</span>
+                  <span class="cab__countdown-unit">
+                    <span class="cab__countdown-num" data-cab-s>00</span>
+                    <span class="cab__countdown-label">s</span>
+                  </span>
+                </span>
+              {%- endif -%}
+            </p>
+          {%- endif -%}
+
+          {%- comment %} Bouton CTA {% endcomment %}
+          {%- if block.settings.cta_label != blank and block.settings.link != blank -%}
+            <a class="cab__cta" href="{{ block.settings.link }}">
+              {{ block.settings.cta_label | escape }}
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    {%- comment %} Flèches navigation {% endcomment %}
+    {%- if multi -%}
+      <button class="cab__nav cab__nav--prev" data-cab-prev type="button" aria-label="Annonce précédente">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="cab__nav cab__nav--next" data-cab-next type="button" aria-label="Annonce suivante">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    {%- endif -%}
+
+    {%- comment %} Barre de progression {% endcomment %}
+    {%- if multi and section.settings.auto_rotate -%}
+      <div class="cab__progress" data-cab-progress></div>
+    {%- endif -%}
+
+    {%- comment %} Bouton fermer {% endcomment %}
+    {%- if section.settings.show_dismiss -%}
+      <button class="cab__dismiss" data-cab-dismiss type="button" aria-label="Fermer la barre d'annonce">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    {%- endif -%}
+  </div>
+</div>
+
+<script src="{{ 'custom-announcement-bar.js' | asset_url }}" defer="defer"></script>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Annonce - Barre premium",
+  "tag": "div",
+  "class": "custom-announcement-bar-section",
+  "limit": 1,
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Couleurs globales"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Couleur de fond",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Couleur du texte",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Défilement"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_rotate",
+      "label": "Rotation automatique",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Vitesse de défilement",
+      "min": 3,
+      "max": 15,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dismiss",
+      "label": "Permettre de fermer la barre",
+      "default": false,
+      "info": "Masquée pour la session en cours"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Annonce",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icône / Emoji",
+          "info": "Collez un emoji (🔥 🎁 🚚 ✨ 💎 etc.)"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texte de l'annonce",
+          "default": "Bienvenue sur notre boutique"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Lien"
+        },
+        {
+          "type": "text",
+          "id": "cta_label",
+          "label": "Texte du bouton CTA",
+          "info": "Laisser vide = pas de bouton, le texte sera cliquable"
+        },
+        {
+          "type": "header",
+          "content": "Countdown (optionnel)"
+        },
+        {
+          "type": "text",
+          "id": "countdown_date",
+          "label": "Date de fin (YYYY-MM-DD HH:MM)",
+          "info": "Ex : 2026-05-01 23:59. Laisser vide = pas de countdown."
+        },
+        {
+          "type": "header",
+          "content": "Couleurs (par annonce)"
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Fond personnalisé",
+          "info": "Laisser vide = utilise la couleur globale"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Texte personnalisé",
+          "info": "Laisser vide = utilise la couleur globale"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Annonce - Barre premium",
+      "blocks": [
+        {
+          "type": "announcement",
+          "settings": {
+            "icon": "🚚",
+            "text": "Livraison gratuite dès 50€ d'achat"
+          }
+        },
+        {
+          "type": "announcement",
+          "settings": {
+            "icon": "🔥",
+            "text": "Soldes d'été — jusqu'à -40%",
+            "cta_label": "J'en profite"
+          }
+        },
+        {
+          "type": "announcement",
+          "settings": {
+            "icon": "✨",
+            "text": "Nouveau : découvrez notre collection printemps"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
