@@ -21,7 +21,9 @@
             "text": "Livraison gratuite dès 50€ d'achat",
             "link": "",
             "cta_label": "",
-            "countdown_date": ""
+            "countdown_date": "",
+            "bg_color": "",
+            "text_color": ""
           }
         },
         "promo_2": {
@@ -31,7 +33,9 @@
             "text": "Soldes flash — jusqu'à -40%",
             "link": "",
             "cta_label": "J'en profite",
-            "countdown_date": "2026-06-01 23:59"
+            "countdown_date": "2026-06-01 23:59",
+            "bg_color": "",
+            "text_color": ""
           }
         },
         "promo_3": {
@@ -41,7 +45,9 @@
             "text": "Bienvenue dans notre boutique",
             "link": "",
             "cta_label": "",
-            "countdown_date": ""
+            "countdown_date": "",
+            "bg_color": "",
+            "text_color": ""
           }
         }
       },
@@ -64,7 +70,7 @@
         "logo_position": "middle-center",
         "mobile_logo_position": "left",
         "menu": "main-menu",
-        "menu_type_desktop": "mega-pro",
+        "menu_type_desktop": "dropdown",
         "sticky_header_type": "on-scroll-up",
         "show_line_separator": true,
         "color_scheme": "scheme-2",
@@ -72,6 +78,12 @@
         "enable_country_selector": false,
         "enable_language_selector": false,
         "enable_customer_avatar": false,
+        "mega_product_count": 3,
+        "mega_view_all_label": "VOIR TOUS LES PRODUITS",
+        "mega_promo_title": "Pack",
+        "mega_promo_text": "Optez pour des routines qui ciblent un objectif précis",
+        "mega_promo_cta": "NOS PACKS",
+        "mega_promo_link": "",
         "margin_bottom": 0,
         "padding_top": 20,
         "padding_bottom": 20
