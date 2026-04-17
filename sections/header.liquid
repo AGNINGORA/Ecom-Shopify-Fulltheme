@@ -12,9 +12,8 @@
   <link rel="stylesheet" href="{{ 'component-price.css' | asset_url }}" media="print" onload="this.media='all'">
 {%- endif -%}
 
-{%- if section.settings.menu_type_desktop == 'mega' or section.settings.menu_type_desktop == 'mega-pro' -%}
+{%- if section.settings.menu_type_desktop == 'mega' -%}
   <link rel="stylesheet" href="{{ 'component-mega-menu.css' | asset_url }}" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="{{ 'mega-menu-pro.css' | asset_url }}" media="print" onload="this.media='all'">
 {%- endif -%}
 
 <style>
@@ -200,8 +199,6 @@
       if section.settings.menu != blank
         if section.settings.menu_type_desktop == 'dropdown'
           render 'header-dropdown-menu'
-        elsif section.settings.menu_type_desktop == 'mega' or section.settings.menu_type_desktop == 'mega-pro'
-          render 'header-mega-menu-pro'
         elsif section.settings.menu_type_desktop != 'drawer'
           render 'header-mega-menu'
         endif
