@@ -141,6 +141,19 @@
       },
       "custom-promo-bar": {
         "type": "custom-promo-bar",
+        "blocks": {
+          "message_QmpXfL": {
+            "type": "message",
+            "settings": {
+              "icon": "🚚",
+              "text": "Livraison gratuite dès 50 € d'achat",
+              "link": ""
+            }
+          }
+        },
+        "block_order": [
+          "message_QmpXfL"
+        ],
         "settings": {
           "enabled": true,
           "sticky": false,
@@ -199,6 +212,8 @@
           "shipping_free_msg": "Félicitations ! Livraison gratuite !",
           "show_upsell": true,
           "upsell_title": "Vous aimerez peut-être",
+          "upsell_limit": 3,
+          "show_savings": true,
           "show_gift_options": true,
           "gift_wrapping_price": 0,
           "show_payment_icons": true,

@@ -14,6 +14,20 @@
     "announcement-bar": {
       "type": "announcement-bar",
       "blocks": {
+        "announcement_Q43pwJ": {
+          "type": "announcement",
+          "settings": {
+            "text": "Bienvenue dans notre boutique",
+            "link": ""
+          }
+        },
+        "announcement_DHELPL": {
+          "type": "announcement",
+          "settings": {
+            "text": "Bienvenue dans notre boutique",
+            "link": ""
+          }
+        },
         "announcement_W8XWHq": {
           "type": "announcement",
           "settings": {
@@ -23,6 +37,8 @@
         }
       },
       "block_order": [
+        "announcement_Q43pwJ",
+        "announcement_DHELPL",
         "announcement_W8XWHq"
       ],
       "settings": {
