@@ -234,7 +234,7 @@
       "custom-newsletter-popup": {
         "type": "custom-newsletter-popup",
         "settings": {
-          "enabled": true,
+          "enabled": false,
           "delay_seconds": 5,
           "dismiss_days": 7,
           "exit_intent": true,
