@@ -10,14 +10,6 @@
 
 {%- liquid
   assign threshold_cents = section.settings.free_shipping_threshold | times: 100
-  assign up1 = section.settings.upsell_product_1
-  assign up2 = section.settings.upsell_product_2
-  assign has_upsell = false
-  if section.settings.show_upsell
-    if up1 != blank or up2 != blank
-      assign has_upsell = true
-    endif
-  endif
   if threshold_cents > 0
     assign shipping_pct = cart.total_price | times: 100 | divided_by: threshold_cents | at_most: 100
   else
@@ -103,43 +95,17 @@
       </a>
     </div>
 
-    {%- comment %} Upsell {% endcomment %}
-    {%- if has_upsell -%}
-      <div class="ccd__upsell" data-ccd-upsell {% if cart.item_count == 0 %}hidden{% endif %}>
+    {%- comment %} Recommandations dynamiques (remplies par JS via API Shopify) {% endcomment %}
+    {%- if section.settings.show_upsell -%}
+      <div
+        class="ccd__upsell"
+        data-ccd-upsell
+        data-upsell-limit="{{ section.settings.upsell_limit | default: 3 }}"
+        {% if cart.item_count == 0 %}hidden{% endif %}
+      >
         <p class="ccd__upsell-title">{{ section.settings.upsell_title | default: 'Vous aimerez peut-être' | escape }}</p>
-        <div class="ccd__upsell-list">
-          {%- if up1 != blank and up1.available -%}
-            <div class="ccd__upsell-item" data-ccd-upsell-product data-product-id="{{ up1.id }}">
-              {%- if up1.featured_image != blank -%}
-                <img class="ccd__upsell-img" src="{{ up1.featured_image | image_url: width: 120 }}" alt="{{ up1.featured_image.alt | default: up1.title | escape }}" width="60" height="60" loading="lazy">
-              {%- endif -%}
-              <div class="ccd__upsell-info">
-                <p class="ccd__upsell-name">{{ up1.title | truncatewords: 5 | escape }}</p>
-                <p class="ccd__upsell-price">{{ up1.price | money }}</p>
-              </div>
-              <button class="ccd__upsell-add" data-ccd-upsell-add="{{ up1.first_available_variant.id }}" type="button" aria-label="Ajouter {{ up1.title | escape }}">
-                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </button>
-            </div>
-          {%- endif -%}
-          {%- if up2 != blank and up2.available -%}
-            <div class="ccd__upsell-item" data-ccd-upsell-product data-product-id="{{ up2.id }}">
-              {%- if up2.featured_image != blank -%}
-                <img class="ccd__upsell-img" src="{{ up2.featured_image | image_url: width: 120 }}" alt="{{ up2.featured_image.alt | default: up2.title | escape }}" width="60" height="60" loading="lazy">
-              {%- endif -%}
-              <div class="ccd__upsell-info">
-                <p class="ccd__upsell-name">{{ up2.title | truncatewords: 5 | escape }}</p>
-                <p class="ccd__upsell-price">{{ up2.price | money }}</p>
-              </div>
-              <button class="ccd__upsell-add" data-ccd-upsell-add="{{ up2.first_available_variant.id }}" type="button" aria-label="Ajouter {{ up2.title | escape }}">
-                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </button>
-            </div>
-          {%- endif -%}
+        <div class="ccd__upsell-list" data-ccd-upsell-list>
+          {%- comment %} Rempli dynamiquement par JS {% endcomment %}
         </div>
       </div>
     {%- endif -%}
@@ -157,6 +123,19 @@
 
   {%- comment %} ── Footer ──────────────────────────────────── {% endcomment %}
   <div class="ccd__footer" data-ccd-footer {% if cart.item_count == 0 %}hidden{% endif %}>
+    {%- comment %} Économies {% endcomment %}
+    {%- if section.settings.show_savings -%}
+      {%- assign total_savings = 0 -%}
+      {%- for item in cart.items -%}
+        {%- if item.original_line_price > item.final_line_price -%}
+          {%- assign total_savings = total_savings | plus: item.original_line_price | minus: item.final_line_price -%}
+        {%- endif -%}
+      {%- endfor -%}
+      <div class="ccd__savings" data-ccd-savings {% if total_savings == 0 %}hidden{% endif %}>
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 10L9 12L13 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span data-ccd-savings-text>Vous économisez {{ total_savings | money }}</span>
+      </div>
+    {%- endif -%}
     <div class="ccd__subtotal">
       <span class="ccd__subtotal-label">Sous-total</span>
       <span class="ccd__subtotal-price" data-ccd-total>{{ cart.total_price | money }}</span>
@@ -283,14 +262,23 @@
       "default": "Vous aimerez peut-être"
     },
     {
-      "type": "product",
-      "id": "upsell_product_1",
-      "label": "Produit recommandé 1"
+      "type": "range",
+      "id": "upsell_limit",
+      "label": "Nombre de recommandations",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3
     },
     {
-      "type": "product",
-      "id": "upsell_product_2",
-      "label": "Produit recommandé 2"
+      "type": "header",
+      "content": "Économies"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_savings",
+      "label": "Afficher le montant économisé",
+      "default": true
     },
     {
       "type": "header",

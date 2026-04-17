@@ -118,21 +118,29 @@
       this.shippingMsg  = this.drawer.querySelector('[data-ccd-shipping-msg]');
       this.shippingBar  = this.drawer.querySelector('[data-ccd-shipping-bar]');
       this.upsellWrap   = this.drawer.querySelector('[data-ccd-upsell]');
+      this.upsellList   = this.drawer.querySelector('[data-ccd-upsell-list]');
+      this.savingsWrap  = this.drawer.querySelector('[data-ccd-savings]');
+      this.savingsText  = this.drawer.querySelector('[data-ccd-savings-text]');
 
       // Config depuis data-attributes
       this.threshold  = parseInt(this.drawer.dataset.threshold, 10) || 0;
       this.showShipping = this.drawer.dataset.showShipping !== 'false';
       this.freeMsg    = this.drawer.dataset.freeMsg || 'Félicitations ! Livraison gratuite !';
+      this.upsellLimit = parseInt(this.upsellWrap?.dataset.upsellLimit, 10) || 3;
 
       this._isOpen    = false;
       this._loading   = false;
+      this._recoCache = {};
 
       this._bindEvents();
       this._hookDawnEvents();
 
       // Sync l'état upsell sur le chargement initial
       this._fetchCart().then((cart) => {
-        if (cart) this._updateUpsell(cart);
+        if (cart) {
+          this._updateUpsell(cart);
+          this._updateSavings(cart);
+        }
       });
     }
 
@@ -218,8 +226,9 @@
       if (this.emptyWrap) this.emptyWrap.hidden = !isEmpty;
       if (this.footer)    this.footer.hidden    = isEmpty;
 
-      // Upsell
+      // Upsell + Économies
       this._updateUpsell(cart);
+      this._updateSavings(cart);
     }
 
     // ── Barre livraison gratuite ──────────────────────────────────
@@ -243,19 +252,84 @@
       }
     }
 
-    // ── Upsell : marque les produits déjà dans le panier ─────────
-    _updateUpsell(cart) {
-      if (!this.upsellWrap) return;
+    // ── Recommandations dynamiques (API Shopify) ────────────────
+    async _updateUpsell(cart) {
+      if (!this.upsellWrap || !this.upsellList) return;
+
+      const isEmpty = (cart.item_count || 0) === 0;
+      this.upsellWrap.hidden = isEmpty;
+      if (isEmpty) return;
 
       const cartProductIds = new Set(cart.items.map((i) => String(i.product_id)));
-      const isEmpty        = (cart.item_count || 0) === 0;
+      const lastProductId  = cart.items[cart.items.length - 1]?.product_id;
+      if (!lastProductId) return;
 
-      this.upsellWrap.hidden = isEmpty;
+      try {
+        const products = await this._fetchRecommendations(lastProductId);
+        const filtered = products
+          .filter((p) => !cartProductIds.has(String(p.id)) && p.available)
+          .slice(0, this.upsellLimit);
 
-      this.upsellWrap.querySelectorAll('[data-ccd-upsell-product]').forEach((el) => {
-        const pid = el.dataset.productId;
-        el.classList.toggle('is-in-cart', cartProductIds.has(String(pid)));
+        if (filtered.length === 0) {
+          this.upsellWrap.hidden = true;
+          return;
+        }
+
+        this.upsellList.innerHTML = filtered.map((p) => {
+          const vid   = p.variants[0]?.id || '';
+          const img   = p.featured_image ? `<img class="ccd__upsell-img" src="${esc(p.featured_image)}" alt="${esc(p.title)}" width="60" height="60" loading="lazy">` : '';
+          const price = money(p.price);
+          const cmp   = p.compare_at_price && p.compare_at_price > p.price
+            ? `<span class="ccd__upsell-compare">${money(p.compare_at_price)}</span>`
+            : '';
+          return `
+            <div class="ccd__upsell-item" data-ccd-upsell-product data-product-id="${p.id}">
+              ${img}
+              <div class="ccd__upsell-info">
+                <p class="ccd__upsell-name">${esc(p.title)}</p>
+                <p class="ccd__upsell-price">${cmp}${price}</p>
+              </div>
+              <button class="ccd__upsell-add" data-ccd-upsell-add="${vid}" type="button" aria-label="Ajouter ${esc(p.title)}">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>`;
+        }).join('');
+      } catch (_) {
+        this.upsellWrap.hidden = true;
+      }
+    }
+
+    async _fetchRecommendations(productId) {
+      if (this._recoCache[productId]) return this._recoCache[productId];
+      try {
+        const res = await fetch(`/recommendations/products.json?product_id=${productId}&limit=8&intent=related`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        const products = data.products || [];
+        this._recoCache[productId] = products;
+        return products;
+      } catch (_) {
+        return [];
+      }
+    }
+
+    // ── Économies ────────────────────────────────────────────────
+    _updateSavings(cart) {
+      if (!this.savingsWrap || !this.savingsText) return;
+
+      let totalSavings = 0;
+      (cart.items || []).forEach((item) => {
+        if (item.original_line_price > item.final_line_price) {
+          totalSavings += item.original_line_price - item.final_line_price;
+        }
       });
+
+      if (totalSavings > 0) {
+        this.savingsWrap.hidden = false;
+        this.savingsText.textContent = `Vous économisez ${money(totalSavings)}`;
+      } else {
+        this.savingsWrap.hidden = true;
+      }
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -456,6 +530,9 @@
       this.shippingMsg  = this.drawer.querySelector('[data-ccd-shipping-msg]');
       this.shippingBar  = this.drawer.querySelector('[data-ccd-shipping-bar]');
       this.upsellWrap   = this.drawer.querySelector('[data-ccd-upsell]');
+      this.upsellList   = this.drawer.querySelector('[data-ccd-upsell-list]');
+      this.savingsWrap  = this.drawer.querySelector('[data-ccd-savings]');
+      this.savingsText  = this.drawer.querySelector('[data-ccd-savings-text]');
       this.closeBtn   = this.drawer.querySelector('[data-ccd-close]');
       this.threshold  = parseInt(this.drawer.dataset.threshold, 10) || 0;
       this.freeMsg    = this.drawer.dataset.freeMsg || '';

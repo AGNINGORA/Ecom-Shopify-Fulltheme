@@ -1,0 +1,144 @@
+{% comment %}
+  custom-product-addons.liquid
+  Add-ons / accessoires à ajouter avec le produit principal
+  Dawn 15.x · Blocks dynamiques
+  CSS : assets/custom-product-addons.css
+  JS  : assets/custom-product-addons.js
+{% endcomment %}
+
+{%- if section.blocks.size > 0 -%}
+
+{{ 'custom-product-addons.css' | asset_url | stylesheet_tag }}
+
+<div
+  class="cpa"
+  data-cpa-section
+  style="--cpa-accent: {{ section.settings.accent_color }};"
+  {{ section.shopify_attributes }}
+>
+  {%- if section.settings.title != blank -%}
+    <p class="cpa__title">{{ section.settings.title | escape }}</p>
+  {%- endif -%}
+
+  <div class="cpa__list">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign addon_product = block.settings.product
+        if addon_product == blank
+          continue
+        endif
+        assign variant = addon_product.first_available_variant
+        if variant == blank
+          continue
+        endif
+        assign addon_price = variant.price
+        assign addon_free  = false
+        if addon_price == 0
+          assign addon_free = true
+        endif
+      -%}
+
+      <div
+        class="cpa__item"
+        data-cpa-item
+        data-variant-id="{{ variant.id }}"
+        data-price="{{ addon_price }}"
+        {{ block.shopify_attributes }}
+      >
+        <div class="cpa__check" aria-hidden="true"></div>
+
+        {%- if addon_product.featured_image != blank -%}
+          <img
+            class="cpa__img"
+            src="{{ addon_product.featured_image | image_url: width: 120 }}"
+            alt="{{ addon_product.featured_image.alt | default: addon_product.title | escape }}"
+            width="48"
+            height="48"
+            loading="lazy"
+          >
+        {%- endif -%}
+
+        <div class="cpa__info">
+          <p class="cpa__name">{{ block.settings.label | default: addon_product.title | escape }}</p>
+          {%- if block.settings.description != blank -%}
+            <p class="cpa__desc">{{ block.settings.description | escape }}</p>
+          {%- endif -%}
+        </div>
+
+        <span class="cpa__price {% if addon_free %}cpa__price--free{% endif %}">
+          {%- if addon_free -%}
+            Gratuit
+          {%- else -%}
+            +{{ addon_price | money }}
+          {%- endif -%}
+        </span>
+      </div>
+    {%- endfor -%}
+  </div>
+
+  <div class="cpa__summary" data-cpa-summary>
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M7 10L9 12L13 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+    </svg>
+    <span data-cpa-summary-text></span>
+  </div>
+</div>
+
+<script src="{{ 'custom-product-addons.js' | asset_url }}" defer="defer"></script>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Produit - Add-ons",
+  "tag": "div",
+  "class": "section-product-addons",
+  "limit": 1,
+  "templates": ["product"],
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre de la section",
+      "default": "Ajoutez à votre commande"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d'accent",
+      "default": "#C9A96E"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "addon",
+      "name": "Add-on",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Produit add-on"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Nom personnalisé (optionnel)",
+          "info": "Si vide, le nom du produit sera utilisé"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Courte description (optionnel)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Produit - Add-ons"
+    }
+  ]
+}
+{% endschema %}
