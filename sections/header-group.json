@@ -28,6 +28,7 @@
         "enable_customer_avatar": false,
         "mega_product_count": 3,
         "mega_view_all_label": "VOIR TOUS LES PRODUITS",
+        "mega_promo_image": "shopify://shop_images/427f4052e1097639d3f70cfa37c9234a.jpg",
         "mega_promo_title": "Pack",
         "mega_promo_text": "Optez pour des routines qui ciblent un objectif précis",
         "mega_promo_cta": "NOS PACKS",

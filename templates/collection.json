@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "banner": {
@@ -16,8 +25,22 @@
         "show_filters": true,
         "filter_layout": "sidebar",
         "show_sort": true,
-        "padding_top": 36,
-        "padding_bottom": 36
+        "pagination_type": "load_more",
+        "accent_color": "#c9a96e",
+        "card_style": "showcase",
+        "image_ratio": "square",
+        "card_radius": 12,
+        "card_bg_color": "#f9f9f9",
+        "show_vendor": false,
+        "show_price": true,
+        "show_rating": true,
+        "show_feature_tags": true,
+        "tag_prefix": "feat:",
+        "show_badges": true,
+        "show_hover_image": true,
+        "show_swatches": true,
+        "show_atc_button": true,
+        "atc_label": "Acheter"
       }
     },
     "recently-viewed": {
@@ -26,9 +49,7 @@
         "title": "Récemment consultés",
         "max_products": 8,
         "columns": "4",
-        "accent_color": "#C9A96E",
-        "padding_top": 48,
-        "padding_bottom": 80
+        "accent_color": "#c9a96e"
       }
     }
   },

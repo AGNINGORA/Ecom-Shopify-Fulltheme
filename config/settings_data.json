@@ -142,7 +142,7 @@
       "custom-promo-bar": {
         "type": "custom-promo-bar",
         "blocks": {
-          "message_gtPXFH": {
+          "message_TQpiXr": {
             "type": "message",
             "settings": {
               "icon": "🚚",
@@ -152,7 +152,7 @@
           }
         },
         "block_order": [
-          "message_gtPXFH"
+          "message_TQpiXr"
         ],
         "settings": {
           "enabled": true,
@@ -168,7 +168,7 @@
         "type": "custom-shipping-bar",
         "settings": {
           "enabled": true,
-          "bar_style": "banner",
+          "bar_style": "minimal",
           "bar_position": "top",
           "make_sticky": true,
           "layout": "inline",
