@@ -153,11 +153,12 @@
       },
       "custom-shipping-bar": {
         "type": "custom-shipping-bar",
+        "custom_css": [],
         "settings": {
           "enabled": true,
           "bar_style": "minimal",
           "bar_position": "top",
-          "make_sticky": true,
+          "make_sticky": false,
           "layout": "inline",
           "threshold": 50,
           "hide_when_free": false,
@@ -169,7 +170,7 @@
           "message_prefix": "Plus que",
           "message_suffix": "pour la livraison gratuite !",
           "message_free": "Livraison gratuite !",
-          "bg_color": "#00000b",
+          "bg_color": "#3535a5",
           "text_color": "#494541",
           "highlight_color": "#c9a96e",
           "bar_color": "#c9a96e",
