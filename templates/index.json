@@ -48,21 +48,16 @@
             "text": "<p>Ça me va comme un gant. Ça me façonne le corps à la perfection, je commande toutes les couleurs.</p>"
           }
         },
-        "button_RydREd": {
-          "type": "button",
+        "text_tA76Me": {
+          "type": "text",
           "settings": {
-            "button_label": "Texte du bouton",
-            "button_link": "",
-            "button_style_secondary": false,
-            "button_label_2": "",
-            "button_link_2": "",
-            "button_style_secondary_2": false
+            "text": "<p>- Maryline </p>"
           }
         }
       },
       "block_order": [
         "text_YRVqwi",
-        "button_RydREd"
+        "text_tA76Me"
       ],
       "name": "t:sections.rich-text.presets.name",
       "settings": {
@@ -70,8 +65,8 @@
         "content_alignment": "center",
         "color_scheme": "scheme-3",
         "full_width": true,
-        "padding_top": 40,
-        "padding_bottom": 52
+        "padding_top": 68,
+        "padding_bottom": 72
       }
     },
     "rich_text_APQUHz": {

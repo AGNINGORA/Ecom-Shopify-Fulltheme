@@ -67,8 +67,8 @@
         "btn_secondary_label": "Consultez notre aide",
         "btn_secondary_url": "",
         "faq_title": "Questions fréquentes",
-        "contact_bg": "#F7F5F2",
-        "accent_color": "#C9A96E",
+        "contact_bg": "#f7f5f2",
+        "accent_color": "#c9a96e",
         "padding_top": 64,
         "padding_bottom": 64
       }
@@ -76,7 +76,7 @@
     "footer": {
       "type": "footer",
       "settings": {
-        "color_scheme": "scheme-1",
+        "color_scheme": "scheme-3",
         "newsletter_enable": true,
         "newsletter_heading": "Subscribe to our emails",
         "enable_follow_on_shop": true,

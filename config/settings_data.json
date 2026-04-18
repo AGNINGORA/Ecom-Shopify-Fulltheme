@@ -285,12 +285,12 @@
       },
       "scheme-3": {
         "settings": {
-          "background": "#ffd6b6",
+          "background": "#5e2b00",
           "background_gradient": "",
-          "text": "#111111",
+          "text": "#ffffff",
           "button": "#ffffff",
           "button_label": "#000000",
-          "secondary_button_label": "#ffffff",
+          "secondary_button_label": "#be9e76",
           "shadow": "#121212"
         }
       },
