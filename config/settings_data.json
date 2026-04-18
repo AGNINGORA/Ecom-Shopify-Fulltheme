@@ -141,19 +141,6 @@
       },
       "custom-promo-bar": {
         "type": "custom-promo-bar",
-        "blocks": {
-          "message_TQpiXr": {
-            "type": "message",
-            "settings": {
-              "icon": "🚚",
-              "text": "Livraison gratuite dès 50 € d'achat",
-              "link": ""
-            }
-          }
-        },
-        "block_order": [
-          "message_TQpiXr"
-        ],
         "settings": {
           "enabled": true,
           "sticky": false,
@@ -182,8 +169,8 @@
           "message_prefix": "Plus que",
           "message_suffix": "pour la livraison gratuite !",
           "message_free": "Livraison gratuite !",
-          "bg_color": "#1a1a2e",
-          "text_color": "#ffffff",
+          "bg_color": "#00000b",
+          "text_color": "#494541",
           "highlight_color": "#c9a96e",
           "bar_color": "#c9a96e",
           "bar_free_color": "#00ff26",
@@ -290,7 +277,7 @@
       },
       "scheme-3": {
         "settings": {
-          "background": "#a95100",
+          "background": "#494541",
           "background_gradient": "",
           "text": "#111111",
           "button": "#ffffff",
