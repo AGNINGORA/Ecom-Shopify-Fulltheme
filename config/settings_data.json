@@ -234,12 +234,12 @@
       "custom-newsletter-popup": {
         "type": "custom-newsletter-popup",
         "settings": {
-          "enabled": false,
+          "enabled": true,
           "delay_seconds": 5,
           "dismiss_days": 7,
           "exit_intent": true,
           "hide_on_mobile": false,
-          "image_bg": "#f0ece6",
+          "image_bg": "#111111",
           "eyebrow": "Offre exclusive",
           "title": "Profitez de -10% sur votre première commande",
           "subtitle": "Inscrivez-vous à notre newsletter et recevez votre code de réduction.",
@@ -277,17 +277,6 @@
     },
     "content_for_index": [],
     "color_schemes": {
-      "scheme-1": {
-        "settings": {
-          "background": "#632f00",
-          "background_gradient": "",
-          "text": "#ffffff",
-          "button": "#a95100",
-          "button_label": "#ffffff",
-          "secondary_button_label": "#121212",
-          "shadow": "#121212"
-        }
-      },
       "scheme-2": {
         "settings": {
           "background": "#f3f3f3",
