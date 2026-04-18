@@ -461,10 +461,12 @@
     // ── Connexion aux événements Dawn (PubSub + custom events) ────
     _hookDawnEvents() {
       // Dawn 15 PubSub : subscribe est global
+      // Ne PAS appeler open() ici — seule une action utilisateur doit ouvrir le drawer.
+      // cart-update sert uniquement à synchroniser les données (compteur, total, items).
       if (typeof subscribe === 'function') {
         try {
           subscribe('cart-update', () => {
-            this.fetchAndRender().then(() => this.open());
+            this.fetchAndRender();
           });
         } catch (_) { /* noop si PubSub indisponible */ }
       }
