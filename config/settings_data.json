@@ -263,6 +263,13 @@
       }
     },
     "content_for_index": [],
+    "blocks": {
+      "14060646107696862457": {
+        "type": "shopify://apps/judge-me-reviews/blocks/judgeme_core/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+        "disabled": true,
+        "settings": {}
+      }
+    },
     "color_schemes": {
       "scheme-2": {
         "settings": {
@@ -277,7 +284,7 @@
       },
       "scheme-3": {
         "settings": {
-          "background": "#494541",
+          "background": "#ffd6b6",
           "background_gradient": "",
           "text": "#111111",
           "button": "#ffffff",

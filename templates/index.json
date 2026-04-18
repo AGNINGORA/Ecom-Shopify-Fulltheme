@@ -68,7 +68,7 @@
       "settings": {
         "desktop_content_position": "center",
         "content_alignment": "center",
-        "color_scheme": "scheme-2",
+        "color_scheme": "scheme-3",
         "full_width": true,
         "padding_top": 40,
         "padding_bottom": 52
@@ -229,13 +229,14 @@
       "type": "custom-image-text",
       "settings": {
         "layout": "image_left",
+        "image": "shopify://shop_images/297b01b8b75dadc2bd92f959019c438c.jpg",
         "image_alt": "",
         "eyebrow": "NOTRE HISTOIRE",
         "title": "Pensé pour vous, créé avec soin",
         "text": "<p>Chaque pièce est le fruit d'un savoir-faire artisanal, alliant matières nobles et coupes modernes. Nous croyons qu'un vêtement doit raconter une histoire — la vôtre.</p><p>De la sélection des tissus à la confection finale, chaque détail est pensé pour offrir confort, élégance et durabilité au quotidien.</p>",
         "button_label": "En savoir plus",
         "button_url": "",
-        "section_bg": "#111111",
+        "section_bg": "#ffffff",
         "text_color": "#111111",
         "accent_color": "#c9a96e",
         "button_bg": "#111111",
@@ -256,6 +257,90 @@
         "text_color": "#111111",
         "padding_top": 72,
         "padding_bottom": 72
+      }
+    },
+    "multicolumn_PFhHJM": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_YqgkeB": {
+          "type": "column",
+          "settings": {
+            "title": "Colonne",
+            "text": "<p>Associez un texte à une image pour mettre en avant le produit, la collection ou l’article de blog de votre choix. Ajoutez des informations sur la disponibilité ou le style. Vous pouvez même fournir un avis.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "column_YwELjY": {
+          "type": "column",
+          "settings": {
+            "title": "Colonne",
+            "text": "<p>Associez un texte à une image pour mettre en avant le produit, la collection ou l’article de blog de votre choix. Ajoutez des informations sur la disponibilité ou le style. Vous pouvez même fournir un avis.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "column_Q4MT4g": {
+          "type": "column",
+          "settings": {
+            "title": "Colonne",
+            "text": "<p>Associez un texte à une image pour mettre en avant le produit, la collection ou l’article de blog de votre choix. Ajoutez des informations sur la disponibilité ou le style. Vous pouvez même fournir un avis.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "column_mKKiqD": {
+          "type": "column",
+          "settings": {
+            "title": "Colonne",
+            "text": "<p>Associez un texte à une image pour mettre en avant le produit, la collection ou l’article de blog de votre choix. Ajoutez des informations sur la disponibilité ou le style. Vous pouvez même fournir un avis.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "column_wqkX9J": {
+          "type": "column",
+          "settings": {
+            "title": "Colonne",
+            "text": "<p>Associez un texte à une image pour mettre en avant le produit, la collection ou l’article de blog de votre choix. Ajoutez des informations sur la disponibilité ou le style. Vous pouvez même fournir un avis.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "column_UtXgwk": {
+          "type": "column",
+          "settings": {
+            "title": "Colonne",
+            "text": "<p>Associez un texte à une image pour mettre en avant le produit, la collection ou l’article de blog de votre choix. Ajoutez des informations sur la disponibilité ou le style. Vous pouvez même fournir un avis.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "column_YqgkeB",
+        "column_YwELjY",
+        "column_Q4MT4g",
+        "column_mKKiqD",
+        "column_wqkX9J",
+        "column_UtXgwk"
+      ],
+      "name": "t:sections.multicolumn.presets.name",
+      "settings": {
+        "title": "6 promesses confirmées par vos avis",
+        "heading_size": "h1",
+        "image_width": "full",
+        "image_ratio": "adapt",
+        "button_label": "Commander",
+        "button_link": "",
+        "columns_desktop": 3,
+        "column_alignment": "left",
+        "background_style": "primary",
+        "color_scheme": "",
+        "columns_mobile": "2",
+        "swipe_on_mobile": false,
+        "padding_top": 36,
+        "padding_bottom": 36
       }
     },
     "custom_reviews_mHwf3V": {
@@ -402,6 +487,7 @@
     "featured-product",
     "image-text",
     "testimonials",
+    "multicolumn_PFhHJM",
     "custom_reviews_mHwf3V",
     "custom_bundle_offer_FNTpAX"
   ]
