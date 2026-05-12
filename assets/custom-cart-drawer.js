@@ -444,7 +444,7 @@
       });
 
       // Interception des clics sur le panier Dawn (phase capture)
-      document.addEventListener('click', (e) => {
+      this._captureHandler = (e) => {
         const trigger = e.target.closest(
           '#cart-icon-bubble, [aria-controls="CartDrawer"], [data-open-cart-drawer]'
         );
@@ -453,9 +453,10 @@
         if (e.target.closest('.mega-menu__content, .header__submenu, header-menu details[open]')) return;
 
         e.preventDefault();
-        e.stopPropagation();
+        e.stopImmediatePropagation();
         this.fetchAndRender().then(() => this.open());
-      }, true);
+      };
+      document.addEventListener('click', this._captureHandler, true);
     }
 
     // ── Connexion aux événements Dawn (PubSub + custom events) ────
@@ -522,6 +523,11 @@
 
     // Ré-init après rechargement de section dans l'éditeur
     _reInit() {
+      // Supprimer l'ancien handler capture avant de rebinder
+      if (this._captureHandler) {
+        document.removeEventListener('click', this._captureHandler, true);
+        this._captureHandler = null;
+      }
       this.drawer     = document.getElementById('custom-cart-drawer');
       this.overlay    = document.querySelector('[data-ccd-overlay]');
       if (!this.drawer) return;
