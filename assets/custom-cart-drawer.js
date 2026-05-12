@@ -134,6 +134,7 @@
 
       this._bindEvents();
       this._hookDawnEvents();
+      this._suppressCartNotification();
 
       // Sync l'état upsell sur le chargement initial
       this._fetchCart().then((cart) => {
@@ -460,6 +461,29 @@
         this.fetchAndRender().then(() => this.open());
       };
       document.addEventListener('click', this._captureHandler, true);
+    }
+
+    // ── Supprime l'ouverture de la cart-notification Dawn ────────
+    // product-form.js appelle this.cart.renderContents(response) sur l'élément
+    // cart-notification, ce qui déclenche open() → flash visible pendant ~1 frame
+    // avant que notre drawer custom s'ouvre. On remplace renderContents par une
+    // version qui met à jour uniquement le compteur de bulle sans ouvrir le popup.
+    _suppressCartNotification() {
+      const notif = document.querySelector('cart-notification');
+      if (!notif || typeof notif.renderContents !== 'function') return;
+
+      notif.renderContents = (parsedState) => {
+        try {
+          const bubbleEl = document.getElementById('cart-icon-bubble');
+          const sectionHtml = parsedState?.sections?.['cart-icon-bubble'];
+          if (bubbleEl && sectionHtml) {
+            const parsed = new DOMParser().parseFromString(sectionHtml, 'text/html');
+            const inner  = parsed.querySelector('.shopify-section');
+            if (inner) bubbleEl.innerHTML = inner.innerHTML;
+          }
+        } catch (_) { /* noop */ }
+        // Ne PAS appeler notif.open() — notre custom drawer gère l'affichage
+      };
     }
 
     // ── Connexion aux événements Dawn (PubSub + custom events) ────
