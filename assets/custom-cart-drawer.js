@@ -457,10 +457,10 @@
         if (e.target.closest('.header__inline-menu, .mega-menu__content')) return;
 
         e.preventDefault();
-        e.stopImmediatePropagation();
+        e.stopPropagation();
         this.fetchAndRender().then(() => this.open());
       };
-      document.addEventListener('click', this._captureHandler, true);
+      document.addEventListener('click', this._captureHandler);
     }
 
     // ── Supprime l'ouverture de la cart-notification Dawn ────────
