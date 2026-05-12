@@ -475,12 +475,12 @@
             if (event?.source === 'product-form') {
               this.fetchAndRender().then(() => {
                 this.open();
-                // Fermer la cart-notification Dawn qui s'ouvre en même temps
-                setTimeout(() => {
+                // Fermer la cart-notification Dawn au prochain frame (avant qu'elle soit visible)
+                requestAnimationFrame(() => {
                   const notif = document.querySelector('cart-notification');
                   if (notif?.close) notif.close();
-                  else if (notif) notif.classList.remove('active');
-                }, 50);
+                  else if (notif) notif.classList.remove('animate', 'active');
+                });
               });
             } else {
               this.fetchAndRender();
