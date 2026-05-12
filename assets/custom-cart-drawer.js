@@ -443,14 +443,17 @@
         }
       });
 
-      // Interception des clics sur le panier Dawn (phase capture)
+      // Interception des clics sur le panier (phase capture)
+      // GUARD : on cible UNIQUEMENT #cart-icon-bubble et les triggers explicites.
+      // [aria-controls="CartDrawer"] a été retiré — global.js peut injecter aria-
+      // controls sur n'importe quel <summary> de <details id="Details-*">, ce qui
+      // causait l'ouverture du drawer lors de clics sur les liens de navigation.
       this._captureHandler = (e) => {
-        const trigger = e.target.closest(
-          '#cart-icon-bubble, [aria-controls="CartDrawer"], [data-open-cart-drawer]'
-        );
+        const trigger = e.target.closest('#cart-icon-bubble, [data-open-cart-drawer]');
         if (!trigger) return;
-        // Ne pas intercepter les clics dans le mega menu ou d'autres dropdowns
-        if (e.target.closest('.mega-menu__content, .header__submenu, header-menu details[open]')) return;
+
+        // Guard supplémentaire : exclure tout clic dans la nav (liens de menu)
+        if (e.target.closest('.header__inline-menu, .mega-menu__content')) return;
 
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -466,8 +469,22 @@
       // cart-update sert uniquement à synchroniser les données (compteur, total, items).
       if (typeof subscribe === 'function') {
         try {
-          subscribe('cart-update', () => {
-            this.fetchAndRender();
+          subscribe('cart-update', (event) => {
+            // Si l'ATC vient du product-form Dawn standard, on ouvre le drawer
+            // et on supprime la cart-notification (elle est redondante avec notre drawer).
+            if (event?.source === 'product-form') {
+              this.fetchAndRender().then(() => {
+                this.open();
+                // Fermer la cart-notification Dawn qui s'ouvre en même temps
+                setTimeout(() => {
+                  const notif = document.querySelector('cart-notification');
+                  if (notif?.close) notif.close();
+                  else if (notif) notif.classList.remove('active');
+                }, 50);
+              });
+            } else {
+              this.fetchAndRender();
+            }
           });
         } catch (_) { /* noop si PubSub indisponible */ }
       }

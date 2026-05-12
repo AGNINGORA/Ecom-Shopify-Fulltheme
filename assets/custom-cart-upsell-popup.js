@@ -351,43 +351,48 @@
       this.overlay?.addEventListener('click', () => this.close());
     }
 
-    // ── Écoute les soumissions de formulaires ATC ─────────────
+    // ── Écoute le PubSub cart-update de Dawn (plus d'interception form submit) ─
     _listenATC() {
-      document.addEventListener('submit', async (e) => {
-        const form = e.target;
-        if (form.dataset.type !== 'add-to-cart-form') return;
+      // ARCHITECTURE FIX :
+      // Anciennement : interception document.addEventListener('submit') → double
+      // appel /cart/add.json + conflit avec product-form.js et custom-sticky-cart.js.
+      //
+      // Nouvelle approche : on écoute l'événement PubSub 'cart-update' que
+      // product-form.js dispatch après un ATC réussi. Cela garantit :
+      // 1. Pas de double add-to-cart
+      // 2. Le popup n'ouvre que si le custom cart drawer n'est PAS déjà actif
+      // 3. Les composants custom (quantity-breaks, sticky-cart) qui appellent
+      //    directement ccd.open() ne déclenchent pas en plus le popup
 
-        e.preventDefault();
+      if (typeof subscribe !== 'function') {
+        // Fallback : écouter l'événement custom dispatché par nos composants
+        document.addEventListener('cart:atc-success', (e) => {
+          if (window._ccdInstance) return; // Drawer gère déjà
+          const { item, cart } = e.detail || {};
+          if (item && cart) this.open(item, cart);
+        });
+        return;
+      }
 
-        const formData = new FormData(form);
-        const submitBtn = form.querySelector('[name="add"]');
-        if (submitBtn) submitBtn.disabled = true;
+      try {
+        subscribe('cart-update', async (event) => {
+          // Ne réagir qu'aux ATC via le product-form Dawn standard
+          if (event?.source !== 'product-form') return;
 
-        try {
-          const res = await fetch('/cart/add.json', {
-            method:  'POST',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            body:    formData,
-          });
-          if (!res.ok) throw new Error('ATC failed');
+          // Si le custom cart drawer est actif, il gère l'affichage — ce
+          // popup est redondant et crée du bruit visuel
+          if (window._ccdInstance) return;
 
-          const item     = await res.json();
-          const cartRes  = await fetch('/cart.json');
-          const cartData = await cartRes.json();
-
-          // Dispatch pour mettre à jour drawer / header count
-          document.dispatchEvent(new CustomEvent('cart:updated', { detail: cartData }));
-
-          this.open(item, cartData);
-
-        } catch (err) {
-          console.warn('[CartUpsellPopup] ATC error:', err);
-          // Fallback : soumission native
-          form.submit();
-        } finally {
-          if (submitBtn) submitBtn.disabled = false;
-        }
-      });
+          try {
+            const item    = event.cartData;       // données de l'article ajouté
+            const cartRes = await fetch('/cart.json');
+            const cart    = await cartRes.json();
+            this.open(item, cart);
+          } catch (err) {
+            console.warn('[CartUpsellPopup] Erreur chargement panier :', err);
+          }
+        });
+      } catch (e) { /* noop si PubSub indisponible */ }
     }
   }
 
