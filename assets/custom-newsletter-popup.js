@@ -208,14 +208,11 @@
     init();
   }
 
-  // Rechargement éditeur de thème — prévisualiser immédiatement
+  // Rechargement éditeur de thème — ré-initialiser sans forcer l'affichage
   document.addEventListener('shopify:section:load', (e) => {
     const el = e.target.querySelector('[data-cnp]');
     if (!el) return;
     el._cnpInit = null;
-    // En mode éditeur, ignorer les vérifications localStorage
-    const popup = new NewsletterPopup(el);
-    popup._shown = false;
-    popup._show();
+    el._cnpInit = new NewsletterPopup(el);
   });
 })();
