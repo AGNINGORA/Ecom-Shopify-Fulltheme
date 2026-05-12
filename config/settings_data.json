@@ -206,7 +206,7 @@
           "gift_wrapping_price": 0,
           "show_payment_icons": true,
           "accent_color": "#111111",
-          "btn_text_color": "#111111"
+          "btn_text_color": "#f3f3f3"
         }
       },
       "custom-social-proof": {
