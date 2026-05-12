@@ -36,9 +36,23 @@
         "padding_top": 20,
         "padding_bottom": 20
       }
+    },
+    "custom_mega_menu_LwCP69": {
+      "type": "custom-mega-menu",
+      "name": "Mega Menu",
+      "settings": {
+        "menu": "main-menu",
+        "show_logo": false,
+        "sticky": true,
+        "bar_height": 56,
+        "bg_color": "#FFFFFF",
+        "link_color": "#111111",
+        "accent_color": "#C9A96E"
+      }
     }
   },
   "order": [
-    "header"
+    "header",
+    "custom_mega_menu_LwCP69"
   ]
 }
