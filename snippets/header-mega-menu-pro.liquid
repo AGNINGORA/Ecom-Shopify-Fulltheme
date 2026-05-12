@@ -2,8 +2,8 @@
   header-mega-menu-pro.liquid
   Mega menu professionnel — affiche les produits de la collection liée
   + un bloc promo configurable à droite + bouton "Voir tous"
-  N'utilise PAS <header-menu> (son onFocusOut ferme le panneau immédiatement).
-  Gestion manuelle : clic extérieur, Escape, fermeture des autres panneaux.
+  N'utilise PAS <header-menu> ni les classes Dawn mega-menu / mega-menu__content
+  pour éviter tout conflit avec component-mega-menu.css.
 {% endcomment %}
 
 <nav class="header__inline-menu">
@@ -11,11 +11,11 @@
     {%- for link in section.settings.menu.links -%}
       <li>
         {%- if link.links != blank -%}
-          {%- comment %} PAS de <header-menu> — on utilise <details> natif {% endcomment %}
-          <details id="Details-MMP-{{ forloop.index }}" class="mega-menu mmp">
+          <details id="Details-MMP-{{ forloop.index }}" class="mmp__details">
             <summary
               id="HeaderMenu-{{ link.handle }}"
               class="header__menu-item list-menu__item link focus-inset"
+              aria-expanded="false"
             >
               <span
                 {%- if link.child_active %}
@@ -29,7 +29,7 @@
 
             <div
               id="MegaMenu-Content-{{ forloop.index }}"
-              class="mega-menu__content mmp__content color-{{ section.settings.menu_color_scheme }} gradient"
+              class="mmp__panel"
               tabindex="-1"
             >
               <div class="mmp__grid page-width">
@@ -168,55 +168,61 @@
 </nav>
 
 <script>
-  /* ── Mega Menu Pro — gestion ouverture/fermeture sans header-menu ── */
+  /* ── Mega Menu Pro — gestion ouverture/fermeture ── */
   (function() {
-    const allMenus = document.querySelectorAll('details.mmp');
-    if (!allMenus.length) return;
+    var allDetails = Array.from(document.querySelectorAll('details.mmp__details'));
+    if (!allDetails.length) return;
 
-    function closeAll(except) {
-      allMenus.forEach(function(d) {
-        if (d !== except && d.hasAttribute('open')) d.removeAttribute('open');
-      });
+    /* Purger les aria-controls injectés par global.js
+       (évite tout faux-match avec le cart drawer capture listener) */
+    allDetails.forEach(function(d) {
+      var s = d.querySelector('summary');
+      if (s) s.removeAttribute('aria-controls');
+    });
+
+    function setOpen(details, open) {
+      var summary = details.querySelector('summary');
+      if (open) {
+        details.setAttribute('open', '');
+        if (summary) summary.setAttribute('aria-expanded', 'true');
+      } else {
+        details.removeAttribute('open');
+        if (summary) summary.setAttribute('aria-expanded', 'false');
+      }
     }
 
-    /* BUG 2 FIX — Purger les aria-controls injectés par global.js sur les
-       summaries MMP. global.js scanne [id^="Details-"] et assigne aria-controls
-       = id du contenu. Notre cart drawer capture listener cible
-       [aria-controls="CartDrawer"] : en isolant nos summaries, on évite tout
-       faux match futur si les IDs changent. */
-    allMenus.forEach(function(details) {
-      var summary = details.querySelector('summary');
-      if (summary) {
-        summary.removeAttribute('aria-controls');
-        summary.removeAttribute('aria-expanded');
-      }
-    });
+    function closeAll() {
+      allDetails.forEach(function(d) { setOpen(d, false); });
+    }
 
-    /* Ouvrir un seul panneau à la fois */
-    allMenus.forEach(function(details) {
-      details.addEventListener('toggle', function() {
-        if (details.open) closeAll(details);
+    function openOne(details) {
+      allDetails.forEach(function(d) { if (d !== details) setOpen(d, false); });
+      setOpen(details, true);
+    }
+
+    allDetails.forEach(function(details) {
+      var summary = details.querySelector('summary');
+      if (!summary) return;
+
+      summary.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (details.hasAttribute('open')) {
+          closeAll();
+        } else {
+          openOne(details);
+        }
       });
-
-      /* BUG 2 FIX — Stopper la propagation du clic sur le summary en phase
-         capture : empêche que le click atteigne d'autres listeners document
-         (cart drawer, global.js) qui pourraient mal interpréter l'événement. */
-      var summary = details.querySelector('summary');
-      if (summary) {
-        summary.addEventListener('click', function(e) {
-          e.stopPropagation();
-        });
-      }
     });
 
-    /* Clic extérieur → fermer (phase bubble, après les listeners internes) */
+    /* Clic extérieur → fermer */
     document.addEventListener('click', function(e) {
-      if (!e.target.closest('details.mmp')) closeAll(null);
+      if (!e.target.closest('details.mmp__details')) closeAll();
     });
 
     /* Escape → fermer */
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeAll(null);
+      if (e.key === 'Escape') closeAll();
     });
   })();
 </script>
