@@ -5,27 +5,45 @@
    ============================================================= */
 
 /* ══════════════════════════════════════════════════════════════
-   OVERRIDE — z-index et transitions (fix global-settings-popup)
+   POSITIONNEMENT — details.mmp (hors du <style> inline snippet)
+   ══════════════════════════════════════════════════════════════ */
+
+details.mmp {
+  position: static !important;
+}
+
+details.mmp > .mmp__content {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 100% !important;
+  z-index: 200 !important;
+  background-color: rgb(var(--color-background)) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  /* Caché par défaut — double sécurité en plus du masquage natif <details> */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-0.8rem);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s 0.25s;
+}
+
+details.mmp[open] > .mmp__content {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+  pointer-events: auto !important;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s 0s !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   OVERRIDE — z-index et border (fix global-settings-popup)
    ══════════════════════════════════════════════════════════════ */
 
 .mmp .mega-menu__content.mmp__content {
-  z-index: 4;
+  z-index: 200;
   border-width: 0;
   border-radius: 0;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.js .mmp .mega-menu__content.mmp__content {
-  opacity: 0;
-  transform: translateY(-0.8rem);
-  pointer-events: none;
-}
-
-.mmp[open] > .mega-menu__content.mmp__content {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
 }
 
 /* ══════════════════════════════════════════════════════════════

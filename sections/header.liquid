@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="{{ 'component-list-menu.css' | asset_url }}" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="{{ 'component-search.css' | asset_url }}" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="{{ 'component-menu-drawer.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'custom-wishlist.css' | asset_url }}" media="print" onload="this.media='all'">
 {%- if section.settings.menu_type_desktop != 'drawer' -%}
   <link rel="stylesheet" href="{{ 'component-mega-menu.css' | asset_url }}" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="{{ 'mega-menu-pro.css' | asset_url }}" media="print" onload="this.media='all'">
@@ -303,7 +304,6 @@
       {% endcomment %}
 
       {%- comment %} ── Icône Wishlist ── {% endcomment %}
-      {{ 'custom-wishlist.css' | asset_url | stylesheet_tag }}
       <a
         href="/pages/wishlist"
         class="header__icon cwl__header-link link focus-inset"
@@ -321,7 +321,6 @@
         <span class="visually-hidden">Liste de souhaits</span>
         <span class="cwl__header-count" data-cwl-count aria-live="polite"></span>
       </a>
-      <script src="{{ 'custom-wishlist.js' | asset_url }}" defer="defer"></script>
 
       <a href="{{ routes.cart_url }}" class="header__icon header__icon--cart link focus-inset" id="cart-icon-bubble">
         {% if cart == empty %}
@@ -342,6 +341,7 @@
     </div>
   </header>
 </{{ header_tag }}>
+<script src="{{ 'custom-wishlist.js' | asset_url }}" defer="defer"></script>
 
 {%- if settings.cart_type == 'notification' -%}
   {%- render 'cart-notification',
