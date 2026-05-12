@@ -37,8 +37,38 @@
         "padding_bottom": 20
       }
     },
-    "custom_mega_menu_LwCP69": {
+    "custom_mega_menu_7GBzwR": {
       "type": "custom-mega-menu",
+      "blocks": {
+        "promo_image_EMF7Ag": {
+          "type": "promo_image",
+          "settings": {
+            "menu_item_title": "",
+            "image": "shopify://shop_images/undergarments-minimal-3.jpg",
+            "promo_label": "",
+            "promo_title": "",
+            "promo_subtitle": "",
+            "promo_link": "",
+            "promo_cta": "Découvrir"
+          }
+        },
+        "promo_image_jdMnfU": {
+          "type": "promo_image",
+          "settings": {
+            "menu_item_title": "",
+            "image": "shopify://shop_images/undergarments-minimal-2.jpg",
+            "promo_label": "",
+            "promo_title": "",
+            "promo_subtitle": "",
+            "promo_link": "",
+            "promo_cta": "Découvrir"
+          }
+        }
+      },
+      "block_order": [
+        "promo_image_EMF7Ag",
+        "promo_image_jdMnfU"
+      ],
       "name": "Mega Menu",
       "settings": {
         "menu": "main-menu",
@@ -53,6 +83,6 @@
   },
   "order": [
     "header",
-    "custom_mega_menu_LwCP69"
+    "custom_mega_menu_7GBzwR"
   ]
 }
