@@ -12,42 +12,42 @@
     "main": {
       "type": "main-product",
       "blocks": {
-        "title_4hhrx38g": {
+        "title_dulhordh": {
           "type": "title",
           "settings": {}
         },
-        "price_1u7yrcfz": {
+        "price_xvwf5a82": {
           "type": "price",
           "settings": {}
         },
-        "variant_picker_onm0e7vx": {
+        "variant_picker_0e8t4uiv": {
           "type": "variant_picker",
           "settings": {
             "picker_type": "button"
           }
         },
-        "buy_buttons_ohsv5x5v": {
+        "buy_buttons_h4htggv4": {
           "type": "buy_buttons",
           "settings": {
             "show_dynamic_checkout": true
           }
         },
-        "description_r8d4rzy0": {
+        "description_oy7spg4j": {
           "type": "description",
           "settings": {}
         },
-        "share_vmjsyo6i": {
+        "share_a3hktztm": {
           "type": "share",
           "settings": {}
         }
       },
       "block_order": [
-        "title_4hhrx38g",
-        "price_1u7yrcfz",
-        "variant_picker_onm0e7vx",
-        "buy_buttons_ohsv5x5v",
-        "description_r8d4rzy0",
-        "share_vmjsyo6i"
+        "title_dulhordh",
+        "price_xvwf5a82",
+        "variant_picker_0e8t4uiv",
+        "buy_buttons_h4htggv4",
+        "description_oy7spg4j",
+        "share_a3hktztm"
       ],
       "settings": {
         "enable_sticky_info": true,
@@ -66,7 +66,7 @@
     "trust_badges": {
       "type": "custom-trust-badges",
       "blocks": {
-        "badge_7epkob6i": {
+        "badge_ypvylhbw": {
           "type": "badge",
           "settings": {
             "icon": "check",
@@ -74,7 +74,7 @@
             "icon_color": "#E8B4B8"
           }
         },
-        "badge_q6nyeno5": {
+        "badge_sa9sj41r": {
           "type": "badge",
           "settings": {
             "icon": "check",
@@ -82,7 +82,7 @@
             "icon_color": "#E8B4B8"
           }
         },
-        "badge_wohr6zes": {
+        "badge_r1n50173": {
           "type": "badge",
           "settings": {
             "icon": "check",
@@ -90,7 +90,7 @@
             "icon_color": "#E8B4B8"
           }
         },
-        "badge_cbkgzby0": {
+        "badge_yak26lfv": {
           "type": "badge",
           "settings": {
             "icon": "truck",
@@ -100,10 +100,10 @@
         }
       },
       "block_order": [
-        "badge_7epkob6i",
-        "badge_q6nyeno5",
-        "badge_wohr6zes",
-        "badge_cbkgzby0"
+        "badge_ypvylhbw",
+        "badge_sa9sj41r",
+        "badge_r1n50173",
+        "badge_yak26lfv"
       ],
       "settings": {
         "color_scheme": "background-1",
@@ -114,56 +114,56 @@
     "product_faq": {
       "type": "custom-product-faq",
       "blocks": {
-        "faq_qgyss4ng": {
+        "faq_sv3wajv1": {
           "type": "faq_item",
           "settings": {
             "question": "Jusqu'à quel âge mon bébé peut-il dormir dedans ?",
             "answer": "<p>Le berceau convient de la naissance jusqu'à environ 10-12 mois, ou jusqu'à ce que bébé commence à se mettre debout tout seul. Dès qu'il essaie de se redresser en s'appuyant sur les bords, il est temps de passer à un lit classique. La capacité de poids maximale est d'environ 9 kg.</p>"
           }
         },
-        "faq_8eh9wm64": {
+        "faq_94k961ws": {
           "type": "faq_item",
           "settings": {
             "question": "Est-ce que ça reste vraiment stable si mon bébé bouge beaucoup la nuit ?",
             "answer": "<p>Oui, la structure périphérique rigide maintient le berceau en place. Votre bébé peut gigoter, tourner la tête, bouger les jambes, le berceau ne va pas se refermer ou basculer. Par contre, si vous le posez sur un lit adulte, restez toujours à proximité pour surveiller, on ne laisse jamais bébé seul en hauteur.</p>"
           }
         },
-        "faq_dele6vqn": {
+        "faq_hhrej17x": {
           "type": "faq_item",
           "settings": {
             "question": "Le matelas est-il assez confortable pour des nuits complètes ?",
             "answer": "<p>Le matelas est moelleux et respirant, conçu pour des siestes et des nuits de plusieurs heures. Il fait environ 3 cm d'épaisseur, ce qui est suffisant pour un nouveau-né. Si vous voulez plus de confort, vous pouvez ajouter un drap-housse fin par-dessus, mais le matelas seul fait très bien le job.</p>"
           }
         },
-        "faq_wpwevohu": {
+        "faq_afh2c0jb": {
           "type": "faq_item",
           "settings": {
             "question": "Comment je lave le berceau si bébé régurgite dessus ?",
             "answer": "<p>Le matelas se retire, vous pouvez le laver à la main ou en machine à 30°C. La structure en tissu se nettoie avec une éponge humide et un peu de savon doux. Ça sèche vite. La moustiquaire se rince aussi facilement. Pas besoin de tout démonter à chaque fois, un coup d'éponge suffit souvent.</p>"
           }
         },
-        "faq_k5jmslpk": {
+        "faq_hi035ez7": {
           "type": "faq_item",
           "settings": {
             "question": "Vous livrez en combien de temps en France ?",
             "answer": "<p>Nous expédions sous 24-48h après votre commande. La livraison prend ensuite 7 à 10 jours ouvrés en France métropolitaine. Vous recevez un numéro de suivi par email pour suivre votre colis en temps réel. Pour la Corse et les DOM-TOM, comptez quelques jours supplémentaires.</p>"
           }
         },
-        "faq_1dm4lxm7": {
+        "faq_1psayklx": {
           "type": "faq_item",
           "settings": {
             "question": "Je peux le retourner si finalement ça ne me convient pas ?",
             "answer": "<p>Oui, vous avez 30 jours pour changer d'avis. Vous nous renvoyez le berceau dans son emballage d'origine (ou un carton équivalent), on vous rembourse intégralement dès réception. Les frais de retour sont à votre charge, mais on ne pose pas de questions, c'est votre droit.</p>"
           }
         },
-        "faq_gpf3wect": {
+        "faq_kh31ldon": {
           "type": "faq_item",
           "settings": {
             "question": "Quelle taille de bébé ça accueille confortablement ?",
             "answer": "<p>Le berceau fait environ 85 cm de long sur 45 cm de large à l'intérieur. Un nouveau-né de 50 cm a largement de la place. À 10-12 mois, quand bébé mesure environ 70-75 cm, il commence à être un peu à l'étroit, c'est le signal qu'il est temps de passer au lit classique.</p>"
           }
         },
-        "faq_az70i7km": {
+        "faq_kjz8nrre": {
           "type": "faq_item",
           "settings": {
             "question": "Les couleurs disponibles sont-elles mixtes ?",
@@ -172,14 +172,14 @@
         }
       },
       "block_order": [
-        "faq_qgyss4ng",
-        "faq_8eh9wm64",
-        "faq_dele6vqn",
-        "faq_wpwevohu",
-        "faq_k5jmslpk",
-        "faq_1dm4lxm7",
-        "faq_gpf3wect",
-        "faq_az70i7km"
+        "faq_sv3wajv1",
+        "faq_94k961ws",
+        "faq_hhrej17x",
+        "faq_afh2c0jb",
+        "faq_hi035ez7",
+        "faq_1psayklx",
+        "faq_kh31ldon",
+        "faq_kjz8nrre"
       ],
       "settings": {
         "title": "Questions fréquentes",
